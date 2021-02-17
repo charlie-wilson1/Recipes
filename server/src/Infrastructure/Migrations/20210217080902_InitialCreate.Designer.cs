@@ -10,16 +10,16 @@ using Recipes.Infrastructure.Persistence;
 namespace Recipes.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20210209063555_InitialCreate")]
+    [Migration("20210217080902_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .UseIdentityColumns()
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("ProductVersion", "5.0.2");
+                .HasAnnotation("ProductVersion", "5.0.3")
+                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
@@ -53,7 +53,7 @@ namespace Recipes.Infrastructure.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("ClaimType")
                         .HasColumnType("nvarchar(max)");
@@ -148,7 +148,7 @@ namespace Recipes.Infrastructure.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("ClaimType")
                         .HasColumnType("nvarchar(max)");
@@ -228,11 +228,11 @@ namespace Recipes.Infrastructure.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("CreatedByUserId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
@@ -243,7 +243,7 @@ namespace Recipes.Infrastructure.Migrations
                         .HasDefaultValue(false);
 
                     b.Property<string>("LastModifiedByUserId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("LastModifiedDate")
                         .HasColumnType("datetime2");
@@ -252,11 +252,24 @@ namespace Recipes.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Notes")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("OrderNumber")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RecipeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UnitId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("CreatedByUserId");
-
-                    b.HasIndex("LastModifiedByUserId");
+                    b.HasIndex("RecipeId");
 
                     b.ToTable("Ingredients");
                 });
@@ -266,11 +279,11 @@ namespace Recipes.Infrastructure.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("CreatedByUserId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
@@ -285,7 +298,7 @@ namespace Recipes.Infrastructure.Migrations
                         .HasDefaultValue(false);
 
                     b.Property<string>("LastModifiedByUserId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("LastModifiedDate")
                         .HasColumnType("datetime2");
@@ -298,10 +311,6 @@ namespace Recipes.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CreatedByUserId");
-
-                    b.HasIndex("LastModifiedByUserId");
-
                     b.HasIndex("RecipeId");
 
                     b.ToTable("Instructions");
@@ -312,7 +321,10 @@ namespace Recipes.Infrastructure.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("ApplicationUserId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("CookTime")
                         .HasColumnType("int");
@@ -333,7 +345,7 @@ namespace Recipes.Infrastructure.Migrations
                         .HasDefaultValue(false);
 
                     b.Property<string>("LastModifiedByUserId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("LastModifiedDate")
                         .HasColumnType("datetime2");
@@ -347,11 +359,11 @@ namespace Recipes.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ApplicationUserId");
+
                     b.HasIndex("CreatedByUserId");
 
                     b.HasIndex("ImageId");
-
-                    b.HasIndex("LastModifiedByUserId");
 
                     b.ToTable("Recipes");
                 });
@@ -361,11 +373,11 @@ namespace Recipes.Infrastructure.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("CreatedByUserId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
@@ -376,7 +388,7 @@ namespace Recipes.Infrastructure.Migrations
                         .HasDefaultValue(false);
 
                     b.Property<string>("LastModifiedByUserId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("LastModifiedDate")
                         .HasColumnType("datetime2");
@@ -391,69 +403,7 @@ namespace Recipes.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CreatedByUserId");
-
-                    b.HasIndex("LastModifiedByUserId");
-
                     b.ToTable("RecipeImages");
-                });
-
-            modelBuilder.Entity("Recipes.Domain.Entities.Recipes.RecipeIngredient", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<string>("CreatedByUserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("IngredientId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
-
-                    b.Property<string>("LastModifiedByUserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime?>("LastModifiedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Notes")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("OrderNumber")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.Property<int>("RecipeId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UnitId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedByUserId");
-
-                    b.HasIndex("IngredientId");
-
-                    b.HasIndex("LastModifiedByUserId");
-
-                    b.HasIndex("RecipeId");
-
-                    b.HasIndex("UnitId");
-
-                    b.ToTable("RecipesIngredients");
                 });
 
             modelBuilder.Entity("Recipes.Domain.Entities.Recipes.RecipeNoteEntity", b =>
@@ -461,11 +411,11 @@ namespace Recipes.Infrastructure.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("CreatedByUserId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
@@ -480,7 +430,7 @@ namespace Recipes.Infrastructure.Migrations
                         .HasDefaultValue(false);
 
                     b.Property<string>("LastModifiedByUserId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("LastModifiedDate")
                         .HasColumnType("datetime2");
@@ -489,10 +439,6 @@ namespace Recipes.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CreatedByUserId");
-
-                    b.HasIndex("LastModifiedByUserId");
 
                     b.HasIndex("RecipeId");
 
@@ -504,11 +450,11 @@ namespace Recipes.Infrastructure.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("CreatedByUserId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
@@ -519,7 +465,7 @@ namespace Recipes.Infrastructure.Migrations
                         .HasDefaultValue(false);
 
                     b.Property<string>("LastModifiedByUserId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("LastModifiedDate")
                         .HasColumnType("datetime2");
@@ -527,31 +473,24 @@ namespace Recipes.Infrastructure.Migrations
                     b.Property<int>("RecipeId")
                         .HasColumnType("int");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId1")
+                    b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CreatedByUserId");
-
-                    b.HasIndex("LastModifiedByUserId");
-
                     b.HasIndex("RecipeId");
 
-                    b.HasIndex("UserId1");
+                    b.HasIndex("UserId");
 
                     b.ToTable("RecipesUsers");
                 });
 
-            modelBuilder.Entity("Recipes.Domain.Entities.Recipes.Unit", b =>
+            modelBuilder.Entity("Recipes.Domain.Entities.Recipes.UnitEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -654,7 +593,7 @@ namespace Recipes.Infrastructure.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Recipes.Domain.Entities.Identity.ApplicationUser", b =>
+            modelBuilder.Entity("Recipes.Infrastructure.Identity.Models.ApplicationUser", b =>
                 {
                     b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
 
@@ -719,54 +658,36 @@ namespace Recipes.Infrastructure.Migrations
 
             modelBuilder.Entity("Recipes.Domain.Entities.Recipes.IngredientEntity", b =>
                 {
-                    b.HasOne("Recipes.Domain.Entities.Identity.ApplicationUser", "CreatedByUser")
-                        .WithMany()
-                        .HasForeignKey("CreatedByUserId")
+                    b.HasOne("Recipes.Domain.Entities.Recipes.RecipeEntity", "Recipe")
+                        .WithMany("Ingredients")
+                        .HasForeignKey("RecipeId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Recipes.Domain.Entities.Identity.ApplicationUser", "LastModifiedByUser")
-                        .WithMany()
-                        .HasForeignKey("LastModifiedByUserId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.Navigation("CreatedByUser");
-
-                    b.Navigation("LastModifiedByUser");
+                    b.Navigation("Recipe");
                 });
 
             modelBuilder.Entity("Recipes.Domain.Entities.Recipes.InstructionEntity", b =>
                 {
-                    b.HasOne("Recipes.Domain.Entities.Identity.ApplicationUser", "CreatedByUser")
-                        .WithMany()
-                        .HasForeignKey("CreatedByUserId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("Recipes.Domain.Entities.Identity.ApplicationUser", "LastModifiedByUser")
-                        .WithMany()
-                        .HasForeignKey("LastModifiedByUserId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
                     b.HasOne("Recipes.Domain.Entities.Recipes.RecipeEntity", "Recipe")
                         .WithMany("Instructions")
                         .HasForeignKey("RecipeId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.Navigation("CreatedByUser");
-
-                    b.Navigation("LastModifiedByUser");
-
                     b.Navigation("Recipe");
                 });
 
             modelBuilder.Entity("Recipes.Domain.Entities.Recipes.RecipeEntity", b =>
                 {
-                    b.HasOne("Recipes.Domain.Entities.Identity.ApplicationUser", "CreatedByUser")
+                    b.HasOne("Recipes.Infrastructure.Identity.Models.ApplicationUser", null)
+                        .WithMany("ModifiedRecipes")
+                        .HasForeignKey("ApplicationUserId");
+
+                    b.HasOne("Recipes.Infrastructure.Identity.Models.ApplicationUser", null)
                         .WithMany("Recipes")
                         .HasForeignKey("CreatedByUserId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Recipes.Domain.Entities.Recipes.RecipeImageEntity", "Image")
@@ -774,152 +695,46 @@ namespace Recipes.Infrastructure.Migrations
                         .HasForeignKey("ImageId")
                         .OnDelete(DeleteBehavior.NoAction);
 
-                    b.HasOne("Recipes.Domain.Entities.Identity.ApplicationUser", "LastModifiedByUser")
-                        .WithMany("ModifiedRecipes")
-                        .HasForeignKey("LastModifiedByUserId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.Navigation("CreatedByUser");
-
                     b.Navigation("Image");
-
-                    b.Navigation("LastModifiedByUser");
-                });
-
-            modelBuilder.Entity("Recipes.Domain.Entities.Recipes.RecipeImageEntity", b =>
-                {
-                    b.HasOne("Recipes.Domain.Entities.Identity.ApplicationUser", "CreatedByUser")
-                        .WithMany()
-                        .HasForeignKey("CreatedByUserId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("Recipes.Domain.Entities.Identity.ApplicationUser", "LastModifiedByUser")
-                        .WithMany()
-                        .HasForeignKey("LastModifiedByUserId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.Navigation("CreatedByUser");
-
-                    b.Navigation("LastModifiedByUser");
-                });
-
-            modelBuilder.Entity("Recipes.Domain.Entities.Recipes.RecipeIngredient", b =>
-                {
-                    b.HasOne("Recipes.Domain.Entities.Identity.ApplicationUser", "CreatedByUser")
-                        .WithMany()
-                        .HasForeignKey("CreatedByUserId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("Recipes.Domain.Entities.Recipes.IngredientEntity", "Ingredient")
-                        .WithMany("RecipeIngredients")
-                        .HasForeignKey("IngredientId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("Recipes.Domain.Entities.Identity.ApplicationUser", "LastModifiedByUser")
-                        .WithMany()
-                        .HasForeignKey("LastModifiedByUserId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("Recipes.Domain.Entities.Recipes.RecipeEntity", "Recipe")
-                        .WithMany("RecipeIngredients")
-                        .HasForeignKey("RecipeId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("Recipes.Domain.Entities.Recipes.Unit", "Unit")
-                        .WithMany()
-                        .HasForeignKey("UnitId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("CreatedByUser");
-
-                    b.Navigation("Ingredient");
-
-                    b.Navigation("LastModifiedByUser");
-
-                    b.Navigation("Recipe");
-
-                    b.Navigation("Unit");
                 });
 
             modelBuilder.Entity("Recipes.Domain.Entities.Recipes.RecipeNoteEntity", b =>
                 {
-                    b.HasOne("Recipes.Domain.Entities.Identity.ApplicationUser", "CreatedByUser")
-                        .WithMany()
-                        .HasForeignKey("CreatedByUserId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("Recipes.Domain.Entities.Identity.ApplicationUser", "LastModifiedByUser")
-                        .WithMany()
-                        .HasForeignKey("LastModifiedByUserId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
                     b.HasOne("Recipes.Domain.Entities.Recipes.RecipeEntity", "Recipe")
                         .WithMany("Notes")
                         .HasForeignKey("RecipeId")
                         .OnDelete(DeleteBehavior.NoAction);
-
-                    b.Navigation("CreatedByUser");
-
-                    b.Navigation("LastModifiedByUser");
 
                     b.Navigation("Recipe");
                 });
 
             modelBuilder.Entity("Recipes.Domain.Entities.Recipes.RecipeUser", b =>
                 {
-                    b.HasOne("Recipes.Domain.Entities.Identity.ApplicationUser", "CreatedByUser")
-                        .WithMany("SharedRecipes")
-                        .HasForeignKey("CreatedByUserId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("Recipes.Domain.Entities.Identity.ApplicationUser", "LastModifiedByUser")
-                        .WithMany()
-                        .HasForeignKey("LastModifiedByUserId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
                     b.HasOne("Recipes.Domain.Entities.Recipes.RecipeEntity", "Recipe")
                         .WithMany("SharedWithUsers")
                         .HasForeignKey("RecipeId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Recipes.Domain.Entities.Identity.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId1");
-
-                    b.Navigation("CreatedByUser");
-
-                    b.Navigation("LastModifiedByUser");
+                    b.HasOne("Recipes.Infrastructure.Identity.Models.ApplicationUser", null)
+                        .WithMany("SharedRecipes")
+                        .HasForeignKey("UserId");
 
                     b.Navigation("Recipe");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Recipes.Domain.Entities.Recipes.IngredientEntity", b =>
-                {
-                    b.Navigation("RecipeIngredients");
                 });
 
             modelBuilder.Entity("Recipes.Domain.Entities.Recipes.RecipeEntity", b =>
                 {
+                    b.Navigation("Ingredients");
+
                     b.Navigation("Instructions");
 
                     b.Navigation("Notes");
 
-                    b.Navigation("RecipeIngredients");
-
                     b.Navigation("SharedWithUsers");
                 });
 
-            modelBuilder.Entity("Recipes.Domain.Entities.Identity.ApplicationUser", b =>
+            modelBuilder.Entity("Recipes.Infrastructure.Identity.Models.ApplicationUser", b =>
                 {
                     b.Navigation("ModifiedRecipes");
 

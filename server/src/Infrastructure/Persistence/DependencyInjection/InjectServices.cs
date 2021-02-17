@@ -3,7 +3,6 @@ using Recipes.Application.Contracts;
 using Recipes.Application.Contracts.Identity;
 using Recipes.Application.Contracts.Notifications.SendGrid;
 using Recipes.Application.Contracts.RecipeRepositories;
-using Recipes.Domain.Entities.Generic;
 using Recipes.Infrastructure.ExternalServices.Notifications.SendGrid;
 using Recipes.Infrastructure.Identity.Services;
 using Recipes.Infrastructure.Persistence.Services;

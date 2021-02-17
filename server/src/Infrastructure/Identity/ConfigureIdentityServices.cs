@@ -16,7 +16,7 @@ namespace Recipes.Infrastructure.Identity
         internal static void AddIdentityConfiguration(this IServiceCollection services, IdentitySeedSettings seedSettings)
         {
             var serviceProvider = services.BuildServiceProvider();
-            var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            var roleManager = serviceProvider.GetService<RoleManager<IdentityRole>>();
             var roleNames = new List<string> { "Admin", "Member" };
             
             foreach (var roleName in roleNames)
@@ -35,7 +35,7 @@ namespace Recipes.Infrastructure.Identity
                 }
             }
 
-            var userManager = serviceProvider.GetRequiredService<UserManager<IdentityUser>>();
+            var userManager = serviceProvider.GetService<UserManager<IdentityUser>>();
             var userExists = userManager.FindByNameAsync(seedSettings.AdminUsername).Result;
 
             if (userExists is null)
@@ -67,7 +67,7 @@ namespace Recipes.Infrastructure.Identity
 
         internal static void ConfigureIdentity(this IServiceCollection services, JwtBearerTokenSettings jwtSettings, bool isDevelopment)
         {
-            services.AddIdentity<ApplicationUser, IdentityRole>(options => options.User.RequireUniqueEmail = true)
+            services.AddIdentity<IdentityUser, IdentityRole>(options => options.User.RequireUniqueEmail = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 

@@ -7,10 +7,11 @@ using Recipes.Application.Contracts.Identity;
 using Recipes.Domain.Entities.Generic;
 using Recipes.Domain.Entities.Recipes;
 using Recipes.Application.Contracts;
+using Microsoft.AspNetCore.Identity;
 
 namespace Recipes.Infrastructure.Persistence
 {
-    public class ApplicationDbContext : IdentityDbContext, IApplicationDbContext
+    public class ApplicationDbContext : IdentityDbContext<IdentityUser>, IApplicationDbContext
     {
         public DbSet<IngredientEntity> Ingredients { get; set; }
         public DbSet<InstructionEntity> Instructions { get; set; }
@@ -19,6 +20,11 @@ namespace Recipes.Infrastructure.Persistence
         public DbSet<RecipeNoteEntity> RecipeNotes { get; set; }
         public DbSet<RecipeUser> RecipesUsers { get; set; }
         public DbSet<UnitEntity> Units { get; set; }
+
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+            :base(options)
+        {
+        }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, ICurrentUserService currentUserService, IDateTime dateTime)
             : base(options) 

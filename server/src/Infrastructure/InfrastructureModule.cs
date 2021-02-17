@@ -10,11 +10,12 @@ namespace Recipes.Infrastructure
     {
         public static void AddInfrastructureModule(this IServiceCollection services, InfastructureSettingsDto settings)
         {
+            services.RegisterDependencies();
             services.AddDbContext<ApplicationDbContext>(options => 
                 options.UseSqlServer(settings.ConnectionString));
 
-            services.RegisterDependencies();
             services.ConfigureIdentity(settings.JwtBearerTokenSettings, settings.IsDevelopment);
+
 
             if (settings.IdentitySeedSettings is not null)
             {

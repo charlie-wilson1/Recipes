@@ -49,6 +49,25 @@ namespace Recipes.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "RecipeImages",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Url = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedByUserId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LastModifiedByUserId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    LastModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RecipeImages", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Units",
                 columns: table => new
                 {
@@ -168,63 +187,6 @@ namespace Recipes.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Ingredients",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreatedByUserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    LastModifiedByUserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    LastModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Ingredients", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Ingredients_AspNetUsers_CreatedByUserId",
-                        column: x => x.CreatedByUserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Ingredients_AspNetUsers_LastModifiedByUserId",
-                        column: x => x.LastModifiedByUserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "RecipeImages",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Url = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreatedByUserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    LastModifiedByUserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    LastModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_RecipeImages", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_RecipeImages_AspNetUsers_CreatedByUserId",
-                        column: x => x.CreatedByUserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_RecipeImages_AspNetUsers_LastModifiedByUserId",
-                        column: x => x.LastModifiedByUserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Recipes",
                 columns: table => new
                 {
@@ -234,8 +196,9 @@ namespace Recipes.Infrastructure.Migrations
                     PrepTime = table.Column<int>(type: "int", nullable: false),
                     CookTime = table.Column<int>(type: "int", nullable: false),
                     ImageId = table.Column<int>(type: "int", nullable: true),
+                    ApplicationUserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     CreatedByUserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    LastModifiedByUserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    LastModifiedByUserId = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     LastModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false)
@@ -244,19 +207,49 @@ namespace Recipes.Infrastructure.Migrations
                 {
                     table.PrimaryKey("PK_Recipes", x => x.Id);
                     table.ForeignKey(
+                        name: "FK_Recipes_AspNetUsers_ApplicationUserId",
+                        column: x => x.ApplicationUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
                         name: "FK_Recipes_AspNetUsers_CreatedByUserId",
                         column: x => x.CreatedByUserId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Recipes_AspNetUsers_LastModifiedByUserId",
-                        column: x => x.LastModifiedByUserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Recipes_RecipeImages_ImageId",
                         column: x => x.ImageId,
                         principalTable: "RecipeImages",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Ingredients",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UnitId = table.Column<int>(type: "int", nullable: false),
+                    RecipeId = table.Column<int>(type: "int", nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: false),
+                    OrderNumber = table.Column<int>(type: "int", nullable: false),
+                    CreatedByUserId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LastModifiedByUserId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    LastModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Ingredients", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Ingredients_Recipes_RecipeId",
+                        column: x => x.RecipeId,
+                        principalTable: "Recipes",
                         principalColumn: "Id");
                 });
 
@@ -269,8 +262,8 @@ namespace Recipes.Infrastructure.Migrations
                     OrderNumber = table.Column<int>(type: "int", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     RecipeId = table.Column<int>(type: "int", nullable: false),
-                    CreatedByUserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    LastModifiedByUserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    CreatedByUserId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LastModifiedByUserId = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     LastModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false)
@@ -278,16 +271,6 @@ namespace Recipes.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Instructions", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Instructions_AspNetUsers_CreatedByUserId",
-                        column: x => x.CreatedByUserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Instructions_AspNetUsers_LastModifiedByUserId",
-                        column: x => x.LastModifiedByUserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Instructions_Recipes_RecipeId",
                         column: x => x.RecipeId,
@@ -303,8 +286,8 @@ namespace Recipes.Infrastructure.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     RecipeId = table.Column<int>(type: "int", nullable: false),
-                    CreatedByUserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    LastModifiedByUserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    CreatedByUserId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LastModifiedByUserId = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     LastModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false)
@@ -313,67 +296,9 @@ namespace Recipes.Infrastructure.Migrations
                 {
                     table.PrimaryKey("PK_RecipeNotes", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_RecipeNotes_AspNetUsers_CreatedByUserId",
-                        column: x => x.CreatedByUserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_RecipeNotes_AspNetUsers_LastModifiedByUserId",
-                        column: x => x.LastModifiedByUserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
                         name: "FK_RecipeNotes_Recipes_RecipeId",
                         column: x => x.RecipeId,
                         principalTable: "Recipes",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "RecipesIngredients",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    RecipeId = table.Column<int>(type: "int", nullable: false),
-                    IngredientId = table.Column<int>(type: "int", nullable: false),
-                    UnitId = table.Column<int>(type: "int", nullable: false),
-                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Quantity = table.Column<int>(type: "int", nullable: false),
-                    OrderNumber = table.Column<int>(type: "int", nullable: false),
-                    CreatedByUserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    LastModifiedByUserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    LastModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_RecipesIngredients", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_RecipesIngredients_AspNetUsers_CreatedByUserId",
-                        column: x => x.CreatedByUserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_RecipesIngredients_AspNetUsers_LastModifiedByUserId",
-                        column: x => x.LastModifiedByUserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_RecipesIngredients_Ingredients_IngredientId",
-                        column: x => x.IngredientId,
-                        principalTable: "Ingredients",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_RecipesIngredients_Recipes_RecipeId",
-                        column: x => x.RecipeId,
-                        principalTable: "Recipes",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_RecipesIngredients_Units_UnitId",
-                        column: x => x.UnitId,
-                        principalTable: "Units",
                         principalColumn: "Id");
                 });
 
@@ -384,10 +309,9 @@ namespace Recipes.Infrastructure.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     RecipeId = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: false),
-                    UserId1 = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    CreatedByUserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    LastModifiedByUserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    CreatedByUserId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LastModifiedByUserId = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     LastModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false)
@@ -396,18 +320,8 @@ namespace Recipes.Infrastructure.Migrations
                 {
                     table.PrimaryKey("PK_RecipesUsers", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_RecipesUsers_AspNetUsers_CreatedByUserId",
-                        column: x => x.CreatedByUserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_RecipesUsers_AspNetUsers_LastModifiedByUserId",
-                        column: x => x.LastModifiedByUserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_RecipesUsers_AspNetUsers_UserId1",
-                        column: x => x.UserId1,
+                        name: "FK_RecipesUsers_AspNetUsers_UserId",
+                        column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -483,24 +397,9 @@ namespace Recipes.Infrastructure.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Ingredients_CreatedByUserId",
+                name: "IX_Ingredients_RecipeId",
                 table: "Ingredients",
-                column: "CreatedByUserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Ingredients_LastModifiedByUserId",
-                table: "Ingredients",
-                column: "LastModifiedByUserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Instructions_CreatedByUserId",
-                table: "Instructions",
-                column: "CreatedByUserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Instructions_LastModifiedByUserId",
-                table: "Instructions",
-                column: "LastModifiedByUserId");
+                column: "RecipeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Instructions_RecipeId",
@@ -508,29 +407,14 @@ namespace Recipes.Infrastructure.Migrations
                 column: "RecipeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_RecipeImages_CreatedByUserId",
-                table: "RecipeImages",
-                column: "CreatedByUserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_RecipeImages_LastModifiedByUserId",
-                table: "RecipeImages",
-                column: "LastModifiedByUserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_RecipeNotes_CreatedByUserId",
-                table: "RecipeNotes",
-                column: "CreatedByUserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_RecipeNotes_LastModifiedByUserId",
-                table: "RecipeNotes",
-                column: "LastModifiedByUserId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_RecipeNotes_RecipeId",
                 table: "RecipeNotes",
                 column: "RecipeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Recipes_ApplicationUserId",
+                table: "Recipes",
+                column: "ApplicationUserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Recipes_CreatedByUserId",
@@ -543,54 +427,14 @@ namespace Recipes.Infrastructure.Migrations
                 column: "ImageId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Recipes_LastModifiedByUserId",
-                table: "Recipes",
-                column: "LastModifiedByUserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_RecipesIngredients_CreatedByUserId",
-                table: "RecipesIngredients",
-                column: "CreatedByUserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_RecipesIngredients_IngredientId",
-                table: "RecipesIngredients",
-                column: "IngredientId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_RecipesIngredients_LastModifiedByUserId",
-                table: "RecipesIngredients",
-                column: "LastModifiedByUserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_RecipesIngredients_RecipeId",
-                table: "RecipesIngredients",
-                column: "RecipeId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_RecipesIngredients_UnitId",
-                table: "RecipesIngredients",
-                column: "UnitId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_RecipesUsers_CreatedByUserId",
-                table: "RecipesUsers",
-                column: "CreatedByUserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_RecipesUsers_LastModifiedByUserId",
-                table: "RecipesUsers",
-                column: "LastModifiedByUserId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_RecipesUsers_RecipeId",
                 table: "RecipesUsers",
                 column: "RecipeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_RecipesUsers_UserId1",
+                name: "IX_RecipesUsers_UserId",
                 table: "RecipesUsers",
-                column: "UserId1");
+                column: "UserId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -611,34 +455,31 @@ namespace Recipes.Infrastructure.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "Ingredients");
+
+            migrationBuilder.DropTable(
                 name: "Instructions");
 
             migrationBuilder.DropTable(
                 name: "RecipeNotes");
 
             migrationBuilder.DropTable(
-                name: "RecipesIngredients");
-
-            migrationBuilder.DropTable(
                 name: "RecipesUsers");
-
-            migrationBuilder.DropTable(
-                name: "AspNetRoles");
-
-            migrationBuilder.DropTable(
-                name: "Ingredients");
 
             migrationBuilder.DropTable(
                 name: "Units");
 
             migrationBuilder.DropTable(
+                name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
                 name: "Recipes");
 
             migrationBuilder.DropTable(
-                name: "RecipeImages");
+                name: "AspNetUsers");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
+                name: "RecipeImages");
         }
     }
 }
