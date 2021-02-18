@@ -1,7 +1,7 @@
 ﻿using Recipes.Application.Contracts;
 using System;
 
-namespace Recipes.Infrastructure.Persistence.Services
+namespace Recipes.Infrastructure.Common
 {
     public class DateTimeProvider : IDateTime
     {

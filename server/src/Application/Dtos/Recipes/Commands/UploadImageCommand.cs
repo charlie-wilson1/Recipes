@@ -26,7 +26,7 @@ namespace Recipes.Application.Dtos.Recipes.Commands
 
             public async Task<ImageDto> Handle(UploadImageCommand request, CancellationToken cancellationToken)
             {
-                var image = new RecipeImageEntity { 
+                var image = new RecipeImage { 
                     Name = request.Name,
                     Url = request.Url
                 };

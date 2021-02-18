@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Recipes.Domain.Entities.Recipes
 {
-    public class IngredientEntity : AuditableEntity
+    public class Ingredient : AuditableEntity
     {
         public string Name { get; set; }
         public string Notes { get; set; }
@@ -17,6 +17,6 @@ namespace Recipes.Domain.Entities.Recipes
         [Range(1, int.MaxValue, ErrorMessage = "must be greater than 0")]
         public int OrderNumber { get; set; }
 
-        public virtual RecipeEntity Recipe { get; set; }
+        public virtual Recipe Recipe { get; set; }
     }
 }

@@ -4,9 +4,9 @@ using Recipes.Domain.Entities.Recipes;
 
 namespace Recipes.Infrastructure.Persistence.EntityTypeConfigurations.Recipes
 {
-    public class RecipeImageTypeConfiguration : IEntityTypeConfiguration<RecipeImageEntity>
+    public class RecipeImageTypeConfiguration : IEntityTypeConfiguration<RecipeImage>
     {
-        public void Configure(EntityTypeBuilder<RecipeImageEntity> builder)
+        public void Configure(EntityTypeBuilder<RecipeImage> builder)
         {
             builder.HasKey(x => x.Id);
             builder.Property(x => x.Url).IsRequired();

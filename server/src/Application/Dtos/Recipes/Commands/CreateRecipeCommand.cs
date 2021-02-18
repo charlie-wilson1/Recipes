@@ -33,7 +33,7 @@ namespace Recipes.Application.Dtos.Recipes.Commands
             public async Task<int> Handle(CreateRecipeCommand request, CancellationToken cancellationToken)
             {
                 var ingredients = request.Ingredients
-                    .Select(ingredient => new IngredientEntity
+                    .Select(ingredient => new Ingredient
                     {
                         Name = ingredient.Name,
                         Notes = ingredient.Notes,
@@ -43,19 +43,19 @@ namespace Recipes.Application.Dtos.Recipes.Commands
                     }).ToList();
 
                 var instructions = request.Instructions
-                    .Select(instruction => new InstructionEntity
+                    .Select(instruction => new Instruction
                     {
                         Description = instruction.Description,
                         OrderNumber = instruction.OrderNumber,
                     }).ToList();
 
                 var notes = request.Notes
-                    .Select(note => new RecipeNoteEntity
+                    .Select(note => new RecipeNote
                     {
                         Description = note.Description
                     }).ToList();
 
-                var recipe = new RecipeEntity
+                var recipe = new Recipe
                 {
                     Name = request.Name,
                     PrepTime = request.PrepTime,

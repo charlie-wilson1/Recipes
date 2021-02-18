@@ -7,13 +7,13 @@ namespace Recipes.Application.Contracts
 {
     public interface IApplicationDbContext
     {
-        DbSet<IngredientEntity> Ingredients { get; set; }
-        DbSet<InstructionEntity> Instructions { get; set; }
-        DbSet<RecipeEntity> Recipes { get; set; }
-        DbSet<RecipeImageEntity> RecipeImages { get; set; }
-        DbSet<RecipeNoteEntity> RecipeNotes { get; set; }
+        DbSet<Ingredient> Ingredients { get; set; }
+        DbSet<Instruction> Instructions { get; set; }
+        DbSet<Recipe> Recipes { get; set; }
+        DbSet<RecipeImage> RecipeImages { get; set; }
+        DbSet<RecipeNote> RecipeNotes { get; set; }
         DbSet<RecipeUser> RecipesUsers { get; set; }
-        DbSet<UnitEntity> Units { get; set; }
+        DbSet<Unit> Units { get; set; }
 
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     }

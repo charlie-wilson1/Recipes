@@ -2,7 +2,7 @@
 
 namespace Recipes.Domain.Entities.Recipes
 {
-    public class RecipeImageEntity : AuditableEntity
+    public class RecipeImage : AuditableEntity
     {
         public string Url { get; set; }
         public string Name { get; set; }

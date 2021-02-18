@@ -5,7 +5,7 @@ using Recipes.Application.Contracts.Notifications.SendGrid;
 using Recipes.Application.Contracts.RecipeRepositories;
 using Recipes.Infrastructure.ExternalServices.Notifications.SendGrid;
 using Recipes.Infrastructure.Identity.Services;
-using Recipes.Infrastructure.Persistence.Services;
+using Recipes.Infrastructure.Common;
 using Recipes.Infrastructure.RecipeRepositories;
 
 namespace Recipes.Infrastructure.Persistence.DependencyInjection

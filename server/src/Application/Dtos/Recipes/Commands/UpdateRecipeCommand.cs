@@ -41,7 +41,7 @@ namespace Recipes.Application.Dtos.Recipes.Commands
                 _genericEntityRepository = genericEntityRepository;
             }
 
-            public async Task<Unit> Handle(UpdateRecipeCommand request, CancellationToken cancellationToken)
+            public async Task<MediatR.Unit> Handle(UpdateRecipeCommand request, CancellationToken cancellationToken)
             {
                 var currentUserId = _currentUserService.UserId;
                 var recipe = _context.Recipes
@@ -68,7 +68,7 @@ namespace Recipes.Application.Dtos.Recipes.Commands
                 _context.Recipes.Update(recipe);
                 await _context.SaveChangesAsync();
 
-                return Unit.Value;
+                return MediatR.Unit.Value;
             }
 
             // Ingredients section
@@ -104,11 +104,11 @@ namespace Recipes.Application.Dtos.Recipes.Commands
 
             private void AddIngredients(List<UpdateIngredient> ingredientsToAdd, int recipeId)
             {
-                var ingredientEntitiesToAdd = new List<IngredientEntity>();
+                var ingredientEntitiesToAdd = new List<Ingredient>();
 
                 foreach (var ingredient in ingredientsToAdd)
                 {
-                    ingredientEntitiesToAdd.Add(new IngredientEntity
+                    ingredientEntitiesToAdd.Add(new Ingredient
                     {
                         RecipeId = recipeId,
                         Name = ingredient.Name,
@@ -125,7 +125,7 @@ namespace Recipes.Application.Dtos.Recipes.Commands
                 }
             }
 
-            private void EditIngredients(List<UpdateIngredient> requestedIngredients, List<IngredientEntity> ingredientsToEdit)
+            private void EditIngredients(List<UpdateIngredient> requestedIngredients, List<Ingredient> ingredientsToEdit)
             {
                 foreach (var ingredient in ingredientsToEdit)
                 {
@@ -143,7 +143,7 @@ namespace Recipes.Application.Dtos.Recipes.Commands
                 }
             }
 
-            private void DeleteIngredients(List<IngredientEntity> ingredientsToDelete)
+            private void DeleteIngredients(List<Ingredient> ingredientsToDelete)
             {
                 foreach (var ingredient in ingredientsToDelete)
                 {
@@ -186,11 +186,11 @@ namespace Recipes.Application.Dtos.Recipes.Commands
 
             private void AddInstructions(List<UpdateInstruction> instructionsToAdd, int recipeId)
             {
-                var instructionEntitiesToAdd = new List<InstructionEntity>();
+                var instructionEntitiesToAdd = new List<Instruction>();
 
                 foreach (var instruction in instructionsToAdd)
                 {
-                    instructionEntitiesToAdd.Add(new InstructionEntity
+                    instructionEntitiesToAdd.Add(new Instruction
                     {
                         RecipeId = recipeId,
                         OrderNumber = instruction.OrderNumber,
@@ -204,7 +204,7 @@ namespace Recipes.Application.Dtos.Recipes.Commands
                 }
             }
 
-            private void EditInstructions(List<UpdateInstruction> requestedInstructions, List<InstructionEntity> instructionsToEdit)
+            private void EditInstructions(List<UpdateInstruction> requestedInstructions, List<Instruction> instructionsToEdit)
             {
                 foreach (var instruction in instructionsToEdit)
                 {
@@ -219,7 +219,7 @@ namespace Recipes.Application.Dtos.Recipes.Commands
                 }
             }
 
-            private void DeleteInstructions(List<InstructionEntity> instructionsToDelete)
+            private void DeleteInstructions(List<Instruction> instructionsToDelete)
             {
                 foreach (var instruction in instructionsToDelete)
                 {
@@ -262,11 +262,11 @@ namespace Recipes.Application.Dtos.Recipes.Commands
 
             private void AddNotes(int recipeId, List<UpdateRecipeNote> notesToAdd)
             {
-                List<RecipeNoteEntity> noteEntitiesToAdd = new List<RecipeNoteEntity>();
+                List<RecipeNote> noteEntitiesToAdd = new List<RecipeNote>();
 
                 foreach (var note in notesToAdd)
                 {
-                    noteEntitiesToAdd.Add(new RecipeNoteEntity
+                    noteEntitiesToAdd.Add(new RecipeNote
                     {
                         RecipeId = recipeId,
                         Description = note.Description
@@ -279,7 +279,7 @@ namespace Recipes.Application.Dtos.Recipes.Commands
                 }
             }
 
-            private void EditNotes(List<UpdateRecipeNote> requestedNotes, List<RecipeNoteEntity> notesToEdit)
+            private void EditNotes(List<UpdateRecipeNote> requestedNotes, List<RecipeNote> notesToEdit)
             {
                 foreach (var note in notesToEdit)
                 {
@@ -293,7 +293,7 @@ namespace Recipes.Application.Dtos.Recipes.Commands
                 }
             }
 
-            private void DeleteNotes(List<RecipeNoteEntity> notesToDelete)
+            private void DeleteNotes(List<RecipeNote> notesToDelete)
             {
                 foreach (var note in notesToDelete)
                 {

@@ -4,100 +4,100 @@ using Recipes.Domain.Entities.Recipes;
 
 namespace Recipes.Infrastructure.Persistence.EntityTypeConfigurations.Recipes
 {
-    public class UnitTypeConfiguration : IEntityTypeConfiguration<UnitEntity>
+    public class UnitTypeConfiguration : IEntityTypeConfiguration<Unit>
     {
-        public void Configure(EntityTypeBuilder<UnitEntity> builder)
+        public void Configure(EntityTypeBuilder<Unit> builder)
         {
             builder.HasKey(x => x.Id);
             builder.Property(x => x.Name).IsRequired();
 
             builder.HasData(
-                new UnitEntity 
+                new Unit 
                 {
                     Id = 1,
                     Name = "gm"
                 },
-                new UnitEntity
+                new Unit
                 {
                     Id = 2,
                     Name = "cups"
                 },
-                new UnitEntity
+                new Unit
                 {
                     Id = 3,
                     Name = "oz"
                 },
-                new UnitEntity
+                new Unit
                 {
                     Id = 4,
                     Name = "tsp"
                 },
-                new UnitEntity
+                new Unit
                 {
                     Id = 5,
                     Name = "tbs"
                 },
-                new UnitEntity
+                new Unit
                 {
                     Id = 6,
                     Name = "ltr"
                 },
-                new UnitEntity
+                new Unit
                 {
                     Id = 7,
                     Name = "qt"
                 },
-                new UnitEntity
+                new Unit
                 {
                     Id = 8,
                     Name = "ml"
                 },
-                new UnitEntity
+                new Unit
                 {
                     Id = 9,
                     Name = "pt"
                 },
-                new UnitEntity
+                new Unit
                 {
                     Id = 10,
                     Name = "pinch"
                 },
-                new UnitEntity
+                new Unit
                 {
                     Id = 11,
                     Name = "gal"
                 },
-                new UnitEntity
+                new Unit
                 {
                     Id = 12,
                     Name = "lbs"
                 },
-                new UnitEntity
+                new Unit
                 {
                     Id = 13,
                     Name = "kg"
                 },
-                new UnitEntity
+                new Unit
                 {
                     Id = 43,
                     Name = "mg"
                 },
-                new UnitEntity
+                new Unit
                 {
                     Id = 15,
                     Name = "mm"
                 },
-                new UnitEntity
+                new Unit
                 {
                     Id = 16,
                     Name = "cm"
                 },
-                new UnitEntity
+                new Unit
                 {
                     Id = 17,
                     Name = "in"
                 },
-                new UnitEntity
+                new Unit
                 {
                     Id = 18,
                     Name = "F"

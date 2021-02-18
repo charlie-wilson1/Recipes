@@ -9,7 +9,7 @@ namespace Recipes.Infrastructure.Identity.Models
     {
         public bool IsActive { get; set; }
         public virtual ICollection<RecipeUser> SharedRecipes { get; set; }
-        public virtual ICollection<RecipeEntity> Recipes { get; set; }
-        public virtual ICollection<RecipeEntity> ModifiedRecipes { get; set; }
+        public virtual ICollection<Recipe> Recipes { get; set; }
+        public virtual ICollection<Recipe> ModifiedRecipes { get; set; }
     }
 }

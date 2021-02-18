@@ -9,7 +9,7 @@ namespace Recipes.Application.Common.Mappings
         public MappingProfile()
         {
             // entity => response
-            CreateMap<RecipeEntity, RecipeResponse>()
+            CreateMap<Recipe, RecipeResponse>()
                 .ForMember(destination => destination.ImageName,
                            opt => opt.MapFrom(
                                source => source.Image != null ?
@@ -24,10 +24,10 @@ namespace Recipes.Application.Common.Mappings
                            opt => opt.MapFrom(
                                source => source.PrepTime + source.CookTime));
 
-            CreateMap<IngredientEntity, IngredientDto>();
-            CreateMap<InstructionEntity, InstructionDto>();
-            CreateMap<RecipeNoteEntity, RecipeNoteDto>();
-            CreateMap<RecipeImageEntity, ImageDto>();
+            CreateMap<Ingredient, IngredientDto>();
+            CreateMap<Instruction, InstructionDto>();
+            CreateMap<RecipeNote, RecipeNoteDto>();
+            CreateMap<RecipeImage, ImageDto>();
         }
     }
 }

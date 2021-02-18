@@ -4,9 +4,9 @@ using Recipes.Domain.Entities.Recipes;
 
 namespace Recipes.Infrastructure.Persistence.EntityTypeConfigurations.Recipes
 {
-    public class InstructionTypeConfiguration : IEntityTypeConfiguration<InstructionEntity>
+    public class InstructionTypeConfiguration : IEntityTypeConfiguration<Instruction>
     {
-        public void Configure(EntityTypeBuilder<InstructionEntity> builder)
+        public void Configure(EntityTypeBuilder<Instruction> builder)
         {
             builder.HasKey(x => x.Id);
             builder.Property(x => x.OrderNumber).IsRequired();
