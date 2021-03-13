@@ -49,7 +49,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
 import { Recipe } from "@/models/RecipeModels";
-import { Units } from "@/models/Enums";
+import { UnitsString } from "@/models/Enums";
 import OrderedListGroup from "../shared/OrderedListGroup.vue";
 
 @Component({
@@ -61,12 +61,12 @@ export default class RecipeDescription extends Vue {
   @Prop({ required: true })
   recipe!: Recipe;
 
-  public getUnitName(unit: keyof typeof Units): string {
-    return Units[unit];
+  public getUnitName(unit: keyof typeof UnitsString): string {
+    return UnitsString[unit];
   }
 
-  get instructions() {
-    return this.recipe.instructions.map(i => i.description);
+  get instructions(): Array<string> | null {
+    return this.recipe.instructions?.map(i => i.description);
   }
 }
 </script>

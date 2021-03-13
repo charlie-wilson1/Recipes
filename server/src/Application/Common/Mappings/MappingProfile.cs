@@ -26,7 +26,6 @@ namespace Recipes.Application.Common.Mappings
 
             CreateMap<Ingredient, IngredientDto>();
             CreateMap<Instruction, InstructionDto>();
-            CreateMap<RecipeNote, RecipeNoteDto>();
             CreateMap<RecipeImage, ImageDto>();
         }
     }

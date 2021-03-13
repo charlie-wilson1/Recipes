@@ -14,7 +14,7 @@ namespace Recipes.Infrastructure
             services.AddDbContext<ApplicationDbContext>(options => 
                 options.UseSqlServer(settings.ConnectionString));
 
-            services.ConfigureIdentity(settings.JwtBearerTokenSettings, settings.IsDevelopment);
+            services.ConfigureIdentity(settings.JwtBearerTokenSettings, settings.ProviderSettings, settings.IsDevelopment);
 
 
             if (settings.IdentitySeedSettings is not null)

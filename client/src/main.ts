@@ -7,7 +7,6 @@ import store from "./store/store";
 import vSelect from "vue-select";
 import VueToast from "vue-toast-notification";
 import "vue-toast-notification/dist/theme-sugar.css";
-import axios from "axios";
 
 Vue.use(Vuelidate);
 Vue.use(BootstrapVue);

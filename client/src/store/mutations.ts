@@ -21,6 +21,7 @@ export const mutations: MutationTree<RootState> = {
   },
 
   logout(state) {
+    console.log("logging out");
     state.token = undefined;
     state.username = undefined;
     state.roles = undefined;

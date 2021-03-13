@@ -17,6 +17,7 @@ namespace Recipes.Infrastructure.Persistence.EntityTypeConfigurations.Recipes
             builder.Property(x => x.CreatedDate).IsRequired();
             builder.Property(x => x.LastModifiedByUserId).IsRequired(false);
             builder.Property(x => x.LastModifiedDate).IsRequired(false);
+            builder.Property(x => x.Notes).IsRequired(false);
             builder.HasQueryFilter(x => !x.IsDeleted);
 
             builder.Property(x => x.IsDeleted)
@@ -26,12 +27,6 @@ namespace Recipes.Infrastructure.Persistence.EntityTypeConfigurations.Recipes
             builder.HasOne(x => x.Image)
                 .WithMany()
                 .HasForeignKey(y => y.ImageId)
-                .OnDelete(DeleteBehavior.NoAction)
-                .IsRequired(false);
-
-            builder.HasMany(x => x.Notes)
-                .WithOne(y => y.Recipe)
-                .HasForeignKey(y => y.RecipeId)
                 .OnDelete(DeleteBehavior.NoAction)
                 .IsRequired(false);
 

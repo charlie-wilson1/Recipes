@@ -32,6 +32,8 @@ namespace Recipes.Application.Dtos.Recipes.Queries
 
                 var recipes = await _context.Recipes
                     .Include(x => x.Image)
+                    .Include(x => x.Ingredients)
+                        .ThenInclude(i => i.Unit)
                     .Where(recipe => (string.IsNullOrWhiteSpace(request.Request.SearchQuery) ||
                                         recipe.Name.Contains(request.Request.SearchQuery)) &&
                                      (recipe.CreatedByUserId == currentUserId ||
@@ -48,6 +50,26 @@ namespace Recipes.Application.Dtos.Recipes.Queries
                         ImageId = recipe.ImageId,
                         ImageUrl = recipe.Image != null ? recipe.Image.Url : string.Empty,
                         ImageName = recipe.Image != null ? recipe.Image.Name : string.Empty,
+                        CookTime = recipe.CookTime,
+                        PrepTime = recipe.PrepTime,
+                        TotalTime = (recipe.PrepTime + recipe.CookTime),
+                        CreatedDate = recipe.CreatedDate,
+                        LastModifiedDate = recipe.LastModifiedDate,
+                        Ingredients = recipe.Ingredients.Select(ingredient => new IngredientDto
+                        {
+                            Id = ingredient.Id,
+                            Name = ingredient.Name,
+                            OrderNumber = ingredient.OrderNumber,
+                            Quantity = ingredient.Quantity,
+                            UnitId = ingredient.UnitId,
+                            Notes = ingredient.Notes,
+                        }).ToList(),
+                        Instructions = recipe.Instructions.Select(instruction => new InstructionDto
+                        {
+                            Id = instruction.Id,
+                            Description = instruction.Description,
+                            OrderNumber = instruction.OrderNumber
+                        }).ToList(),
                     })
                     .ToListAsync();
 

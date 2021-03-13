@@ -65,7 +65,7 @@ namespace Recipes.Infrastructure.Identity
             }
         }
 
-        internal static void ConfigureIdentity(this IServiceCollection services, JwtBearerTokenSettings jwtSettings, bool isDevelopment)
+        internal static void ConfigureIdentity(this IServiceCollection services, JwtBearerTokenSettings jwtSettings, ProviderSettings providerSettings, bool isDevelopment)
         {
             services.AddIdentity<IdentityUser, IdentityRole>(options => options.User.RequireUniqueEmail = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>()
@@ -74,7 +74,7 @@ namespace Recipes.Infrastructure.Identity
             services.Configure<DataProtectionTokenProviderOptions>(options => options.TokenLifespan = TimeSpan.FromSeconds(jwtSettings.ExpiryTimeInSeconds));
 
             var builder = new IdentityBuilder(typeof(IdentityUser), services);
-            builder.AddTokenProvider("Recipes", typeof(DataProtectorTokenProvider<IdentityUser>));
+            builder.AddTokenProvider(providerSettings.Name, typeof(DataProtectorTokenProvider<IdentityUser>));
 
             services.AddAuthentication(options =>
             {
@@ -99,8 +99,8 @@ namespace Recipes.Infrastructure.Identity
                         ValidateIssuerSigningKey = true,
                         ValidateIssuer = false,
                         ValidateAudience = false,
-                        ValidateLifetime = !isDevelopment,
-                        ValidIssuer = jwtSettings.Issuer
+                        ValidateLifetime = true,
+                        ValidIssuer = jwtSettings.Issuer,
                     };
 
                     options.Events = new JwtBearerEvents

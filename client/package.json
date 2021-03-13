@@ -16,6 +16,7 @@
     "axios": "^0.21.1",
     "bootstrap": "^4.5.3",
     "bootstrap-vue": "^2.20.1",
+    "cloudinary-vue": "^1.1.2",
     "core-js": "^3.6.5",
     "firebase": "^8.2.6",
     "jsonwebtoken": "^8.5.1",

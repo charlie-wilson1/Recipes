@@ -1,7 +1,7 @@
 import { Units } from "./Enums";
 
 export interface Recipe {
-  id: string;
+  id?: number;
   name: string;
   image?: RecipeImage;
   ingredients: Array<Ingredient>;
@@ -13,21 +13,23 @@ export interface Recipe {
 }
 
 export interface RecipeImage {
+  id?: number;
   src: string;
   fileName: string;
   fullName: string;
 }
 
 export interface Ingredient {
-  id: string;
+  id?: number;
   name: string;
   quantity: number;
-  unit: Units;
+  unitId: number;
   notes?: string;
   orderNumber: number;
 }
 
 export interface Instruction {
+  id?: number;
   orderNumber: number;
   description: string;
 }

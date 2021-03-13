@@ -31,7 +31,6 @@ namespace Recipes.Application.Dtos.Recipes.Commands
 
                 DeleteIngredients(request.Id);
                 DeleteInstructions(request.Id);
-                DeleteNotes(request.Id);
 
                 recipe.IsDeleted = true;
                 _context.Recipes.Update(recipe);
@@ -62,18 +61,6 @@ namespace Recipes.Application.Dtos.Recipes.Commands
                 }
 
                 _context.Instructions.UpdateRange(instructions);
-            }
-
-            public void DeleteNotes(int recipeId)
-            {
-                var notes = _context.RecipeNotes.Where(x => !x.IsDeleted && x.RecipeId == recipeId);
-
-                foreach (var note in notes)
-                {
-                    note.IsDeleted = true;
-                }
-
-                _context.RecipeNotes.UpdateRange(notes);
             }
         }
     }

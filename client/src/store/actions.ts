@@ -31,7 +31,7 @@ export const actions: ActionTree<RootState, RootState> = {
       .post(accountsUrl + "register", payload.command)
       .then(response => {
         const token = response.data.accessToken as string;
-        console.log(token);
+        
         // eslint-disable-next-line
         const decodedToken: any = jwt.decode(token);
 
@@ -44,9 +44,6 @@ export const actions: ActionTree<RootState, RootState> = {
         };
 
         commit("setUserVariables", data);
-        
-        delete axios.defaults.headers.common["Authorization"];
-        axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
         if (payload.redirect) {
           router.push(payload.redirect);
@@ -64,7 +61,7 @@ export const actions: ActionTree<RootState, RootState> = {
       .post(accountsUrl + "login", payload.command)
       .then(response => {
         const token = response.data.accessToken as string;
-        console.log(token);
+
         // eslint-disable-next-line
         const decodedToken: any = jwt.decode(token);
 
@@ -106,14 +103,12 @@ export const actions: ActionTree<RootState, RootState> = {
   async refreshJwtToken({ commit, rootState }) {
     axios
       .post(accountsUrl + "refresh", {
-        data: {
-          refreshToken: rootState.refreshToken,
-          username: rootState.username
-        }
+        username: rootState.username,
+        refreshToken: rootState.refreshToken
       })
       .then(response => {
         const token = response.data.accessToken as string;
-        console.log(token);
+
         // eslint-disable-next-line
         const decodedToken: any = jwt.decode(token);
 

@@ -30,15 +30,18 @@ namespace Recipes.WebApi
         {
             var connectionString = Configuration.GetConnectionString("DefaultConnection");
             var jwtSettings = Configuration.GetSection("Auth:JwtBearerTokenSettings").Get<JwtBearerTokenSettings>();
+            var providerSettings = Configuration.GetSection("ProviderSettings").Get<ProviderSettings>();
             var clientRoute = Configuration.GetSection("Auth:ClientRoute").Value;
 
             services.Configure<JwtBearerTokenSettings>(Configuration.GetSection("Auth:JwtBearerTokenSettings"));
             services.Configure<SendGridSettings>(Configuration.GetSection("SendGrid"));
+            services.Configure<ProviderSettings>(Configuration.GetSection("ProviderSettings"));
 
             var servicesSettings = new InfastructureSettingsDto
             {
                 ConnectionString = connectionString,
                 JwtBearerTokenSettings = jwtSettings,
+                ProviderSettings = providerSettings,
                 IsDevelopment = CurrentEnvironment.IsDevelopment(),
             };
             

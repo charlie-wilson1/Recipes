@@ -4,10 +4,10 @@ import { RootState } from "@/store/state";
 import {
   Recipe,
   Ingredient,
-  Instruction,
-  RecipeImage
+  Instruction
+  // RecipeImage,
 } from "@/models/RecipeModels";
-import { storage } from "@/database/firebase";
+import { storage } from "@/firebase/firebase";
 import Vue from "vue";
 import axios from "axios";
 
@@ -50,7 +50,22 @@ export const actions: ActionTree<NewRecipeState, RootState> = {
   async insertRecipe(_, recipe: Recipe) {
     axios
       .post(recipesUrl, {
-        data: recipe
+        name: recipe.name,
+        imageId: recipe.image?.id,
+        notes: recipe.notes,
+        prepTime: recipe.prepTime,
+        cookTime: recipe.cookTime,
+        ingredients: recipe.ingredients.map(ingredient => ({
+          name: ingredient.name,
+          quantity: ingredient.quantity,
+          unitId: ingredient.unitId,
+          orderNumber: ingredient.orderNumber + 1,
+          notes: ingredient.notes
+        })),
+        instructions: recipe.instructions.map(instruction => ({
+          orderNumber: instruction.orderNumber,
+          description: instruction.description
+        }))
       })
       .then(() => {
         Vue.$toast.success("Saved successfully!");
@@ -61,43 +76,43 @@ export const actions: ActionTree<NewRecipeState, RootState> = {
       });
   },
 
-  async uploadRecipeImage({ commit, rootState }, image: File) {
-    const unixTimestamp = Math.round(new Date().getTime() / 1000);
-    const fileName = `${unixTimestamp}_${image.name}`;
+  // async uploadRecipeImage({ commit, rootState }, image: File) {
+  //   const unixTimestamp = Math.round(new Date().getTime() / 1000);
+  //   const fileName = `${unixTimestamp}_${image.name}`;
 
-    const storageRef = storage
-      .ref("ajax-recipes")
-      .child("images")
-      .child(fileName);
+  //   const storageRef = storage
+  //     .ref("ajax-recipes")
+  //     .child("images")
+  //     .child(fileName);
 
-    try {
-      await storageRef.put(image);
-    } catch {
-      Vue.$toast.error("Could not save image. Please try again.");
-    }
+  //   try {
+  //     await storageRef.put(image);
+  //   } catch {
+  //     Vue.$toast.error("Could not save image. Please try again.");
+  //   }
 
-    const fileURL = await storageRef.getDownloadURL();
+  //   const fileURL = await storageRef.getDownloadURL();
 
-    const img: RecipeImage = {
-      src: fileURL,
-      fileName: image.name,
-      fullName: fileName
-    };
+  //   const img: RecipeImage = {
+  //     src: fileURL,
+  //     fileName: image.name,
+  //     fullName: fileName
+  //   };
 
-    axios
-      .post(`${recipesUrl}/image`, {
-        data: img
-      })
-      .then(() => {
-        Vue.$toast.success("Saved successfully!");
-      })
-      .catch(err => {
-        console.log(err);
-        Vue.$toast.error("Could not save image. Please try again.");
-      });
+  //   axios
+  //     .post(`${recipesUrl}/image`, {
+  //       data: img
+  //     })
+  //     .then(() => {
+  //       Vue.$toast.success("Saved successfully!");
+  //     })
+  //     .catch(err => {
+  //       console.log(err);
+  //       Vue.$toast.error("Could not save image. Please try again.");
+  //     });
 
-    commit("uploadRecipeImage", img);
-  },
+  //   commit("uploadRecipeImage", img);
+  // },
 
   insertIngredient({ commit }, ingredient: Ingredient) {
     commit("insertIngredient", ingredient);
@@ -114,7 +129,25 @@ export const actions: ActionTree<NewRecipeState, RootState> = {
   updateRecipe({ commit }, recipe: Recipe) {
     axios
       .put(recipesUrl, {
-        data: recipe
+        id: recipe.id,
+        name: recipe.name,
+        imageId: recipe.image?.id,
+        notes: recipe.notes,
+        prepTime: recipe.prepTime,
+        cookTime: recipe.cookTime,
+        ingredients: recipe.ingredients.map(ingredient => ({
+          id: ingredient.id,
+          name: ingredient.name,
+          quantity: ingredient.quantity,
+          unitId: ingredient.unitId,
+          orderNumber: ingredient.orderNumber + 1,
+          notes: ingredient.notes
+        })),
+        instructions: recipe.instructions.map(instruction => ({
+          id: instruction.id,
+          orderNumber: instruction.orderNumber,
+          description: instruction.description
+        }))
       })
       .then(() => {
         Vue.$toast.success("Saved successfully!");
@@ -145,7 +178,7 @@ export const actions: ActionTree<NewRecipeState, RootState> = {
     commit("destroyNewRecipe");
   },
 
-  async deleteImage({ commit, rootState }, fileName: string) {
+  async deleteImage({ commit }, fileName: string) {
     try {
       await storage
         .ref("ajax-recipes")

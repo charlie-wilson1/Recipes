@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,7 +20,6 @@ namespace Recipes.Application.Dtos.Recipes.Commands
 
         public List<CreateIngredient> Ingredients { get; set; }
         public List<CreateInstruction> Instructions { get; set; }
-        public List<CreateRecipeNote> Notes { get; set; }
 
         public class Handler : IRequestHandler<CreateRecipeCommand, int>
         {
@@ -36,10 +36,10 @@ namespace Recipes.Application.Dtos.Recipes.Commands
                     .Select(ingredient => new Ingredient
                     {
                         Name = ingredient.Name,
-                        Notes = ingredient.Notes,
                         OrderNumber = ingredient.OrderNumber,
                         Quantity = ingredient.Quantity,
                         UnitId = ingredient.UnitId,
+                        Notes = ingredient.Notes
                     }).ToList();
 
                 var instructions = request.Instructions
@@ -47,12 +47,6 @@ namespace Recipes.Application.Dtos.Recipes.Commands
                     {
                         Description = instruction.Description,
                         OrderNumber = instruction.OrderNumber,
-                    }).ToList();
-
-                var notes = request.Notes
-                    .Select(note => new RecipeNote
-                    {
-                        Description = note.Description
                     }).ToList();
 
                 var recipe = new Recipe
@@ -66,7 +60,6 @@ namespace Recipes.Application.Dtos.Recipes.Commands
                         null,
                     Ingredients = ingredients,
                     Instructions = instructions,
-                    Notes = notes,
                 };
 
                 var response = await _context.Recipes.AddAsync(recipe);

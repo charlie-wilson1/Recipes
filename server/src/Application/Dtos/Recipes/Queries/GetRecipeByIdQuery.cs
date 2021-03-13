@@ -45,8 +45,8 @@ namespace Recipes.Application.Dtos.Recipes.Queries
                 var recipe = await _context.Recipes
                     .Include(x => x.Image)
                     .Include(x => x.Instructions)
-                    .Include(x => x.Notes)
                     .Include(x => x.Ingredients)
+                        .ThenInclude(i => i.Unit)
                     .FirstOrDefaultAsync(recipe => !recipe.IsDeleted &&
                                                     recipe.Id == request.RecipeId &&
                                                     (recipe.CreatedByUserId == currentUserId ||

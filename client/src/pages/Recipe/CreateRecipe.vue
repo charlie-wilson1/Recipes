@@ -62,10 +62,12 @@
             >
               <b-form-input
                 class="form__input"
-                v-model.trim="$v.currentRecipe.prepTime.$model"
+                v-model.number="$v.currentRecipe.prepTime.$model"
                 type="number"
                 id="prepTime"
                 placeholder="Prep"
+                min="1"
+                required
               ></b-form-input>
               <div
                 class="error"
@@ -86,11 +88,11 @@
             >
               <b-form-input
                 class="form__input"
-                v-model.trim="$v.currentRecipe.cookTime.$model"
+                v-model.number="$v.currentRecipe.cookTime.$model"
                 type="number"
                 id="cookTime"
                 placeholder="Cook"
-                min="0"
+                min="1"
                 required
               ></b-form-input>
               <div
@@ -119,7 +121,7 @@
           </b-col>
         </b-form-row>
         <hr />
-        <IngredientsForm :ingredients="currentRecipe.ingredients" />
+        <IngredientsForm :_ingredients="currentRecipe.ingredients" />
         <hr />
         <InstructionsForm :instructions="currentRecipe.instructions" />
         <hr />
@@ -160,7 +162,6 @@ import { Validate } from "vuelidate-property-decorators";
 import { validationMixin } from "vuelidate";
 import { required, minValue } from "vuelidate/lib/validators";
 import { Ingredient, Recipe } from "@/models/RecipeModels";
-import { Units } from "@/models/Enums";
 import { defaultRecipe } from "@/models/DefaultModels";
 import CreateList from "@/components/create/CreateList.vue";
 import IngredientsForm from "@/components/create/IngredientsForm.vue";
@@ -179,19 +180,15 @@ export default class CreateRecipe extends Vue {
     return this.$route.path.toLowerCase().includes("edit");
   }
 
-  get recipeId(): string | undefined {
+  get recipeId(): number | undefined {
     if (this.isEditMode) {
-      return this.$route.params.recipe_id as string;
+      return parseInt(this.$route.params.recipe_id);
     }
     return undefined;
   }
 
   get title(): string {
     return this.isEditMode ? "Edit Recipe" : "Create Recipe";
-  }
-
-  get units(): string[] {
-    return Object.keys(Units);
   }
 
   get isLoading(): boolean {
@@ -223,7 +220,7 @@ export default class CreateRecipe extends Vue {
     return ingredients.map(ingredient => {
       return {
         defaultValue: ingredient.name,
-        additionalValue: `${ingredient.quantity} ${ingredient.unit}`,
+        additionalValue: `${ingredient.quantity} ${ingredient.unitId}`,
         notes: ingredient.notes
       };
     });

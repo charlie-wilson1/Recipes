@@ -17,7 +17,6 @@ namespace Recipes.Infrastructure.Persistence
         public DbSet<Instruction> Instructions { get; set; }
         public DbSet<Recipe> Recipes { get; set; }
         public DbSet<RecipeImage> RecipeImages { get; set; }
-        public DbSet<RecipeNote> RecipeNotes { get; set; }
         public DbSet<RecipeUser> RecipesUsers { get; set; }
         public DbSet<Unit> Units { get; set; }
 

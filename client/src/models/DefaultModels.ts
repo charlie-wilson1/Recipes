@@ -2,21 +2,22 @@ import { Units } from "@/models/Enums";
 import { Ingredient, Instruction, Recipe } from "@/models/RecipeModels";
 
 export const defaultIngredient: Ingredient = {
-  id: "",
+  id: undefined,
   name: "",
   quantity: 0,
-  unit: Units.gm,
+  unitId: Units.gm,
   notes: "",
   orderNumber: 0
 };
 
 export const defaultInstruction: Instruction = {
+  id: undefined,
   orderNumber: 0,
   description: ""
 };
 
 export const defaultRecipe: Recipe = {
-  id: "",
+  id: undefined,
   name: "",
   image: undefined,
   ingredients: [],

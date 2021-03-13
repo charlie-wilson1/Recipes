@@ -8,6 +8,7 @@ namespace Recipes.Infrastructure
         public string ConnectionString { get; set; }
         public JwtBearerTokenSettings JwtBearerTokenSettings { get; set; }
         public IdentitySeedSettings IdentitySeedSettings { get; set; }
+        public ProviderSettings ProviderSettings { get; set; }
         public bool IsDevelopment { get; set; }
     }
 }

@@ -6,9 +6,12 @@ import Make from "@/pages/Recipe/Make.vue";
 import Login from "@/pages/Auth/Login.vue";
 import Register from "@/pages/Auth/Register.vue";
 import AdminRegister from "@/pages/Admin/AdminRegister.vue";
-import { handleLogin, matchesLoginMeta } from "@/middleware/login"
-import { handleLogout, matchesLogoutMeta } from "@/middleware/logout"
-import { handleUnauthorized, matchesUnauthorizedMeta } from "@/middleware/unauthorized"
+import { handleLogin, matchesLoginMeta } from "@/middleware/login";
+import { handleLogout, matchesLogoutMeta } from "@/middleware/logout";
+import {
+  handleUnauthorized,
+  matchesUnauthorizedMeta
+} from "@/middleware/unauthorized";
 import { handleTokenRefresh, tokenExpired } from "@/middleware/jwt";
 
 Vue.use(VueRouter);
@@ -60,7 +63,6 @@ const routes: Array<RouteConfig> = [
   {
     path: "/logout",
     name: "logout",
-    redirect: "login",
     meta: {
       logout: true
     }
@@ -87,21 +89,20 @@ const router = new VueRouter({
   routes
 });
 
-
 router.beforeEach((to, _, next) => {
   if (matchesLogoutMeta(to)) {
     handleLogout(next);
   }
   if (matchesLoginMeta(to)) {
     handleLogin(next);
-  } 
+  }
   if (matchesUnauthorizedMeta(to)) {
     handleUnauthorized(next);
   }
   if (tokenExpired) {
     handleTokenRefresh(next);
   }
-  
+
   next();
 });
 

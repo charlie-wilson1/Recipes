@@ -32,6 +32,6 @@ namespace Recipes.Application.Common.Validators
 		}
 
 		protected override string GetDefaultMessageTemplate()
-			=> "{PropertyName} must contain more than {MinElements} items.";
+			=> _min == 1 ? "{PropertyName} must contain at least {MinElements} item." : "{PropertyName} must contain at least {MinElements} items.";
 	}
 }

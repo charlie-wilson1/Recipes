@@ -35,10 +35,12 @@ namespace Recipes.Identity
             // get settings from secrets
             var connectionString = Configuration.GetConnectionString("DefaultConnection");
             var jwtSettings = Configuration.GetSection("Auth:JwtBearerTokenSettings").Get<JwtBearerTokenSettings>();
+            var providerSettings = Configuration.GetSection("ProviderSettings").Get<ProviderSettings>();
             var clientRoute = Configuration.GetSection("Auth:ClientRoute").Value;
 
             services.Configure<JwtBearerTokenSettings>(Configuration.GetSection("Auth:JwtBearerTokenSettings"));
             services.Configure<SendGridSettings>(Configuration.GetSection("SendGrid"));
+            services.Configure<ProviderSettings>(Configuration.GetSection("ProviderSettings"));
 
             var adminEmail = Configuration.GetSection("Auth:AdminUser:Email").Value;
             var adminUsername = Configuration.GetSection("Auth:AdminUser:Username").Value;
@@ -56,6 +58,7 @@ namespace Recipes.Identity
                 ConnectionString = connectionString,
                 JwtBearerTokenSettings = jwtSettings,
                 IdentitySeedSettings = adminSettings,
+                ProviderSettings = providerSettings,
                 IsDevelopment = CurrentEnvironment.IsDevelopment(),
             };
 

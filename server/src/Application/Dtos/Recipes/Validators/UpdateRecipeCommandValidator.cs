@@ -19,7 +19,6 @@ namespace Recipes.Application.Dtos.Recipes.Validators
 
             RuleFor(x => x.Instructions).SetValidator(new MinListCountValidator<UpdateInstruction>(1));
             RuleFor(x => x.Ingredients).SetValidator(new MinListCountValidator<UpdateIngredient>(1));
-            RuleFor(x => x.Notes).SetValidator(new MinListCountValidator<UpdateRecipeNote>(1));
         }
     }
 }

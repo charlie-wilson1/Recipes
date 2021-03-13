@@ -14,11 +14,17 @@ namespace Recipes.Infrastructure.Persistence.EntityTypeConfigurations.Recipes
             builder.Property(x => x.CreatedDate).IsRequired();
             builder.Property(x => x.LastModifiedByUserId).IsRequired(false);
             builder.Property(x => x.LastModifiedDate).IsRequired(false);
+            builder.Property(x => x.Notes).IsRequired(false);
             builder.HasQueryFilter(x => !x.IsDeleted);
 
             builder.Property(x => x.IsDeleted)
                 .IsRequired()
                 .HasDefaultValue(false);
+
+            builder.HasOne(x => x.Unit)
+                .WithMany()
+                .OnDelete(DeleteBehavior.NoAction)
+                .IsRequired();
 
         }
     }

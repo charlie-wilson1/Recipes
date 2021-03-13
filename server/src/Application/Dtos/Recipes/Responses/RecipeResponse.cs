@@ -13,11 +13,11 @@ namespace Recipes.Application.Dtos.Recipes.Responses
         public int? ImageId { get; set; }
         public string ImageUrl { get; set; }
         public string ImageName { get; set; }
+        public string Notes { get; set; }
         public string CreatedByUsername { get; set; }
         public DateTime CreatedDate { get; set; }
-        public DateTime LastModifiedDate { get; set; }
+        public DateTime? LastModifiedDate { get; set; }
 
-        public List<RecipeNoteDto> Notes { get; set; }
         public List<InstructionDto> Instructions { get; set; }
         public List<IngredientDto> Ingredients { get; set; }
     }

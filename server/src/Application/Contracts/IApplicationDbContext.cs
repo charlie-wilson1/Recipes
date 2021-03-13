@@ -11,7 +11,6 @@ namespace Recipes.Application.Contracts
         DbSet<Instruction> Instructions { get; set; }
         DbSet<Recipe> Recipes { get; set; }
         DbSet<RecipeImage> RecipeImages { get; set; }
-        DbSet<RecipeNote> RecipeNotes { get; set; }
         DbSet<RecipeUser> RecipesUsers { get; set; }
         DbSet<Unit> Units { get; set; }
 

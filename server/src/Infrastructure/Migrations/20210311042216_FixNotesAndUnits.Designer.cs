@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Recipes.Infrastructure.Persistence;
 
 namespace Recipes.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210311042216_FixNotesAndUnits")]
+    partial class FixNotesAndUnits
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -250,9 +252,6 @@ namespace Recipes.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Notes")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("OrderNumber")
                         .HasColumnType("int");
 
@@ -272,6 +271,45 @@ namespace Recipes.Infrastructure.Migrations
                     b.HasIndex("UnitId");
 
                     b.ToTable("Ingredients");
+                });
+
+            modelBuilder.Entity("Recipes.Domain.Entities.Recipes.IngredientNote", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("CreatedByUserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("IngredientId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("LastModifiedByUserId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("LastModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IngredientId");
+
+                    b.ToTable("IngredientNotes");
                 });
 
             modelBuilder.Entity("Recipes.Domain.Entities.Recipes.Instruction", b =>
@@ -639,6 +677,16 @@ namespace Recipes.Infrastructure.Migrations
                     b.Navigation("Unit");
                 });
 
+            modelBuilder.Entity("Recipes.Domain.Entities.Recipes.IngredientNote", b =>
+                {
+                    b.HasOne("Recipes.Domain.Entities.Recipes.Ingredient", "Ingredient")
+                        .WithMany("Notes")
+                        .HasForeignKey("IngredientId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("Ingredient");
+                });
+
             modelBuilder.Entity("Recipes.Domain.Entities.Recipes.Instruction", b =>
                 {
                     b.HasOne("Recipes.Domain.Entities.Recipes.Recipe", "Recipe")
@@ -683,6 +731,11 @@ namespace Recipes.Infrastructure.Migrations
                         .HasForeignKey("UserId");
 
                     b.Navigation("Recipe");
+                });
+
+            modelBuilder.Entity("Recipes.Domain.Entities.Recipes.Ingredient", b =>
+                {
+                    b.Navigation("Notes");
                 });
 
             modelBuilder.Entity("Recipes.Domain.Entities.Recipes.Recipe", b =>

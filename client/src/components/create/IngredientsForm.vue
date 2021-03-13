@@ -37,7 +37,7 @@
               <label for="ingredient-quantity">Qty</label>
               <b-form-input
                 type="number"
-                v-model.trim="$v.currentIngredient.quantity.$model"
+                v-model.number="$v.currentIngredient.quantity.$model"
                 id="ingredient-quantity"
                 min="0"
               >
@@ -98,9 +98,9 @@
           </b-col>
         </b-form-row>
       </b-col>
-      <b-col v-if="ingredients">
+      <b-col v-if="_ingredients">
         <CreateList
-          :values="getIngredientString(ingredients)"
+          :values="getIngredientString(_ingredients)"
           deletable="true"
           :handleDelete="handleDelete"
           :handleMove="moveItem"
@@ -127,11 +127,26 @@ import CreateList from "@/components/create/CreateList.vue";
   mixins: [validationMixin]
 })
 export default class IngredientsForm extends Vue {
-  public units = Object.keys(Units);
+  public units = Object.keys(Units)
+    .filter(unit => !isNaN(Number(unit)))
+    .map(value => ({
+      value,
+      text: Units[parseInt(value)]
+    }));
+
   public perPage = 10;
 
   @Prop({ required: false })
-  ingredients?: Array<Ingredient>;
+  _ingredients?: Array<Ingredient>;
+
+  get ingredients(): Array<Ingredient> | [] {
+    if (!this._ingredients) {
+      Vue.$toast.error("Could not find selected ingredient.");
+      return [];
+    }
+
+    return this._ingredients;
+  }
 
   @Validate({
     name: { required },
@@ -170,18 +185,27 @@ export default class IngredientsForm extends Vue {
   }
 
   getIngredientString(ingredients: Ingredient[]) {
+    console.log(ingredients.map(x => x.name));
     return ingredients.map(ingredient => {
       return {
         defaultValue: ingredient.name,
-        additionalValue: `${ingredient.quantity} ${ingredient.unit}`,
+        additionalValue: `${ingredient.quantity} ${Units[ingredient.unitId]}`,
         notes: ingredient.notes
       };
     });
   }
 
-  handleDelete(index: number) {
-    if ((this.ingredients ?? []).length - 1 < index) {
+  getIngredient(index: number): Ingredient | undefined {
+    const ingredient = this.ingredients[index];
+    if (!ingredient) {
       Vue.$toast.error("Could not find selected ingredient.");
+      return undefined;
+    }
+    return ingredient;
+  }
+
+  handleDelete(index: number) {
+    if (!this.getIngredient(index)) {
       return;
     }
 
@@ -189,13 +213,13 @@ export default class IngredientsForm extends Vue {
   }
 
   moveItem(from: number, to: number) {
-    if (!this.ingredients) {
-      Vue.$toast.error("Could not find selected ingredient.");
+    const swappedItem = this.getIngredient(to);
+    const item = this.getIngredient(from);
+
+    if (!swappedItem || !item) {
       return;
     }
 
-    const swappedItem = this.ingredients[to];
-    const item = this.ingredients.splice(from, 1)[0];
     item.orderNumber = to;
     swappedItem.orderNumber = from;
     this.ingredients.splice(to, 0, item);

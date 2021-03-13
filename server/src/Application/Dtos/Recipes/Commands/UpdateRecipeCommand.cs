@@ -23,7 +23,6 @@ namespace Recipes.Application.Dtos.Recipes.Commands
 
         public List<UpdateIngredient> Ingredients { get; set; }
         public List<UpdateInstruction> Instructions { get; set; }
-        public List<UpdateRecipeNote> Notes { get; set; }
 
         public class Handler : IRequestHandler<UpdateRecipeCommand>
         {
@@ -57,7 +56,6 @@ namespace Recipes.Application.Dtos.Recipes.Commands
                 // list properties update
                 SaveIngredientChanges(request.Ingredients, request.Id);
                 SaveInstructionChanges(request.Instructions, request.Id);
-                SaveNotesChanges(request.Notes, request.Id);
 
                 // basic props
                 recipe.CookTime = request.CookTime;
@@ -112,10 +110,10 @@ namespace Recipes.Application.Dtos.Recipes.Commands
                     {
                         RecipeId = recipeId,
                         Name = ingredient.Name,
-                        Notes = ingredient.Notes,
                         OrderNumber = ingredient.OrderNumber,
                         Quantity = ingredient.Quantity,
-                        UnitId = ingredient.UnitId
+                        UnitId = ingredient.UnitId,
+                        Notes = ingredient.Notes
                     });
                 }
 
@@ -131,7 +129,6 @@ namespace Recipes.Application.Dtos.Recipes.Commands
                 {
                     var requestedUpdate = requestedIngredients.Find(x => x.Id == ingredient.Id);
                     ingredient.Name = requestedUpdate.Name;
-                    ingredient.Notes = requestedUpdate.Notes;
                     ingredient.OrderNumber = requestedUpdate.OrderNumber;
                     ingredient.Quantity = requestedUpdate.Quantity;
                     ingredient.UnitId = requestedUpdate.UnitId;
@@ -229,80 +226,6 @@ namespace Recipes.Application.Dtos.Recipes.Commands
                 if (instructionsToDelete.Any())
                 {
                     _context.Instructions.UpdateRange(instructionsToDelete);
-                }
-            }
-
-            // Notes Section
-            private void SaveNotesChanges(List<UpdateRecipeNote> requestedNotes, int recipeId)
-            {
-                var requestedNotesWithId = requestedNotes
-                    .Where(x => x.Id.HasValue &&
-                                x.Id.Value > default(int));
-
-                var notesToAdd = requestedNotes
-                    .Except(requestedNotesWithId)
-                    .ToList();
-
-                var noteEntities = _context.RecipeNotes
-                    .Where(x => x.RecipeId == recipeId && !x.IsDeleted)
-                    .ToList();
-
-                var notesToDelete = noteEntities
-                    .Where(entity => !requestedNotesWithId.All(req => req.Id == entity.Id))
-                    .ToList();
-
-                var notesToEdit = noteEntities
-                    .Except(notesToDelete)
-                    .ToList();
-
-                _genericEntityRepository.DeleteAuditableEntities(notesToDelete, false);
-                EditNotes(requestedNotes, notesToEdit);
-                AddNotes(recipeId, notesToAdd);
-            }
-
-            private void AddNotes(int recipeId, List<UpdateRecipeNote> notesToAdd)
-            {
-                List<RecipeNote> noteEntitiesToAdd = new List<RecipeNote>();
-
-                foreach (var note in notesToAdd)
-                {
-                    noteEntitiesToAdd.Add(new RecipeNote
-                    {
-                        RecipeId = recipeId,
-                        Description = note.Description
-                    });
-                }
-
-                if (noteEntitiesToAdd.Any())
-                {
-                    _context.RecipeNotes.AddRange(noteEntitiesToAdd);
-                }
-            }
-
-            private void EditNotes(List<UpdateRecipeNote> requestedNotes, List<RecipeNote> notesToEdit)
-            {
-                foreach (var note in notesToEdit)
-                {
-                    var requestedUpdate = requestedNotes.Find(x => x.Id == note.Id);
-                    note.Description = requestedUpdate.Description;
-                }
-
-                if (notesToEdit.Any())
-                {
-                    _context.RecipeNotes.UpdateRange(notesToEdit);
-                }
-            }
-
-            private void DeleteNotes(List<RecipeNote> notesToDelete)
-            {
-                foreach (var note in notesToDelete)
-                {
-                    note.IsDeleted = true;
-                }
-
-                if (notesToDelete.Any())
-                {
-                    _context.RecipeNotes.UpdateRange(notesToDelete);
                 }
             }
         }

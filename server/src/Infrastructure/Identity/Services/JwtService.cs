@@ -17,11 +17,18 @@ namespace Recipes.Infrastructure.Identity.Services
     {
         private readonly JwtBearerTokenSettings _jwtBearerTokenSettings;
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly string providerName;
+        private readonly string refreshTokenPurpose;
 
-        public JwtService(IOptions<JwtBearerTokenSettings> jwtBearerTokenSettings, UserManager<IdentityUser> userManager)
+        public JwtService(
+            IOptions<JwtBearerTokenSettings> jwtBearerTokenSettings,
+            IOptions<ProviderSettings> providerSettings,
+            UserManager<IdentityUser> userManager)
         {
             _jwtBearerTokenSettings = jwtBearerTokenSettings.Value;
             _userManager = userManager;
+            providerName = providerSettings.Value.Name;
+            refreshTokenPurpose = providerSettings.Value.ProviderPurposes.RefreshToken;
         }
 
         public async Task<JwtAuthResponse> GenerateJwtTokens(IdentityUser identityUser, IList<string> roles)
@@ -38,10 +45,9 @@ namespace Recipes.Infrastructure.Identity.Services
 
         public async Task ValidateRefreshToken(IdentityUser user, string token)
         {
-            var refreshToken = await _userManager.GetAuthenticationTokenAsync(user, "Recipes", "RefreshToken");
-            var isValid = await _userManager.VerifyUserTokenAsync(user, "Recipes", "RefreshToken", refreshToken);
+            var registeredToken = await _userManager.GetAuthenticationTokenAsync(user, providerName, refreshTokenPurpose);
 
-            if (!isValid)
+            if (token != registeredToken)
             {
                 throw new SecurityTokenValidationException();
             }
@@ -59,7 +65,7 @@ namespace Recipes.Infrastructure.Identity.Services
                     new Claim(ClaimTypes.Email, identityUser.Email),
                 }),
 
-                Expires = DateTime.UtcNow.AddMinutes(_jwtBearerTokenSettings.ExpiryTimeInSeconds),
+                Expires = DateTime.UtcNow.AddSeconds(_jwtBearerTokenSettings.ExpiryTimeInSeconds),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
                 Audience = _jwtBearerTokenSettings.Audience,
                 Issuer = _jwtBearerTokenSettings.Issuer,
@@ -80,9 +86,9 @@ namespace Recipes.Infrastructure.Identity.Services
 
         public async Task<string> GenerateRefreshToken(IdentityUser user)
         {
-            await _userManager.RemoveAuthenticationTokenAsync(user, "Recipes", "RefreshToken");
-            var newRefreshToken = await _userManager.GenerateUserTokenAsync(user, "Recipes", "RefreshToken");
-            await _userManager.SetAuthenticationTokenAsync(user, "Recipes", "RefreshToken", newRefreshToken);
+            await _userManager.RemoveAuthenticationTokenAsync(user, providerName, refreshTokenPurpose);
+            var newRefreshToken = await _userManager.GenerateUserTokenAsync(user, providerName, refreshTokenPurpose);
+            await _userManager.SetAuthenticationTokenAsync(user, providerName, refreshTokenPurpose, newRefreshToken);
             return newRefreshToken;
         }
     }
