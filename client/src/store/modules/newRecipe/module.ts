@@ -7,8 +7,8 @@ import { actions } from "./actions";
 import { mutations } from "./mutations";
 
 export const NewRecipeModule: Module<NewRecipeState, RootState> = {
-  state,
-  getters,
-  actions,
-  mutations
+	state,
+	getters,
+	actions,
+	mutations,
 };

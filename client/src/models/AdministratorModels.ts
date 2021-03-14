@@ -1,12 +1,12 @@
 export interface AdminRegisterUserCommand {
-  email: string;
+	email: string;
 }
 
 export interface UpdateRolesCommand {
-  username: string;
-  roles: Array<string>;
+	username: string;
+	roles: Array<string>;
 }
 
 export interface AdminResetUserPasswordCommand {
-  email: string;
+	email: string;
 }

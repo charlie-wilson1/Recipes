@@ -1,107 +1,107 @@
 import { MutationTree } from "vuex";
 import { NewRecipeState } from "./state";
 import {
-  defaultRecipe,
-  defaultIngredient,
-  defaultInstruction
+	defaultRecipe,
+	defaultIngredient,
+	defaultInstruction,
 } from "@/models/DefaultModels";
 import {
-  Ingredient,
-  Instruction,
-  Recipe,
-  RecipeImage
+	Ingredient,
+	Instruction,
+	Recipe,
+	RecipeImage,
 } from "@/models/RecipeModels";
 import Vue from "vue";
 
 /* eslint @typescript-eslint/no-non-null-assertion: "off" */
 export const mutations: MutationTree<NewRecipeState> = {
-  createNewRecipe(state) {
-    state.recipe = { ...defaultRecipe };
-    state.recipe.ingredients = [];
-    state.recipe.instructions = [];
-  },
+	createNewRecipe(state) {
+		state.recipe = { ...defaultRecipe };
+		state.recipe.ingredients = [];
+		state.recipe.instructions = [];
+	},
 
-  setRecipeById(state, recipe: Recipe) {
-    state.recipe = recipe;
-  },
+	setRecipeById(state, recipe: Recipe) {
+		state.recipe = recipe;
+	},
 
-  createDefaultIngredient(state) {
-    state.selectedIngredient = { ...defaultIngredient };
-  },
+	createDefaultIngredient(state) {
+		state.selectedIngredient = { ...defaultIngredient };
+	},
 
-  createDefaultInstruction(state) {
-    state.selectedInstruction = { ...defaultInstruction };
-  },
+	createDefaultInstruction(state) {
+		state.selectedInstruction = { ...defaultInstruction };
+	},
 
-  setSelectedIngredient(state, index: number) {
-    state.selectedIngredient = state.recipe!.ingredients[index];
-  },
+	setSelectedIngredient(state, index: number) {
+		state.selectedIngredient = state.recipe!.ingredients[index];
+	},
 
-  setSelectedInstruction(state, index: number) {
-    state.selectedInstruction = state.recipe!.instructions[index];
-  },
+	setSelectedInstruction(state, index: number) {
+		state.selectedInstruction = state.recipe!.instructions[index];
+	},
 
-  insertRecipe(state, recipe: Recipe) {
-    state.recipe = recipe;
-    Vue.$toast.success("Saved successfully");
-  },
+	insertRecipe(state, recipe: Recipe) {
+		state.recipe = recipe;
+		Vue.$toast.success("Saved successfully");
+	},
 
-  insertIngredient(state, ingredient: Ingredient) {
-    state.recipe!.ingredients.push(ingredient);
-  },
+	insertIngredient(state, ingredient: Ingredient) {
+		state.recipe!.ingredients.push(ingredient);
+	},
 
-  insertInstruction(state, instruction: Instruction) {
-    state.recipe!.instructions.push(instruction);
-  },
+	insertInstruction(state, instruction: Instruction) {
+		state.recipe!.instructions.push(instruction);
+	},
 
-  uploadRecipeImage(state, image: RecipeImage) {
-    state.recipe!.image = image;
-    Vue.$toast.success("Uploaded image successfully");
-  },
+	uploadRecipeImage(state, image: RecipeImage) {
+		state.recipe!.image = image;
+		Vue.$toast.success("Uploaded image successfully");
+	},
 
-  updteRecipe(state, recipe: Recipe) {
-    state.recipe = recipe;
-    Vue.$toast.success("Successfully saved recipe.");
-  },
+	updteRecipe(state, recipe: Recipe) {
+		state.recipe = recipe;
+		Vue.$toast.success("Successfully saved recipe.");
+	},
 
-  updateIngredient(state, payload: { ingredient: Ingredient; index: number }) {
-    state.recipe!.ingredients[payload.index] = payload.ingredient;
-  },
+	updateIngredient(state, payload: { ingredient: Ingredient; index: number }) {
+		state.recipe!.ingredients[payload.index] = payload.ingredient;
+	},
 
-  updateInstruction(
-    state,
-    payload: { instruction: Instruction; index: number }
-  ) {
-    state.recipe!.instructions[payload.index] = payload.instruction;
-    state.selectedInstruction = defaultInstruction;
-  },
+	updateInstruction(
+		state,
+		payload: { instruction: Instruction; index: number }
+	) {
+		state.recipe!.instructions[payload.index] = payload.instruction;
+		state.selectedInstruction = defaultInstruction;
+	},
 
-  removeIngredient(state, index: number) {
-    state.recipe!.ingredients.splice(index, 1);
-    const ingredientsToEdit = state.recipe!.ingredients.slice(index);
+	removeIngredient(state, index: number) {
+		state.recipe!.ingredients.splice(index, 1);
+		const ingredientsToEdit = state.recipe!.ingredients.slice(index);
 
-    ingredientsToEdit.forEach(
-      item => (item.orderNumber = item.orderNumber - 1)
-    );
-  },
+		ingredientsToEdit.forEach(
+			item => (item.orderNumber = item.orderNumber - 1)
+		);
+	},
 
-  removeInstruction(state, index: number) {
-    state.recipe!.instructions.splice(index, 1);
-    const instructionsToEdit = state.recipe!.instructions.slice(index);
+	removeInstruction(state, index: number) {
+		state.recipe!.instructions.splice(index, 1);
+		const instructionsToEdit = state.recipe!.instructions.slice(index);
 
-    instructionsToEdit.forEach(
-      item => (item.orderNumber = item.orderNumber - 1)
-    );
-  },
+		instructionsToEdit.forEach(
+			item => (item.orderNumber = item.orderNumber - 1)
+		);
+	},
 
-  destroyNewRecipe(state) {
-    state.selectedIngredient = undefined;
-    state.selectedInstruction = undefined;
-    state.recipe = undefined;
-  },
+	destroyNewRecipe(state) {
+		state.selectedIngredient = undefined;
+		state.selectedInstruction = undefined;
+		state.recipe = undefined;
+	},
 
-  deleteImage(state) {
-    state.recipe!.image = undefined;
-    Vue.$toast.success("Successfully deleted image.");
-  }
+	deleteImage(state) {
+		state.recipe!.image = undefined;
+		Vue.$toast.success("Successfully deleted image.");
+	},
 };

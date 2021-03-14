@@ -1,11 +1,11 @@
 <template>
-	<section class="login">
-		<div class="wrapper fadeInDown">
+	<section class="admin-register">
+		<div class="wrapper">
 			<div id="formContent">
 				<!-- Tabs Titles -->
 
 				<!-- Icon -->
-				<div class="fadeIn first icon-wrapper mb-0">
+				<div class="icon-wrapper mb-0">
 					<b-icon class="login-icon" icon="person"></b-icon>
 					<!-- <img src="http://danielzawadzki.com/codepen/01/icon.svg" id="icon" alt="User Icon" /> -->
 				</div>
@@ -15,11 +15,10 @@
 					<b-form-group :class="{ 'form-group--error': $v.username.$error }">
 						<input
 							type="text"
-							id="username"
-							class="fadeIn second"
-							name="username"
-							placeholder="username"
-							v-model.trim="$v.username.$model"
+							id="email"
+							name="email"
+							placeholder="email"
+							v-model.trim="$v.email.$model"
 						/>
 						<div
 							class="error"
@@ -28,52 +27,8 @@
 							Field is required
 						</div>
 					</b-form-group>
-					<b-form-group :class="{ 'form-group--error': $v.password.$error }">
-						<input
-							type="password"
-							id="password"
-							class="fadeIn third"
-							name="password"
-							placeholder="Password"
-							v-model.trim="$v.password.$model"
-						/>
-						<div
-							class="error"
-							v-if="!$v.password.required && $v.password.$error"
-						>
-							Field is required
-						</div>
-					</b-form-group>
-					<b-form-group
-						:class="{ 'form-group--error': $v.confirmPassword.$error }"
-					>
-						<input
-							type="password"
-							id="confirmPassword"
-							class="fadeIn third"
-							name="confirmPassword"
-							placeholder="Confirm Password"
-							v-model.trim="$v.confirmPassword.$model"
-						/>
-						<div
-							class="error"
-							v-if="!$v.confirmPassword.required && $v.confirmPassword.$error"
-						>
-							Field is required
-						</div>
-					</b-form-group>
-					<input
-						type="submit"
-						class="fadeIn fourth"
-						value="Log In"
-						:disabled="$v.$invalid"
-					/>
+					<input type="submit" value="Log In" :disabled="$v.$invalid" />
 				</form>
-
-				<!-- Remind Passowrd -->
-				<div id="formFooter">
-					<a class="underlineHover" href="#">Forgot Password?</a>
-				</div>
 			</div>
 		</div>
 	</section>
@@ -84,42 +39,18 @@ import { Component, Vue } from "vue-property-decorator";
 import { Validate } from "vuelidate-property-decorators";
 import { validationMixin } from "vuelidate";
 import { required } from "vuelidate/lib/validators";
-import { RegisterUserCommand } from "@/models/AccountsModels";
+import { AdminRegisterUserCommand } from "@/models/AdministratorModels";
 
 @Component({
 	mixins: [validationMixin],
 })
-export default class Register extends Vue {
-	created() {
-		this.email;
-	}
-
-	get email(): string | undefined {
-		const queryEmail = this.$route.query.email;
-
-		if (typeof queryEmail === "string") {
-			return queryEmail;
-		}
-
-		this.redirect();
-		return undefined;
-	}
-
-	@Validate({ required })
-	username = "";
-
-	@Validate({ required })
-	password = "";
-
-	@Validate({ required })
-	confirmPassword = "";
+export default class AdminRegister extends Vue {
+	@Validate({
+		required,
+	})
+	email = "";
 
 	login() {
-		if (!this.email) {
-			this.redirect();
-			return;
-		}
-
 		this.$v.$touch();
 
 		if (this.$v.$invalid) {
@@ -127,23 +58,11 @@ export default class Register extends Vue {
 			return;
 		}
 
-		const user: RegisterUserCommand = {
+		const register: AdminRegisterUserCommand = {
 			email: this.email,
-			username: this.username,
-			password: this.password,
-			confirmPassword: this.confirmPassword,
 		};
 
-		this.$store.dispatch("register", user);
-	}
-
-	redirect() {
-		if (this.$store.getters.isLoggedIn) {
-			this.$router.push("home");
-		} else {
-			this.$router.push("login");
-		}
-		this.$toast.error("Send request to admin for registration email");
+		this.$store.dispatch("adminRegister", register);
 	}
 }
 </script>
@@ -266,8 +185,7 @@ input[type="reset"]:active {
 	transform: scale(0.95);
 }
 
-input[type="text"],
-input[type="password"] {
+input[type="text"] {
 	background-color: #f6f6f6;
 	border: none;
 	color: #0d0d0d;
@@ -288,14 +206,12 @@ input[type="password"] {
 	border-radius: 5px 5px 5px 5px;
 }
 
-input[type="text"]:focus,
-input[type="password"]:focus {
+input[type="text"]:focus {
 	background-color: #fff;
 	border-bottom: 2px solid #5fbae9;
 }
 
-input[type="text"]:placeholder,
-input[type="password"]:placeholder {
+input[type="text"]:placeholder {
 	color: #cccccc;
 }
 
