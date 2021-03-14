@@ -235,7 +235,7 @@ export default class CreateRecipe extends Vue {
 	}
 
 	// eslint-disable-next-line
-  handleFileUpload(event: any) {
+	handleFileUpload(event: any) {
 		const files: FileList = event.target.files;
 		const image: File = files[0];
 		this.$store.dispatch("uploadRecipeImage", image);
@@ -251,7 +251,7 @@ export default class CreateRecipe extends Vue {
 
 		if (this.isEditMode) {
 			// eslint-disable-next-line
-      recipe.id = this.recipeId!;
+			recipe.id = this.recipeId!;
 			this.$store.dispatch("updateRecipe", recipe);
 		} else {
 			this.$store.dispatch("insertRecipe", recipe);

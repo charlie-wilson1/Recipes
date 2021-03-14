@@ -33,7 +33,7 @@ export const actions: ActionTree<RootState, RootState> = {
 				const token = response.data.accessToken as string;
 
 				// eslint-disable-next-line
-        const decodedToken: any = jwt.decode(token);
+				const decodedToken: any = jwt.decode(token);
 
 				const data: TokenResponse = {
 					token: token,
@@ -63,7 +63,7 @@ export const actions: ActionTree<RootState, RootState> = {
 				const token = response.data.accessToken as string;
 
 				// eslint-disable-next-line
-        const decodedToken: any = jwt.decode(token);
+				const decodedToken: any = jwt.decode(token);
 
 				const data: TokenResponse = {
 					token: token,
@@ -110,7 +110,7 @@ export const actions: ActionTree<RootState, RootState> = {
 				const token = response.data.accessToken as string;
 
 				// eslint-disable-next-line
-        const decodedToken: any = jwt.decode(token);
+				const decodedToken: any = jwt.decode(token);
 
 				const data: TokenResponse = {
 					token: token,
@@ -150,24 +150,6 @@ export const actions: ActionTree<RootState, RootState> = {
 	async confirmResetPassword(_, command: ConfirmResetPasswordCommand) {
 		axios.post(accountsUrl + "ConfirmResetPassword", command).catch(err => {
 			Vue.$toast.error(`Error resetting password: ${err}`);
-		});
-	},
-
-	async adminRegister(_, command: AdminRegisterUserCommand) {
-		axios.post(adminUrl + "Register", command).catch(err => {
-			Vue.$toast.error(`Error registering new user: ${err}`);
-		});
-	},
-
-	async adminUpdateRoles(_, command: UpdateRolesCommand) {
-		axios.post(adminUrl + "login", command).catch(err => {
-			Vue.$toast.error(`Error updating user roles: ${err}`);
-		});
-	},
-
-	async adminResetUserPassword(_, command: AdminResetUserPasswordCommand) {
-		axios.post(adminUrl + "Register", command).catch(err => {
-			Vue.$toast.error(`Error registering new user: ${err}`);
 		});
 	},
 

@@ -1,10 +1,28 @@
 import { MutationTree } from "vuex";
 import { AdminState } from "./state";
 import { User } from "@/models/AdministratorModels";
+import Vue from "vue";
 
 /* eslint @typescript-eslint/no-non-null-assertion: "off" */
 export const mutations: MutationTree<AdminState> = {
 	setUsers(state, users: Array<User>) {
 		state.users = users;
+	},
+
+	setRoles(state, roles: Array<string>) {
+		state.allRoles = roles;
+	},
+
+	updateRoles(state, payload: { roles: Array<string>; username: string }) {
+		const userToUpdateIndex = state.users.findIndex(
+			user => user.username === payload.username
+		);
+
+		if (userToUpdateIndex > 1) {
+			Vue.$toast.error("Could not find user");
+			return;
+		}
+
+		state.users[userToUpdateIndex].roles = payload.roles;
 	},
 };

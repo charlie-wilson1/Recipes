@@ -22,6 +22,13 @@ namespace Recipes.Identity.Controllers
             return Ok(users);
         }
 
+        [HttpGet("Roles")]
+        public async Task<IActionResult> GetRoles()
+        {
+            var roles = await Mediator.Send(new AdminGetRolesQuery());
+            return Ok(roles);
+        }
+
         [HttpPost("Register")]
         public async Task<IActionResult> Register(AdminRegisterUserCommand command)
         {

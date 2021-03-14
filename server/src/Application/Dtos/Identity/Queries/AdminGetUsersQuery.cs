@@ -12,12 +12,12 @@ namespace Recipes.Application.Dtos.Identity.Queries
 {
     public class AdminGetUsersQuery : IRequest<List<AdminGetUsersResponseItem>>
     {
-        public class Hander : IRequestHandler<AdminGetUsersQuery, List<AdminGetUsersResponseItem>>
+        public class Handler : IRequestHandler<AdminGetUsersQuery, List<AdminGetUsersResponseItem>>
         {
             private readonly IIdentityService _identityService;
             private readonly IIdentityRoleService _roleService;
 
-            public Hander(IIdentityService identityService, IIdentityRoleService roleService)
+            public Handler(IIdentityService identityService, IIdentityRoleService roleService)
             {
                 _identityService = identityService;
                 _roleService = roleService;

@@ -1,5 +1,18 @@
 <template>
 	<section class="admin-register">
+		<b-modal id="add-users-modal" title="Add User">
+			<b-form>
+				<b-form-group>
+					<b-form-checkbox-group
+						v-model="selectedRoles"
+						:options="allRoles"
+						:aria-describedby="ariaDescribedby"
+						name="flavour-2a"
+						stacked
+					></b-form-checkbox-group>
+				</b-form-group>
+			</b-form>
+		</b-modal>
 		<div class="wrapper">
 			<div id="formContent">
 				<!-- Tabs Titles -->
