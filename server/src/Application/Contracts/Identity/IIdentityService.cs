@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
+using Recipes.Application.Dtos.Identity.Responses;
 
 namespace Recipes.Application.Contracts.Identity
 {
@@ -20,5 +21,8 @@ namespace Recipes.Application.Contracts.Identity
         Task<bool> CanUserBeLockedOut(IdentityUser user);
         Task<DateTimeOffset> GetTimeTillUnlocked(IdentityUser user);
         Task<string> FindUsernameByUserIdAsync(string userId);
+        Task<List<AdminGetUsersResponseItem>> GetUsersAsync();
+        List<AdminGetUsersResponseItem> MapUserRoleDictionaryToUserResponseItem(Dictionary<string, IList<IdentityUser>> usersDict);
+        Task<Dictionary<string, IList<IdentityUser>>> CreateUserDictionary(List<string> roles);
     }
 }

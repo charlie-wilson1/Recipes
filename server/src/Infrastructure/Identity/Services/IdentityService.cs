@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Recipes.Application.Common.Exceptions;
 using Recipes.Application.Contracts.Identity;
+using Recipes.Application.Dtos.Identity.Responses;
 using Recipes.Infrastructure.Identity.Models;
 
 namespace Recipes.Infrastructure.Identity.Services
@@ -187,6 +190,46 @@ namespace Recipes.Infrastructure.Identity.Services
             }
 
             return timespan.Value;
+        }
+
+        public async Task<List<AdminGetUsersResponseItem>> GetUsersAsync()
+        {
+            var roles = _roleService.GetAllRoles();
+            var usersDict = await CreateUserDictionary(roles);
+            List<AdminGetUsersResponseItem> result = MapUserRoleDictionaryToUserResponseItem(usersDict);
+            return result;
+        }
+
+        public async Task<Dictionary<string, IList<IdentityUser>>> CreateUserDictionary(List<string> roles)
+        {
+            var usersDict = new Dictionary<string, IList<IdentityUser>>();
+
+            foreach (var role in roles)
+            {
+                var users = await _userManager.GetUsersInRoleAsync(role);
+                usersDict.Add(role, users);
+            }
+
+            if (!usersDict.Any())
+            {
+                throw new NotFoundException("No users or roles in database");
+            }
+
+            return usersDict;
+        }
+
+        public List<AdminGetUsersResponseItem> MapUserRoleDictionaryToUserResponseItem(Dictionary<string, IList<IdentityUser>> usersDict)
+        {
+            return usersDict
+                .SelectMany(dict => dict.Value)
+                .GroupBy(user => user.Id)
+                .Select(group => group.First())
+                .Select(user => new AdminGetUsersResponseItem
+                {
+                    Id = user.Id,
+                    Username = user.UserName,
+                    Roles = user.MapUserRolesFromUserDictionary(usersDict)
+                }).ToList();
         }
     }
 }

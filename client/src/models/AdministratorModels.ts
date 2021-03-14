@@ -10,3 +10,9 @@ export interface UpdateRolesCommand {
 export interface AdminResetUserPasswordCommand {
 	email: string;
 }
+
+export interface User {
+	id: string;
+	username: string;
+	roles: Array<string>;
+}

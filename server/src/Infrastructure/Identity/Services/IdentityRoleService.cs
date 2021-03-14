@@ -94,5 +94,11 @@ namespace Recipes.Infrastructure.Identity.Services
                 throw new Exception("Role not added");
             }
         }
+
+        public List<string> GetAllRoles()
+        {
+            var roles = _roleManager.Roles.Select(role => role.NormalizedName).ToList();
+            return roles;
+        }
     }
 }

@@ -4,6 +4,7 @@ import createPersistedState from "vuex-persistedstate";
 import { RootState } from "./state";
 import { RecipeModule } from "./modules/recipe/module";
 import { NewRecipeModule } from "./modules/newRecipe/module";
+import { AdminModule } from "./modules/admin/module";
 import { actions } from "./actions";
 import { mutations } from "./mutations";
 
@@ -22,6 +23,7 @@ const store: StoreOptions<RootState> = {
 	modules: {
 		RecipeModule,
 		NewRecipeModule,
+		AdminModule,
 	},
 	getters: {
 		version: state => {

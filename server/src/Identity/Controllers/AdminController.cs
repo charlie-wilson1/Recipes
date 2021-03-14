@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Recipes.Application.Dtos.Identity.Commands;
+using Recipes.Application.Dtos.Identity.Queries;
 
 namespace Recipes.Identity.Controllers
 {
@@ -13,6 +14,13 @@ namespace Recipes.Identity.Controllers
     {
         public AdminController(IMediator mediator)
             : base(mediator) { } 
+
+        [HttpGet("Users")]
+        public async Task<IActionResult> GetUsers()
+        {
+            var users = await Mediator.Send(new AdminGetUsersQuery());
+            return Ok(users);
+        }
 
         [HttpPost("Register")]
         public async Task<IActionResult> Register(AdminRegisterUserCommand command)

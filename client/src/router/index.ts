@@ -6,6 +6,7 @@ import Make from "@/pages/Recipe/Make.vue";
 import Login from "@/pages/Auth/Login.vue";
 import Register from "@/pages/Auth/Register.vue";
 import AdminRegister from "@/pages/Admin/Register.vue";
+import ManageUsers from "@/pages/Admin/ManageUsers.vue";
 import { handleLogin, matchesLoginMeta } from "@/middleware/login";
 import { handleLogout, matchesLogoutMeta } from "@/middleware/logout";
 import {
@@ -55,6 +56,15 @@ const routes: Array<RouteConfig> = [
 		path: "/admin/register",
 		name: "adminRegister",
 		component: AdminRegister,
+		meta: {
+			requiresLogin: true,
+			requiresAdmin: true,
+		},
+	},
+	{
+		path: "/admin/manage-users",
+		name: "manageUsers",
+		component: ManageUsers,
 		meta: {
 			requiresLogin: true,
 			requiresAdmin: true,

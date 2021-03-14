@@ -15,6 +15,16 @@
 				<b-navbar-nav class="ml-auto" v-else>
 					<b-nav-item href="/login">Login</b-nav-item>
 				</b-navbar-nav>
+				<b-navbar-nav v-if="isAdmin">
+					<b-nav-item-dropdown text="Admin" right>
+						<b-dropdown-item :to="{ name: 'adminRegister' }"
+							>Register Users</b-dropdown-item
+						>
+						<b-dropdown-item :to="{ name: 'manageUsers' }"
+							>Manage Users</b-dropdown-item
+						>
+					</b-nav-item-dropdown>
+				</b-navbar-nav>
 			</b-collapse>
 		</b-navbar>
 	</section>
@@ -36,6 +46,14 @@ export default class Navbar extends Vue {
 		}
 
 		return loggedIn;
+	}
+
+	get isAdmin(): boolean {
+		if (!this.isLoggedIn) {
+			return false;
+		}
+
+		return this.$store.getters.isAdmin;
 	}
 
 	get username(): string {
