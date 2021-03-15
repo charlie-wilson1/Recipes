@@ -1,46 +1,37 @@
-<template>
-	<section class="admin-register">
-		<b-modal id="add-users-modal" title="Add User">
-			<b-form>
-				<b-form-group>
-					<b-form-checkbox-group
-						v-model="selectedRoles"
-						:options="allRoles"
-						:aria-describedby="ariaDescribedby"
-						name="flavour-2a"
-						stacked
-					></b-form-checkbox-group>
-				</b-form-group>
-			</b-form>
-		</b-modal>
-		<div class="wrapper">
+<template lang="html">
+	<section class="forgot-password">
+		<div class="wrapper fadeInDown">
 			<div id="formContent">
 				<!-- Tabs Titles -->
 
 				<!-- Icon -->
-				<div class="icon-wrapper mb-0">
+				<div class="fadeIn first icon-wrapper mb-0">
 					<b-icon class="login-icon" icon="person"></b-icon>
 					<!-- <img src="http://danielzawadzki.com/codepen/01/icon.svg" id="icon" alt="User Icon" /> -->
 				</div>
 
 				<!-- Login Form -->
-				<form @submit.prevent="login" method="POST">
-					<b-form-group :class="{ 'form-group--error': $v.username.$error }">
+				<form @submit.prevent="resetPassword" method="POST">
+					<b-form-group :class="{ 'form-group--error': $v.email.$error }">
 						<input
 							type="text"
 							id="email"
+							class="fadeIn second"
 							name="email"
-							placeholder="email"
+							placeholder="user@email.com"
 							v-model.trim="$v.email.$model"
 						/>
-						<div
-							class="error"
-							v-if="!$v.username.required && $v.username.$error"
-						>
-							Field is required
-						</div>
+						<p v-if="$v.email.$error" class="error">
+							<span v-if="!$v.email.required">This field is required.</span>
+							<span v-else-if="!$v.email.email">Must be a valid email.</span>
+						</p>
 					</b-form-group>
-					<input type="submit" value="Log In" :disabled="$v.$invalid" />
+					<input
+						type="submit"
+						class="fadeIn fourth"
+						value="Reset Password"
+						:disabled="$v.$invalid"
+					/>
 				</form>
 			</div>
 		</div>
@@ -51,19 +42,25 @@
 import { Component, Vue } from "vue-property-decorator";
 import { Validate } from "vuelidate-property-decorators";
 import { validationMixin } from "vuelidate";
-import { required } from "vuelidate/lib/validators";
-import { AdminRegisterUserCommand } from "@/models/AdministratorModels";
+import { required, email } from "vuelidate/lib/validators";
 
 @Component({
 	mixins: [validationMixin],
 })
-export default class AdminRegister extends Vue {
-	@Validate({
-		required,
-	})
+export default class ForgotPassword extends Vue {
+	@Validate({ required, email })
 	email = "";
 
-	login() {
+	get redirectRoute(): string | undefined {
+		const route = this.$route.query.redirect;
+
+		if (typeof route === "string") {
+			return route;
+		}
+		return undefined;
+	}
+
+	resetPassword() {
 		this.$v.$touch();
 
 		if (this.$v.$invalid) {
@@ -71,16 +68,16 @@ export default class AdminRegister extends Vue {
 			return;
 		}
 
-		const register: AdminRegisterUserCommand = {
+		const payload = {
 			email: this.email,
+			redirectUrl: this.redirectRoute,
 		};
-
-		this.$store.dispatch("adminRegister", register);
+		this.$store.dispatch("resetPassword", payload);
 	}
 }
 </script>
 
-<style lang="scss" scoped>
+<style scoped lang="scss">
 /* BASIC */
 html {
 	background-color: #56baed;
@@ -100,7 +97,7 @@ a {
 }
 
 /* STRUCTURE */
-.login {
+.forgot-password {
 	position: absolute;
 	top: 0;
 	bottom: 0;
@@ -198,7 +195,8 @@ input[type="reset"]:active {
 	transform: scale(0.95);
 }
 
-input[type="text"] {
+input[type="text"],
+input[type="password"] {
 	background-color: #f6f6f6;
 	border: none;
 	color: #0d0d0d;
@@ -219,12 +217,14 @@ input[type="text"] {
 	border-radius: 5px 5px 5px 5px;
 }
 
-input[type="text"]:focus {
+input[type="text"]:focus,
+input[type="password"]:focus {
 	background-color: #fff;
 	border-bottom: 2px solid #5fbae9;
 }
 
-input[type="text"]:placeholder {
+input[type="text"]:placeholder,
+input[type="password"]:placeholder {
 	color: #cccccc;
 }
 

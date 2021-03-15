@@ -17,6 +17,7 @@
 				<b-navbar-nav class="ml-auto" v-if="isLoggedIn">
 					<b-nav-item-dropdown :text="username" right>
 						<b-dropdown-item href="/logout">Logout</b-dropdown-item>
+						<b-dropdown-item href="/profile">Profile</b-dropdown-item>
 					</b-nav-item-dropdown>
 				</b-navbar-nav>
 				<b-navbar-nav class="ml-auto" v-else>

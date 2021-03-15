@@ -60,7 +60,9 @@
 
 				<!-- Remind Passowrd -->
 				<div id="formFooter">
-					<a class="underlineHover" href="#">Forgot Password?</a>
+					<a class="underlineHover" :href="resetPasswordRoute"
+						>Forgot Password?</a
+					>
 				</div>
 			</div>
 		</div>
@@ -73,20 +75,32 @@ import { Validate } from "vuelidate-property-decorators";
 import { validationMixin } from "vuelidate";
 import { required } from "vuelidate/lib/validators";
 import { LoginRequest } from "@/models/AccountsModels";
+import ForgotPasswordModal from "@/pages/Auth/ForgotPassword.vue";
 
 @Component({
+	components: { ForgotPasswordModal },
 	mixins: [validationMixin],
 })
 export default class Login extends Vue {
 	private showPassword = false;
 
-	get redirectRoute(): string | undefined {
+	get redirectRoute(): string {
 		const route = this.$route.query.redirect;
 
 		if (typeof route === "string") {
 			return route;
 		}
-		return undefined;
+		return "undefined";
+	}
+
+	get resetPasswordRoute(): string {
+		let route = "/reset-password";
+
+		if (this.redirectRoute) {
+			route = route + `?redirect=${this.redirectRoute}`;
+		}
+
+		return route;
 	}
 
 	@Validate({ required })
@@ -380,6 +394,10 @@ input[type="submit"]:disabled {
 }
 
 /* Simple CSS3 Fade-in Animation */
+.underlineHover {
+	color: #1589c4 !important;
+}
+
 .underlineHover:after {
 	display: block;
 	left: 0;
@@ -392,7 +410,7 @@ input[type="submit"]:disabled {
 }
 
 .underlineHover:hover {
-	color: #0d0d0d;
+	color: #0d0d0d !important;
 }
 
 .underlineHover:hover:after {

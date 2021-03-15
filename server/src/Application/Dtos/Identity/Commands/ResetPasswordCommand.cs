@@ -12,6 +12,7 @@ namespace Recipes.Application.Dtos.Identity.Commands
     public class ResetPasswordCommand : IRequest
     {
         public string Email { get; set; }
+        public string RedirectUrl { get; set; }
 
         public class Handler : IRequestHandler<ResetPasswordCommand>
         {
@@ -34,7 +35,22 @@ namespace Recipes.Application.Dtos.Identity.Commands
                 var user = await _identityService.FindUserByEmailAsync(request.Email);
                 var resetToken = await _passwordService.GeneratePasswordResetTokenAsync(user);
 
-                // send email when SendGrid service completed.
+                var emailData = new SendGridTemplatedEmailDto
+                {
+                    SendToEmail = user.Email,
+                    SendToUsername = user.UserName,
+                    RedirectUri = BuildEmailUri(request.RedirectUrl, user, resetToken)
+                };
+
+                await _emailService.SendResetPasswordTemplatedEmail(emailData);
+
+                // TODO: RECORD DATA WHEN LOGGING IS INSERTED INTO PROJECTS
+
+                return Unit.Value;
+            }
+
+            private static Uri BuildEmailUri(string redirectUrl, Microsoft.AspNetCore.Identity.IdentityUser user, string resetToken)
+            {
                 var clientUri = Environment.GetEnvironmentVariable("CLIENT_URI");
                 var builder = new UriBuilder(clientUri);
                 builder.Path = "/reset-password";
@@ -44,20 +60,13 @@ namespace Recipes.Application.Dtos.Identity.Commands
                     { $"email={user.Email}" }
                 };
 
-                builder.Query = string.Join("&", queryList);
-
-                var emailData = new SendGridTemplatedEmailDto
+                if (!string.IsNullOrWhiteSpace(redirectUrl))
                 {
-                    SendToEmail = user.Email,
-                    SendToUsername = user.UserName,
-                    RedirectUri = new Uri(builder.ToString())
-                };
+                    queryList.Add($"redirectUrl={redirectUrl}");
+                }
 
-                await _emailService.SendResetPasswordTemplatedEmail(emailData);
-
-                // TODO: RECORD DATA WHEN LOGGING IS INSERTED INTO PROJECTS
-
-                return Unit.Value;
+                builder.Query = string.Join("&", queryList);
+                return new Uri(builder.ToString());
             }
         }
     }

@@ -6,29 +6,28 @@ import router from "@/router/index";
 import {
 	UpdateCurrentUserCommand,
 	UpdatePasswordCommand,
-	ResetPasswordCommand,
 	ConfirmResetPasswordCommand,
 	TokenResponse,
 	LoginRequest,
+	RegisterUserCommand,
 } from "@/models/AccountsModels";
-import {
-	AdminRegisterUserCommand,
-	UpdateRolesCommand,
-	AdminResetUserPasswordCommand,
-} from "@/models/AdministratorModels";
 import axios from "axios";
 
 const accountsUrl = process.env.VUE_APP_IDENTITY_URL + "accounts/";
-const adminUrl = process.env.VUE_APP_IDENTITY_URL + "admin/";
 
 export const actions: ActionTree<RootState, RootState> = {
 	setIsLoading: ({ commit }, isLoading: boolean) => {
 		commit("setIsLoading", isLoading);
 	},
 
-	async register({ commit }, payload: LoginRequest) {
+	async register({ commit }, command: RegisterUserCommand) {
 		axios
-			.post(accountsUrl + "register", payload.command)
+			.post(accountsUrl + "register", {
+				email: command.email,
+				username: command.username,
+				password: command.password,
+				confirmPassword: command.confirmPassword,
+			})
 			.then(response => {
 				const token = response.data.accessToken as string;
 
@@ -45,8 +44,8 @@ export const actions: ActionTree<RootState, RootState> = {
 
 				commit("setUserVariables", data);
 
-				if (payload.redirect) {
-					router.push(payload.redirect);
+				if (command.redirect) {
+					router.push(command.redirect);
 				} else {
 					router.push("home");
 				}
@@ -58,7 +57,10 @@ export const actions: ActionTree<RootState, RootState> = {
 
 	async login({ commit }, payload: LoginRequest) {
 		axios
-			.post(accountsUrl + "login", payload.command)
+			.post(accountsUrl + "login", {
+				username: payload.command.username,
+				password: payload.command.password,
+			})
 			.then(response => {
 				const token = response.data.accessToken as string;
 
@@ -130,27 +132,53 @@ export const actions: ActionTree<RootState, RootState> = {
 	},
 
 	async updateUser(_, command: UpdateCurrentUserCommand) {
-		axios.post(accountsUrl + "UpdateCurrentUser", command).catch(err => {
-			Vue.$toast.error(`Error updating user: ${err}`);
-		});
+		axios
+			.put(`${accountsUrl}/UpdateCurrentUser`, {
+				username: command.username,
+				email: command.email,
+			})
+			.catch(err => {
+				Vue.$toast.error(`Error updating user: ${err}`);
+			});
 	},
 
 	async updatePassword(_, command: UpdatePasswordCommand) {
-		axios.post(accountsUrl + "UpdatePassword", command).catch(err => {
-			Vue.$toast.error(`Error updating password: ${err}`);
-		});
+		axios
+			.patch(accountsUrl + "UpdatePassword", {
+				currentPassword: command.currentPassword,
+				newPassword: command.newPassword,
+				newPasswordConfirmation: command.newPasswordConfirmation,
+			})
+			.catch(err => {
+				Vue.$toast.error(`Error updating password: ${err}`);
+			});
 	},
 
-	async resetPassword(_, command: ResetPasswordCommand) {
-		axios.post(accountsUrl + "ResetPassword", command).catch(err => {
-			Vue.$toast.error(`Error resetting password: ${err}`);
-		});
+	async resetPassword(_, payload: { email: string; redirectUrl: string }) {
+		axios
+			.post(accountsUrl + "ResetPassword", {
+				email: payload.email,
+				redirectUrl: payload.redirectUrl,
+			})
+			.then(_ =>
+				Vue.$toast.success("Please check your email to reset your password")
+			)
+			.catch(err => {
+				Vue.$toast.error(`Error resetting password: ${err}`);
+			});
 	},
 
 	async confirmResetPassword(_, command: ConfirmResetPasswordCommand) {
-		axios.post(accountsUrl + "ConfirmResetPassword", command).catch(err => {
-			Vue.$toast.error(`Error resetting password: ${err}`);
-		});
+		axios
+			.post(accountsUrl + "ConfirmResetPassword", {
+				email: command.email,
+				resetToken: command.resetToken,
+				newPassword: command.newPassword,
+				newPasswordConfirmation: command.newPasswordConfirmation,
+			})
+			.catch(err => {
+				Vue.$toast.error(`Error resetting password: ${err}`);
+			});
 	},
 
 	logout({ commit }) {

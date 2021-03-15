@@ -5,7 +5,8 @@ import CreateRecipe from "@/pages/Recipe/CreateRecipe.vue";
 import Make from "@/pages/Recipe/Make.vue";
 import Login from "@/pages/Auth/Login.vue";
 import Register from "@/pages/Auth/Register.vue";
-import AdminRegister from "@/pages/Admin/Register.vue";
+import ForgotPassword from "@/pages/Auth/ForgotPassword.vue";
+import Profile from "@/pages/Auth/Profile.vue";
 import ManageUsers from "@/pages/Admin/ManageUsers.vue";
 import { handleLogin, matchesLoginMeta } from "@/middleware/login";
 import { handleLogout, matchesLogoutMeta } from "@/middleware/logout";
@@ -24,9 +25,16 @@ const routes: Array<RouteConfig> = [
 		component: Login,
 	},
 	{
+		path: "/reset-password",
+		name: "forgotPassword",
+		component: ForgotPassword,
+		props: route => ({ redirectRoute: route.query.redirectRoute }),
+	},
+	{
 		path: "/register",
 		name: "register",
 		component: Register,
+		props: route => ({ redirectRoute: route.query.redirectRoute }),
 	},
 	{
 		path: "/make/:recipe_id",
@@ -53,15 +61,6 @@ const routes: Array<RouteConfig> = [
 		},
 	},
 	{
-		path: "/admin/register",
-		name: "adminRegister",
-		component: AdminRegister,
-		meta: {
-			requiresLogin: true,
-			requiresAdmin: true,
-		},
-	},
-	{
 		path: "/admin/manage-users",
 		name: "manageUsers",
 		component: ManageUsers,
@@ -81,6 +80,14 @@ const routes: Array<RouteConfig> = [
 		path: "/home",
 		name: "home",
 		component: Home,
+		meta: {
+			requiresLogin: true,
+		},
+	},
+	{
+		path: "/profile",
+		name: "profile",
+		component: Profile,
 		meta: {
 			requiresLogin: true,
 		},

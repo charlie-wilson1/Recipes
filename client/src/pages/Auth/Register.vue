@@ -2,15 +2,10 @@
 	<section class="login">
 		<div class="wrapper fadeInDown">
 			<div id="formContent">
-				<!-- Tabs Titles -->
-
-				<!-- Icon -->
 				<div class="fadeIn first icon-wrapper mb-0">
 					<b-icon class="login-icon" icon="person"></b-icon>
-					<!-- <img src="http://danielzawadzki.com/codepen/01/icon.svg" id="icon" alt="User Icon" /> -->
 				</div>
 
-				<!-- Login Form -->
 				<form @submit.prevent="login" method="POST">
 					<b-form-group :class="{ 'form-group--error': $v.username.$error }">
 						<input
@@ -37,12 +32,12 @@
 							placeholder="Password"
 							v-model.trim="$v.password.$model"
 						/>
-						<div
-							class="error"
-							v-if="!$v.password.required && $v.password.$error"
-						>
-							Field is required
-						</div>
+						<p v-if="$v.password.$error" class="error">
+							<span v-if="!$v.password.required">This field is required.</span>
+							<span v-else-if="!$v.password.strongPassword"
+								>Stronger password required.</span
+							>
+						</p>
 					</b-form-group>
 					<b-form-group
 						:class="{ 'form-group--error': $v.confirmPassword.$error }"
@@ -55,12 +50,14 @@
 							placeholder="Confirm Password"
 							v-model.trim="$v.confirmPassword.$model"
 						/>
-						<div
-							class="error"
-							v-if="!$v.confirmPassword.required && $v.confirmPassword.$error"
-						>
-							Field is required
-						</div>
+						<p v-if="$v.confirmPassword.$error" class="error">
+							<span v-if="!$v.confirmPassword.required"
+								>This field is required.</span
+							>
+							<span v-else-if="!$v.confirmPassword.sameAs"
+								>New passwords must match.</span
+							>
+						</p>
 					</b-form-group>
 					<input
 						type="submit"
@@ -70,7 +67,6 @@
 					/>
 				</form>
 
-				<!-- Remind Passowrd -->
 				<div id="formFooter">
 					<a class="underlineHover" href="#">Forgot Password?</a>
 				</div>
@@ -83,7 +79,8 @@
 import { Component, Vue } from "vue-property-decorator";
 import { Validate } from "vuelidate-property-decorators";
 import { validationMixin } from "vuelidate";
-import { required } from "vuelidate/lib/validators";
+import { required, sameAs } from "vuelidate/lib/validators";
+import { validPassword } from "@/mixins/passwordValidation";
 import { RegisterUserCommand } from "@/models/AccountsModels";
 
 @Component({
@@ -92,6 +89,16 @@ import { RegisterUserCommand } from "@/models/AccountsModels";
 export default class Register extends Vue {
 	created() {
 		this.email;
+	}
+
+	get redirectRoute(): string | undefined {
+		const queryRedirectRoute = this.$route.query.redirectRoute;
+
+		if (typeof queryRedirectRoute === "string") {
+			return queryRedirectRoute;
+		}
+
+		return undefined;
 	}
 
 	get email(): string | undefined {
@@ -108,10 +115,10 @@ export default class Register extends Vue {
 	@Validate({ required })
 	username = "";
 
-	@Validate({ required })
+	@Validate({ required, strongPassword: validPassword })
 	password = "";
 
-	@Validate({ required })
+	@Validate({ required, sameAs: sameAs("newPassword") })
 	confirmPassword = "";
 
 	login() {
@@ -132,6 +139,7 @@ export default class Register extends Vue {
 			username: this.username,
 			password: this.password,
 			confirmPassword: this.confirmPassword,
+			redirect: this.redirectRoute,
 		};
 
 		this.$store.dispatch("register", user);

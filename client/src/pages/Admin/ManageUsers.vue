@@ -79,6 +79,7 @@ import { Validate } from "vuelidate-property-decorators";
 import { validationMixin } from "vuelidate";
 import { required } from "vuelidate/lib/validators";
 import { Component, Vue } from "vue-property-decorator";
+import { capitalizeString } from "@/mixins/stringUtils";
 
 @Component({
 	mixins: [validationMixin],
@@ -88,6 +89,8 @@ export default class ManageUsers extends Vue {
 		required,
 	})
 	addedUserEmail = "";
+
+	capitalizeText = capitalizeString;
 
 	get users(): Array<User> {
 		return this.$store.getters.users || [];
@@ -100,10 +103,6 @@ export default class ManageUsers extends Vue {
 
 	selectedUsername: string = this.users[0].username;
 	selectedUser: User = this.users[0];
-
-	public capitalizeText(str: string): string {
-		return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-	}
 
 	selectedRoles: Array<string> = this.allRoles.filter(role =>
 		(this.selectedUser?.roles || [])

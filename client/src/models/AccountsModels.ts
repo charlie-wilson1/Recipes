@@ -3,6 +3,7 @@ export interface RegisterUserCommand {
 	username: string;
 	password: string;
 	confirmPassword: string;
+	redirect: string | undefined;
 }
 
 export interface LoginCommand {
@@ -15,6 +16,11 @@ export interface LoginRequest {
 	redirect: string | undefined;
 }
 
+export interface UpdateCurrentUserForm {
+	updateUserCommand: UpdateCurrentUserCommand;
+	updatePasswordCommand: UpdatePasswordCommand;
+}
+
 export interface UpdateCurrentUserCommand {
 	username: string;
 	email: string;
@@ -24,10 +30,6 @@ export interface UpdatePasswordCommand {
 	currentPassword: string;
 	newPassword: string;
 	newPasswordConfirmation: string;
-}
-
-export interface ResetPasswordCommand {
-	email: string;
 }
 
 export interface ConfirmResetPasswordCommand {
