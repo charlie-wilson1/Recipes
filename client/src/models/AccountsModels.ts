@@ -37,6 +37,7 @@ export interface ConfirmResetPasswordCommand {
 	resetToken: string;
 	newPassword: string;
 	newPasswordConfirmation: string;
+	redirect: string | undefined;
 }
 
 export interface TokenResponse {

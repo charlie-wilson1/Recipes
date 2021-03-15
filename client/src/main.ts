@@ -7,6 +7,7 @@ import store from "./store/store";
 import vSelect from "vue-select";
 import VueToast from "vue-toast-notification";
 import "vue-toast-notification/dist/theme-sugar.css";
+import "../public/css/styles.scss";
 
 Vue.use(Vuelidate);
 Vue.use(BootstrapVue);

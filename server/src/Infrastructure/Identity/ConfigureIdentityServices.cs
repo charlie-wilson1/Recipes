@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -6,6 +7,7 @@ using Recipes.Infrastructure.Identity.Models;
 using Recipes.Infrastructure.Persistence;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -67,14 +69,17 @@ namespace Recipes.Infrastructure.Identity
 
         internal static void ConfigureIdentity(this IServiceCollection services, JwtBearerTokenSettings jwtSettings, ProviderSettings providerSettings, bool isDevelopment)
         {
-            services.AddIdentity<IdentityUser, IdentityRole>(options => options.User.RequireUniqueEmail = true)
+            services.AddDataProtection().SetApplicationName(providerSettings.Name);
+
+            services.AddIdentity<IdentityUser, IdentityRole>(options => {
+                options.User.RequireUniqueEmail = true;
+                options.Tokens.ProviderMap.Add(providerSettings.Name, new TokenProviderDescriptor(typeof(DataProtectorTokenProvider<IdentityUser>)));
+                options.Tokens.PasswordResetTokenProvider = providerSettings.Name;
+            })
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
-            services.Configure<DataProtectionTokenProviderOptions>(options => options.TokenLifespan = TimeSpan.FromSeconds(jwtSettings.ExpiryTimeInSeconds));
-
-            var builder = new IdentityBuilder(typeof(IdentityUser), services);
-            builder.AddTokenProvider(providerSettings.Name, typeof(DataProtectorTokenProvider<IdentityUser>));
+            services.Configure<DataProtectionTokenProviderOptions>(options => options.TokenLifespan = TimeSpan.FromDays(2));
 
             services.AddAuthentication(options =>
             {

@@ -305,15 +305,5 @@ export default class CreateRecipe extends Vue {
 			font-size: 1.2em;
 		}
 	}
-
-	.error {
-		color: red;
-	}
-
-	.form-group--error {
-		input {
-			border-color: red;
-		}
-	}
 }
 </style>

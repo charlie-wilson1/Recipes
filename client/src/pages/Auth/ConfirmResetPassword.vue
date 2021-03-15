@@ -1,12 +1,7 @@
 <template lang="html">
-	<section class="profile-update-password">
-		<h4>Password</h4>
+	<section class="confirm-reset-password container">
+		<h1>Reset Password</h1>
 		<b-form @submit.prevent="handleSubmit">
-			<PasswordInput
-				:password.sync="$v.currentPassword.$model"
-				label="Current Password"
-				:errors="$v.currentPassword"
-			/>
 			<PasswordInput
 				:password.sync="$v.newPassword.$model"
 				label="New Password"
@@ -55,18 +50,51 @@ import { validationMixin } from "vuelidate";
 import { required, sameAs } from "vuelidate/lib/validators";
 import { Component, Vue } from "vue-property-decorator";
 import { validPassword } from "@/mixins/passwordValidation";
-import { UpdatePasswordCommand } from "@/models/AccountsModels";
 import PasswordInput from "@/components/Auth/PasswordInput.vue";
+import { ConfirmResetPasswordCommand } from "@/models/AccountsModels";
+import { redirect } from "@/mixins/routingUtils";
 
 @Component({
-	components: {
-		PasswordInput,
-	},
+	components: { PasswordInput },
 	mixins: [validationMixin],
 })
-export default class ProfileUpdatePassword extends Vue {
-	@Validate({ required })
-	currentPassword = "";
+export default class ConfirmResetPassword extends Vue {
+	created() {
+		this.email;
+		this.redirectRoute;
+	}
+
+	get redirectRoute(): string | undefined {
+		const queryRedirectRoute = this.$route.query.redirectRoute;
+
+		if (typeof queryRedirectRoute === "string") {
+			return queryRedirectRoute;
+		}
+
+		return undefined;
+	}
+
+	get email(): string | undefined {
+		const queryEmail = this.$route.query.email;
+
+		if (typeof queryEmail === "string") {
+			return queryEmail;
+		}
+
+		redirect("Invalid link. Send request to admin for registration email");
+		return undefined;
+	}
+
+	get resetToken(): string | undefined {
+		const token = this.$route.query.token;
+
+		if (typeof token === "string") {
+			return token;
+		}
+
+		redirect("Invalid link. Send request to admin for registration email");
+		return undefined;
+	}
 
 	@Validate({
 		required,
@@ -78,6 +106,10 @@ export default class ProfileUpdatePassword extends Vue {
 	newPasswordConfirmation = "";
 
 	handleSubmit() {
+		if (!this.email || !this.resetToken) {
+			redirect("Invalid link. Send request to admin for registration email");
+		}
+
 		this.$v.$touch();
 
 		if (this.$v.$invalid) {
@@ -85,18 +117,22 @@ export default class ProfileUpdatePassword extends Vue {
 			return;
 		}
 
-		const payload: UpdatePasswordCommand = {
-			currentPassword: this.currentPassword,
+		const command: ConfirmResetPasswordCommand = {
 			newPassword: this.newPassword,
 			newPasswordConfirmation: this.newPasswordConfirmation,
+			// eslint-disable-next-line
+			email: this.email!,
+			// eslint-disable-next-line
+			resetToken: this.resetToken!,
+			redirect: this.redirectRoute,
 		};
 
-		this.$store.dispatch("updatePassword", payload);
+		this.$store.dispatch("confirmResetPassword", command);
 	}
 }
 </script>
 
 <style scoped lang="scss">
-.profile-update-password {
+.confirm-reset-password {
 }
 </style>

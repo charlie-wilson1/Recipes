@@ -1,3 +1,4 @@
+// CREDIT evarevirus's https://bootsnipp.com/snippets/aMnz0
 <template>
 	<section class="login">
 		<div class="wrapper fadeInDown">
@@ -84,17 +85,17 @@ import ForgotPasswordModal from "@/pages/Auth/ForgotPassword.vue";
 export default class Login extends Vue {
 	private showPassword = false;
 
-	get redirectRoute(): string {
+	get redirectRoute(): string | undefined {
 		const route = this.$route.query.redirect;
 
 		if (typeof route === "string") {
 			return route;
 		}
-		return "undefined";
+		return undefined;
 	}
 
 	get resetPasswordRoute(): string {
-		let route = "/reset-password";
+		let route = "/forgot-password";
 
 		if (this.redirectRoute) {
 			route = route + `?redirect=${this.redirectRoute}`;
@@ -424,20 +425,6 @@ input[type="submit"]:disabled {
 
 .login-icon {
 	font-size: 50px;
-}
-
-*:focus {
-	outline: none;
-}
-
-.error {
-	color: red;
-}
-
-.form-group--error {
-	input {
-		border-color: red;
-	}
 }
 
 small {

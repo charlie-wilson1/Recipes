@@ -236,15 +236,5 @@ export default class IngredientsForm extends Vue {
 	.ingredient-button {
 		margin-top: 30px;
 	}
-
-	.error {
-		color: red;
-	}
-
-	.form-group--error {
-		input {
-			border-color: red;
-		}
-	}
 }
 </style>

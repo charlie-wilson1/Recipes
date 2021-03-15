@@ -1,3 +1,4 @@
+// CREDIT evarevirus's https://bootsnipp.com/snippets/aMnz0
 <template lang="html">
 	<section class="forgot-password">
 		<div class="wrapper fadeInDown">
@@ -367,15 +368,5 @@ input[type="submit"]:disabled {
 
 *:focus {
 	outline: none;
-}
-
-.error {
-	color: red;
-}
-
-.form-group--error {
-	input {
-		border-color: red;
-	}
 }
 </style>

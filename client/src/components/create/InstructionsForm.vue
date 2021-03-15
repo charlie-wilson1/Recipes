@@ -166,14 +166,5 @@ export default class InstructionsForm extends Vue {
 
 <style lang="scss" scoped>
 .instructions-form {
-	.error {
-		color: red;
-	}
-
-	.form-group--error {
-		input {
-			border-color: red;
-		}
-	}
 }
 </style>

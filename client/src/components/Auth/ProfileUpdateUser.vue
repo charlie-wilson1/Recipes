@@ -100,21 +100,5 @@ export default class ProfileUpdateUser extends Vue {
 
 <style scoped lang="scss">
 .profile-update-user {
-	.error {
-		color: red;
-	}
-
-	.form-group--error {
-		input {
-			border-color: red;
-		}
-	}
-
-	*:focus {
-		outline: none;
-		border-color: none;
-		-webkit-box-shadow: none;
-		box-shadow: none;
-	}
 }
 </style>

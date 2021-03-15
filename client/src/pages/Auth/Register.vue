@@ -1,3 +1,4 @@
+// CREDIT evarevirus's https://bootsnipp.com/snippets/aMnz0
 <template>
 	<section class="login">
 		<div class="wrapper fadeInDown">
@@ -82,6 +83,7 @@ import { validationMixin } from "vuelidate";
 import { required, sameAs } from "vuelidate/lib/validators";
 import { validPassword } from "@/mixins/passwordValidation";
 import { RegisterUserCommand } from "@/models/AccountsModels";
+import { redirect } from "@/mixins/routingUtils";
 
 @Component({
 	mixins: [validationMixin],
@@ -89,6 +91,7 @@ import { RegisterUserCommand } from "@/models/AccountsModels";
 export default class Register extends Vue {
 	created() {
 		this.email;
+		this.redirectRoute;
 	}
 
 	get redirectRoute(): string | undefined {
@@ -108,7 +111,7 @@ export default class Register extends Vue {
 			return queryEmail;
 		}
 
-		this.redirect();
+		redirect("Send request to admin for registration email");
 		return undefined;
 	}
 
@@ -122,15 +125,11 @@ export default class Register extends Vue {
 	confirmPassword = "";
 
 	login() {
-		if (!this.email) {
-			this.redirect();
-			return;
-		}
-
 		this.$v.$touch();
 
-		if (this.$v.$invalid) {
+		if (this.$v.$invalid || !this.email) {
 			Vue.$toast.error("Please fix invalid fields.");
+			redirect("Send request to admin for registration email");
 			return;
 		}
 
@@ -143,15 +142,6 @@ export default class Register extends Vue {
 		};
 
 		this.$store.dispatch("register", user);
-	}
-
-	redirect() {
-		if (this.$store.getters.isLoggedIn) {
-			this.$router.push("home");
-		} else {
-			this.$router.push("login");
-		}
-		this.$toast.error("Send request to admin for registration email");
 	}
 }
 </script>
@@ -442,19 +432,5 @@ input[type="submit"]:disabled {
 
 .login-icon {
 	font-size: 50px;
-}
-
-*:focus {
-	outline: none;
-}
-
-.error {
-	color: red;
-}
-
-.form-group--error {
-	input {
-		border-color: red;
-	}
 }
 </style>

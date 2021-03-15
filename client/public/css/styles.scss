@@ -1,0 +1,34 @@
+// Forms
+.error {
+	color: red;
+}
+
+.form-group--error {
+	input {
+		border-color: red;
+	}
+}
+
+*:focus {
+	outline: none;
+	border-color: none;
+	-webkit-box-shadow: none;
+	box-shadow: none;
+}
+
+textarea:hover,
+input:hover,
+textarea:active,
+input:active,
+textarea:focus,
+input:focus,
+button:focus,
+button:active,
+button:hover,
+label:focus,
+.btn:active,
+.btn.active {
+	outline: 0px !important;
+	-webkit-appearance: none;
+	box-shadow: none !important;
+}
