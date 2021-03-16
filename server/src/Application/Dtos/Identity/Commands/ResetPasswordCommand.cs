@@ -4,6 +4,7 @@ using Recipes.Application.Contracts.Notifications.SendGrid;
 using Recipes.Application.Dtos.Notifications.SendGrid;
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -56,13 +57,13 @@ namespace Recipes.Application.Dtos.Identity.Commands
                 builder.Path = "/reset-password";
                 var queryList = new List<string>
                 {
-                    { $"token={resetToken}" },
-                    { $"email={user.Email}" }
+                    { $"token={WebUtility.UrlEncode(resetToken)}" },
+                    { $"email={WebUtility.UrlEncode(user.Email)}" }
                 };
 
                 if (!string.IsNullOrWhiteSpace(redirectUrl))
                 {
-                    queryList.Add($"redirectUrl={redirectUrl}");
+                    queryList.Add($"redirectUrl={WebUtility.UrlEncode(redirectUrl)}");
                 }
 
                 builder.Query = string.Join("&", queryList);
