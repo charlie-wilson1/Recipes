@@ -121,9 +121,35 @@
 					</b-col>
 				</b-form-row>
 				<hr />
-				<IngredientsForm :_ingredients="currentRecipe.ingredients" />
+				<b-form-row>
+					<b-col md="7">
+						<IngredientsForm />
+					</b-col>
+					<b-col>
+						<CreateList
+							:values="getIngredientString()"
+							deletable="true"
+							:handle-move="changeIngredientOrder"
+							:handle-delete="deleteIngredient"
+						/>
+					</b-col>
+				</b-form-row>
 				<hr />
-				<InstructionsForm :instructions="currentRecipe.instructions" />
+				<b-form-row>
+					<b-col md="7">
+						<InstructionsForm :instruction.sync="instruction" />
+					</b-col>
+					<b-col>
+						<CreateList
+							:values="getInstructionString()"
+							deletable="true"
+							editable="true"
+							:handle-move="changeInstructionOrder"
+							:handle-edit="editInstruction"
+							:handle-delete="deleteInstruction"
+						/>
+					</b-col>
+				</b-form-row>
 				<hr />
 				<b-form-row>
 					<b-col md="12">
@@ -160,12 +186,14 @@
 import { Component, Vue } from "vue-property-decorator";
 import { Validate } from "vuelidate-property-decorators";
 import { validationMixin } from "vuelidate";
-import { required, minValue } from "vuelidate/lib/validators";
-import { Ingredient, Recipe } from "@/models/RecipeModels";
-import { defaultRecipe } from "@/models/DefaultModels";
+import { required, minValue, minLength } from "vuelidate/lib/validators";
+import { Instruction, Recipe } from "@/models/RecipeModels";
+import { defaultInstruction, defaultRecipe } from "@/models/DefaultModels";
 import CreateList from "@/components/create/CreateList.vue";
 import IngredientsForm from "@/components/create/IngredientsForm.vue";
 import InstructionsForm from "@/components/create/InstructionsForm.vue";
+import { Units } from "@/models/Enums";
+import { indexIsInArray } from "@/mixins/listUtils";
 
 @Component({
 	components: {
@@ -176,6 +204,8 @@ import InstructionsForm from "@/components/create/InstructionsForm.vue";
 	mixins: [validationMixin],
 })
 export default class CreateRecipe extends Vue {
+	instruction: Instruction = { ...defaultInstruction };
+
 	get isEditMode(): boolean {
 		return this.$route.path.toLowerCase().includes("edit");
 	}
@@ -197,8 +227,14 @@ export default class CreateRecipe extends Vue {
 
 	@Validate({
 		name: { required },
-		ingredients: { required },
-		instructions: { required },
+		ingredients: {
+			required,
+			minLength: minLength(1),
+		},
+		instructions: {
+			required,
+			minLength: minLength(1),
+		},
 		prepTime: { required, minValue: minValue(1) },
 		cookTime: { required, minValue: minValue(1) },
 	})
@@ -206,7 +242,7 @@ export default class CreateRecipe extends Vue {
 		let recipe: Recipe = this.$store.getters.recipe;
 
 		if (!recipe) {
-			recipe = defaultRecipe;
+			recipe = { ...defaultRecipe };
 		}
 
 		return recipe;
@@ -216,20 +252,110 @@ export default class CreateRecipe extends Vue {
 		return +this.currentRecipe.prepTime + +this.currentRecipe.cookTime;
 	}
 
-	getIngredientString(ingredients: Ingredient[]) {
-		return ingredients.map(ingredient => {
+	deleteIngredient(index: number) {
+		if (!indexIsInArray(index, this.currentRecipe.ingredients.length)) {
+			this.$toast.error("Could not find selected ingredients.");
+			return;
+		}
+
+		const orderNumber = this.currentRecipe.ingredients[index].orderNumber;
+		this.currentRecipe.ingredients.splice(index);
+
+		this.currentRecipe.ingredients
+			.filter(i => i.orderNumber >= orderNumber)
+			.map(i => ({
+				...i,
+				orderNumber: i.orderNumber - 1,
+			}));
+	}
+
+	changeIngredientOrder(fromIndex: number, toIndex: number) {
+		const ingredientListLength = this.currentRecipe.ingredients.length;
+
+		if (
+			!indexIsInArray(fromIndex, ingredientListLength) ||
+			!indexIsInArray(fromIndex, ingredientListLength)
+		) {
+			this.$toast.error("Could not find selected ingredient.");
+			return;
+		}
+
+		const fromOrderNumber = this.currentRecipe.ingredients[fromIndex]
+			.orderNumber;
+		const toOrderNumber = this.currentRecipe.ingredients[toIndex].orderNumber;
+
+		this.currentRecipe.ingredients[fromIndex].orderNumber = toOrderNumber;
+		this.currentRecipe.ingredients[toIndex].orderNumber = fromOrderNumber;
+
+		this.currentRecipe.ingredients = this.currentRecipe.ingredients.sort(
+			i => i.orderNumber
+		);
+	}
+
+	deleteInstruction(index: number) {
+		if (!indexIsInArray(index, this.currentRecipe.instructions.length)) {
+			this.$toast.error("Could not find selected instruction.");
+			return;
+		}
+
+		const orderNumber = this.currentRecipe.instructions[index].orderNumber;
+		this.currentRecipe.instructions.splice(index);
+
+		this.currentRecipe.instructions
+			.filter(i => i.orderNumber >= orderNumber)
+			.map(i => ({
+				...i,
+				orderNumber: i.orderNumber - 1,
+			}));
+	}
+
+	editInstruction(index: number) {
+		console.log(index);
+		if (!indexIsInArray(index, this.currentRecipe.instructions.length)) {
+			this.$toast.error("Could not find selected instruction.");
+			return;
+		}
+
+		this.instruction = this.currentRecipe.instructions[index];
+	}
+
+	changeInstructionOrder(fromIndex: number, toIndex: number) {
+		const instructionListLength = this.currentRecipe.instructions.length;
+
+		if (
+			!indexIsInArray(fromIndex, instructionListLength) ||
+			!indexIsInArray(fromIndex, instructionListLength)
+		) {
+			this.$toast.error("Could not find selected instruction.");
+			return;
+		}
+
+		const fromOrderNumber = this.currentRecipe.instructions[fromIndex]
+			.orderNumber;
+		const toOrderNumber = this.currentRecipe.instructions[toIndex].orderNumber;
+
+		this.currentRecipe.instructions[fromIndex].orderNumber = toOrderNumber;
+		this.currentRecipe.instructions[toIndex].orderNumber = fromOrderNumber;
+
+		this.currentRecipe.instructions = this.currentRecipe.instructions.sort(
+			i => i.orderNumber
+		);
+	}
+
+	getIngredientString() {
+		return (this.currentRecipe.ingredients || []).map(ingredient => {
 			return {
 				defaultValue: ingredient.name,
-				additionalValue: `${ingredient.quantity} ${ingredient.unitId}`,
+				additionalValue: `${ingredient.quantity} ${Units[ingredient.unitId]}`,
 				notes: ingredient.notes,
 			};
 		});
 	}
 
-	getSimpleStringForCreateList(defaultValues: string[]) {
-		return defaultValues.map(val => {
+	getInstructionString() {
+		return (this.currentRecipe.instructions || []).map(instruction => {
 			return {
-				defaultValue: val,
+				defaultValue: instruction.description,
 			};
 		});
 	}
@@ -283,6 +409,8 @@ export default class CreateRecipe extends Vue {
 			this.$store.dispatch("createNewRecipe");
 		}
 		this.$store.dispatch("setIsLoading", false);
+
+		this.currentRecipe;
 	}
 
 	beforeDestroy() {

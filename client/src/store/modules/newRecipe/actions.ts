@@ -118,10 +118,6 @@ export const actions: ActionTree<NewRecipeState, RootState> = {
 		commit("insertIngredient", ingredient);
 	},
 
-	insertIngredientNote({ commit }, note: string) {
-		commit("insertIngredientNote", note);
-	},
-
 	insertInstruction({ commit }, instruction: Instruction) {
 		commit("insertInstruction", instruction);
 	},

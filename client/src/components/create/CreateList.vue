@@ -11,43 +11,52 @@
 		<b-list-group>
 			<b-list-group-item v-for="(value, index) in values" :key="index">
 				<b-row>
-					<b-col :md="editable ? '10' : '8'">
-						{{ value.defaultValue }}
-					</b-col>
-					<b-col class="d-flex justify-content-between align-items-center">
-						<span v-if="value.additionalValue" class="text-right mr-2">
-							{{ value.additionalValue }}
-						</span>
-						<span v-if="!editingOrder" class="text-right">
-							<b-icon
-								icon="pencil"
-								scale="1"
-								v-if="editable"
-								class="mr-2"
-								@click="handleEdit(index)"
-							></b-icon>
-							<b-icon
-								icon="trash"
-								scale="1"
-								v-if="deletable"
-								@click="handleDelete(index)"
-							></b-icon>
-						</span>
-						<span v-else class="text-right">
-							<b-icon
-								icon="arrow-up"
-								scale="1"
-								:disabled="index > 0"
-								class="mr-2"
-								@click="handleMove(index, index - 1)"
-							></b-icon>
-							<b-icon
-								icon="arrow-down"
-								scale="1"
-								:disabled="index < values.length - 1"
-								@click="handleMove(index, index + 1)"
-							></b-icon>
-						</span>
+					<b-col class="d-flex justify-content-between">
+						<div>
+							{{ value.defaultValue }}
+						</div>
+						<div class="d-inline-flex justify-content-between">
+							<span v-if="value.additionalValue" class="text-right mr-2">
+								{{ value.additionalValue }}
+							</span>
+							<span v-if="!editingOrder" class="text-right">
+								<b-icon
+									icon="pencil"
+									scale="1"
+									v-if="editable"
+									class="mr-2"
+									@click="handleEdit(index)"
+								></b-icon>
+								<b-icon
+									icon="trash"
+									scale="1"
+									v-if="deletable"
+									@click="handleDelete(index)"
+								></b-icon>
+							</span>
+							<span v-else class="text-right">
+								<b-button
+									variant="primary-outline"
+									size="sm"
+									@click="handleMove(index, index - 1)"
+									:disabled="index == 0"
+								>
+									<b-icon
+										icon="arrow-up"
+										scale="1"
+										:disabled="index >= values.length - 1"
+									></b-icon>
+								</b-button>
+								<b-button
+									variant="primary-outline"
+									size="sm"
+									@click="handleMove(index, index + 1)"
+									:disabled="index <= values.length - 1"
+								>
+									<b-icon icon="arrow-down" scale="1"></b-icon>
+								</b-button>
+							</span>
+						</div>
 					</b-col>
 				</b-row>
 				<b-row v-if="value.notes" class="text-left">
@@ -65,7 +74,7 @@ import { Component, Prop, Vue } from "vue-property-decorator";
 
 @Component({})
 export default class CreateListItem extends Vue {
-	@Prop({ required: false })
+	@Prop({ required: true })
 	values!: {
 		defaultValue: string;
 		additionalValue: string;
@@ -74,13 +83,18 @@ export default class CreateListItem extends Vue {
 
 	@Prop({
 		required: false,
+		default: false,
 	})
 	editable!: boolean;
 
 	@Prop({
 		required: false,
+		default: false,
 	})
 	deletable!: boolean;
+
+	// @Prop({ required: true })
+	// handleString!: string;
 
 	@Prop({ required: false })
 	handleEdit!: Function;
@@ -126,6 +140,7 @@ export default class CreateListItem extends Vue {
 
 	svg {
 		padding-left: 0;
+		cursor: pointer;
 	}
 }
 </style>

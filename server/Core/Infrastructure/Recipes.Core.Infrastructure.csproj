@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="RavenDB.Client" Version="5.1.5" />
+    <PackageReference Include="RavenDB.DependencyInjection" Version="4.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Application\Recipes.Core.Application.csproj" />
+    <ProjectReference Include="..\Domain\Recipes.Core.Domain.csproj" />
+  </ItemGroup>
+
+</Project>
