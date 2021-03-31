@@ -48,7 +48,11 @@ namespace Recipes.Core.Application.Recipes.Commands
             {
                 _recipeService.CreateIngredients(recipe, request.Ingredients);
                 _recipeService.CreateInstructions(recipe, request.Instructions);
-                _recipeService.CreateImage(recipe, request.Image);
+
+                if (request.Image is not null)
+                {
+                    _recipeService.CreateImage(recipe, request.Image);
+                }
             }
 
             public Recipe CreateRecipe(CreateRecipeCommand request)
