@@ -28,28 +28,15 @@ export const actions: ActionTree<AdminState, RootState> = {
 			});
 	},
 
-	async getRoles({ commit }) {
-		axios
-			.get(`${adminUrl}/roles`)
-			.then(response => {
-				const roles: Array<string> = response.data;
-				commit("setRoles", roles);
-			})
-			.catch(err => {
-				console.log(err);
-				Vue.$toast.error("Could not find any roles. Please try again.");
-			});
-	},
-
-	async registerNewUser(_, command: AdminRegisterUserCommand) {
-		axios.post(adminUrl + "Register", command).catch(err => {
-			Vue.$toast.error(`Error registering new user: ${err}`);
+	async inviteUser(_, command: AdminRegisterUserCommand) {
+		axios.post(adminUrl + "Invitation", command).catch(err => {
+			Vue.$toast.error(`Error inviting new user: ${err}`);
 		});
 	},
 
 	async updateRoles({ commit }, command: UpdateRolesCommand) {
 		axios
-			.patch(`${adminUrl}/UpdateRoles`, {
+			.patch(`${adminUrl}/roles`, {
 				username: command.username,
 				roles: command.roles,
 			})
@@ -64,11 +51,5 @@ export const actions: ActionTree<AdminState, RootState> = {
 			.catch(err => {
 				Vue.$toast.error(`Error updating user roles: ${err}`);
 			});
-	},
-
-	async resetUserPassword(_, command: AdminResetUserPasswordCommand) {
-		axios.post(adminUrl + "Register", command).catch(err => {
-			Vue.$toast.error(`Error registering new user: ${err}`);
-		});
 	},
 };

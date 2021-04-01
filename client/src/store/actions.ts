@@ -36,7 +36,8 @@ export const actions: ActionTree<RootState, RootState> = {
 
 				const data: TokenResponse = {
 					token: token,
-					username: decodedToken.unique_name,
+					id: decodedToken.nameid,
+					username: decodedToken.name,
 					roles: decodedToken.role,
 					tokenExpiration: decodedToken.exp,
 					refreshToken: response.data.refreshToken,
@@ -55,9 +56,9 @@ export const actions: ActionTree<RootState, RootState> = {
 			});
 	},
 
-	async login({ commit }, payload: LoginRequest) {
+	login({ commit }, payload: LoginRequest) {
 		axios
-			.post(accountsUrl + "login", {
+			.post(accountsUrl + "authenticate", {
 				username: payload.command.username,
 				password: payload.command.password,
 			})
@@ -69,7 +70,8 @@ export const actions: ActionTree<RootState, RootState> = {
 
 				const data: TokenResponse = {
 					token: token,
-					username: decodedToken.unique_name,
+					id: decodedToken.nameid,
+					username: decodedToken.name,
 					roles: decodedToken.role,
 					tokenExpiration: decodedToken.exp,
 					refreshToken: response.data.refreshToken,
@@ -91,20 +93,9 @@ export const actions: ActionTree<RootState, RootState> = {
 			});
 	},
 
-	async getRoles({ commit }) {
-		axios
-			.get(accountsUrl + "roles")
-			.then(response => {
-				commit("updateRoles", response);
-			})
-			.catch(err => {
-				Vue.$toast.error(`Error refreshing roles: ${err}`);
-			});
-	},
-
 	async refreshJwtToken({ commit, rootState }) {
 		axios
-			.post(accountsUrl + "refresh", {
+			.post(accountsUrl + "refreshToken", {
 				username: rootState.username,
 				refreshToken: rootState.refreshToken,
 			})
@@ -116,7 +107,8 @@ export const actions: ActionTree<RootState, RootState> = {
 
 				const data: TokenResponse = {
 					token: token,
-					username: decodedToken.unique_name,
+					id: decodedToken.nameid,
+					username: decodedToken.name,
 					roles: decodedToken.role,
 					tokenExpiration: decodedToken.exp,
 					refreshToken: response.data.refreshToken,
@@ -133,7 +125,7 @@ export const actions: ActionTree<RootState, RootState> = {
 
 	async updateUser(_, command: UpdateCurrentUserCommand) {
 		axios
-			.put(`${accountsUrl}/UpdateCurrentUser`, {
+			.put(`${accountsUrl}/user`, {
 				username: command.username,
 				email: command.email,
 			})
@@ -142,9 +134,9 @@ export const actions: ActionTree<RootState, RootState> = {
 			});
 	},
 
-	async updatePassword(_, command: UpdatePasswordCommand) {
+	async resetPassword(_, command: UpdatePasswordCommand) {
 		axios
-			.patch(accountsUrl + "UpdatePassword", {
+			.patch(accountsUrl + "resetPassword", {
 				currentPassword: command.currentPassword,
 				newPassword: command.newPassword,
 				newPasswordConfirmation: command.newPasswordConfirmation,
@@ -154,13 +146,16 @@ export const actions: ActionTree<RootState, RootState> = {
 			});
 	},
 
-	async resetPassword(_, payload: { email: string; redirectUrl: string }) {
+	async sendResetPasswordEmail(
+		_,
+		payload: { email: string; redirectUrl: string }
+	) {
 		axios
-			.post(accountsUrl + "ResetPassword", {
+			.post(accountsUrl + "sendResetPasswordEmail", {
 				email: payload.email,
 				redirectUrl: payload.redirectUrl,
 			})
-			.then(_ =>
+			.then(() =>
 				Vue.$toast.success("Please check your email to reset your password")
 			)
 			.catch(err => {
@@ -168,9 +163,9 @@ export const actions: ActionTree<RootState, RootState> = {
 			});
 	},
 
-	async confirmResetPassword(_, command: ConfirmResetPasswordCommand) {
+	async tokenResetPassword(_, command: ConfirmResetPasswordCommand) {
 		axios
-			.post(accountsUrl + "ConfirmResetPassword", {
+			.patch(accountsUrl + "tokenResetPassword", {
 				email: command.email,
 				resetToken: command.resetToken,
 				newPassword: command.newPassword,

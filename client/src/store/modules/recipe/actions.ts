@@ -12,13 +12,13 @@ export const actions: ActionTree<RecipeState, RootState> = {
 		axios
 			.get(recipesUrl, {
 				params: {
-					resultsPerPage: query.resultsPerPage,
-					startNumber: query.startNumber,
+					pageSize: query.resultsPerPage,
+					pageNumber: query.pageNumber,
 					searchQuery: query.searchQuery,
 				},
 			})
 			.then(response => {
-				const recipes: Array<Recipe> = response.data;
+				const recipes: Array<Recipe> = response.data.data;
 				commit("setRecipeList", recipes);
 			})
 			.catch(err => {

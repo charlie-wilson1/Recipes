@@ -1,4 +1,4 @@
-export enum UnitsString {
+export enum Units {
 	gm = "gm",
 	cups = "cups",
 	oz = "oz",
@@ -17,27 +17,6 @@ export enum UnitsString {
 	cm = "cm",
 	in = "in",
 	F = "F",
-}
-
-export enum Units {
-	gm = 1,
-	cups,
-	oz,
-	tsp,
-	tbs,
-	ltr,
-	qt,
-	ml,
-	pt,
-	pinch,
-	gal,
-	lbs,
-	kg,
-	mg,
-	mm,
-	cm,
-	in,
-	F,
 }
 
 export enum Images {

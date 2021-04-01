@@ -48,14 +48,20 @@
 				</b-col>
 				<b-col cols="8" class="text-center">
 					<b-button
-						:to="{ name: 'make', params: { recipe_id: selectedRecipe.id } }"
+						:to="{
+							name: 'make',
+							params: { recipe_id: getRecipeId(selectedRecipe.id) },
+						}"
 						absolute
 						variant="primary"
 					>
 						Make
 					</b-button>
 					<b-button
-						:to="{ name: 'edit', params: { recipe_id: selectedRecipe.id } }"
+						:to="{
+							name: 'edit',
+							params: { recipe_id: getRecipeId(selectedRecipe.id) },
+						}"
 						variant="warning"
 					>
 						Edit
@@ -125,6 +131,10 @@ export default class RecipeContainer extends Vue {
 		}
 
 		return recipesList;
+	}
+
+	getRecipeId(recipeId: string): string {
+		return recipeId.substring(recipeId.indexOf("/") + 1);
 	}
 
 	mounted() {

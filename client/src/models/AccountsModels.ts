@@ -41,6 +41,7 @@ export interface ConfirmResetPasswordCommand {
 }
 
 export interface TokenResponse {
+	id: string;
 	token: string;
 	username: string;
 	roles: Array<string>;

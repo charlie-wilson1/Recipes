@@ -8,6 +8,7 @@ import {
 	// RecipeImage,
 } from "@/models/RecipeModels";
 import { storage } from "@/firebase/firebase";
+import router from "@/router/index";
 import Vue from "vue";
 import axios from "axios";
 
@@ -58,7 +59,7 @@ export const actions: ActionTree<NewRecipeState, RootState> = {
 				ingredients: recipe.ingredients.map(ingredient => ({
 					name: ingredient.name,
 					quantity: ingredient.quantity,
-					unitId: ingredient.unitId,
+					unit: ingredient.unit,
 					orderNumber: ingredient.orderNumber + 1,
 					notes: ingredient.notes,
 				})),
@@ -67,8 +68,9 @@ export const actions: ActionTree<NewRecipeState, RootState> = {
 					description: instruction.description,
 				})),
 			})
-			.then(() => {
+			.then(payload => {
 				Vue.$toast.success("Saved successfully!");
+				router.push(`edit/${payload.data.id.split("/").pop()}`);
 			})
 			.catch(err => {
 				console.log(err);
@@ -135,7 +137,7 @@ export const actions: ActionTree<NewRecipeState, RootState> = {
 					id: ingredient.id,
 					name: ingredient.name,
 					quantity: ingredient.quantity,
-					unitId: ingredient.unitId,
+					unit: ingredient.unit,
 					orderNumber: ingredient.orderNumber + 1,
 					notes: ingredient.notes,
 				})),

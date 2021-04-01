@@ -7,11 +7,11 @@ namespace Recipes.Core.Application.Recipes.Validators
     {
         public GetRecipesQueryValidator()
         {
-            RuleFor(x => x.Request.PageNumber)
+            RuleFor(x => x.PageNumber)
                 .NotNull()
                 .GreaterThan(0);
 
-            RuleFor(x => x.Request.PageSize)
+            RuleFor(x => x.PageSize)
                 .NotNull()
                 .GreaterThan(0);
         }

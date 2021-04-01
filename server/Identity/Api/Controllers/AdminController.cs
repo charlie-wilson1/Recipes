@@ -30,7 +30,7 @@ namespace Recipes.Identity.Api.Controllers
             return Ok(users);
         }
 
-        [HttpPut("Roles")]
+        [HttpPatch("Roles")]
         public async Task<IActionResult> UpdateRoles(AdminUpdateUserRolesCommand command)
         {
             await Mediator.Send(command);

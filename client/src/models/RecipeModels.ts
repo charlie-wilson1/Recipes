@@ -1,5 +1,5 @@
 export interface Recipe {
-	id?: number;
+	id?: string;
 	name: string;
 	image?: RecipeImage;
 	ingredients: Array<Ingredient>;
@@ -8,6 +8,7 @@ export interface Recipe {
 	prepTime: number;
 	cookTime: number;
 	totalTime: number;
+	owner?: string;
 }
 
 export interface RecipeImage {
@@ -21,7 +22,7 @@ export interface Ingredient {
 	id?: number;
 	name: string;
 	quantity: number;
-	unitId: number;
+	unit: string;
 	notes?: string;
 	orderNumber: number;
 }
@@ -35,5 +36,5 @@ export interface Instruction {
 export interface GetAllRecipesQuery {
 	searchQuery: string | undefined;
 	resultsPerPage: number;
-	startNumber: number;
+	pageNumber: number;
 }

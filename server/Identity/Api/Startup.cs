@@ -13,6 +13,7 @@ using Recipes.Identity.Infrastructure.Loaders.SettingsModels;
 using Recipes.Identity.Infrastructure;
 using Recipes.Identity.Application;
 using Recipes.Identity.Api.Loaders;
+using Recipes.Identity.Api.FIlters;
 
 namespace Recipes.Identity.Api
 {
@@ -25,7 +26,7 @@ namespace Recipes.Identity.Api
 
         public IConfiguration Configuration { get; }
         private bool isDevelopment { get; set; }
-        private readonly string AllowClientOrigin = "_myAllowSpecificOrigins";
+        private readonly string AllowClientOrigin = "recipesOrigin";
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -41,7 +42,7 @@ namespace Recipes.Identity.Api
             services.Configure<JwtBearerTokenSettings>(Configuration.GetSection("Auth:JwtBearerTokenSettings"));
             services.Configure<SendGridSettings>(Configuration.GetSection("SendGrid"));
 
-            services.AddControllers();
+            services.AddControllers(opts => opts.Filters.Add(new ApiExceptionFilter()));
             services.AddHttpContextAccessor();
             services.AddMvc().AddFluentValidation();
             services.AddDatabaseDeveloperPageExceptionFilter();

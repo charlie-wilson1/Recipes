@@ -7,7 +7,7 @@ using Recipes.Core.Application.Recipes.Queries;
 
 namespace Recipes.Core.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/recipes")]
     [ApiController]
     [Authorize]
     public class RecipesController : BaseApiController
@@ -15,8 +15,9 @@ namespace Recipes.Core.Api.Controllers
         public RecipesController(IMediator mediator) : base(mediator) { }
 
         [HttpGet]
-        public async Task<IActionResult> Get([FromQuery]GetRecipesQuery query)
+        public async Task<IActionResult> Get([FromQuery]string searchQuery, [FromQuery] int pageSize, [FromQuery] int pageNumber, [FromQuery] int skippedResults)
         {
+            var query = new GetRecipesQuery(searchQuery, pageSize, pageNumber, skippedResults);
             var result = await Mediator.Send(query);
             return Ok(result);
         }

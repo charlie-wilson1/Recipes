@@ -68,10 +68,6 @@ export default class InstructionsForm extends Vue {
 		this.$v.$reset();
 		this._instruction = { ...defaultInstruction };
 	}
-
-	beforeCreate() {
-		this.$store.dispatch("createDefaultInstruction");
-	}
 }
 </script>
 

@@ -13,6 +13,7 @@ using Recipes.Core.Infrastructure;
 using Recipes.Core.Application;
 using Recipes.Core.Application.Contracts.Services;
 using Recipes.Core.Api.Services;
+using Recipes.Core.Api.Filters;
 
 namespace Recipes.Core.Api
 {
@@ -25,7 +26,7 @@ namespace Recipes.Core.Api
 
         public IConfiguration Configuration { get; }
         private bool isDevelopment { get; set; }
-        private readonly string AllowClientOrigin = "_myAllowSpecificOrigins";
+        private readonly string AllowClientOrigin = "recipesOrigin";
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -38,7 +39,7 @@ namespace Recipes.Core.Api
                 throw new ArgumentException("Settings cannot be null");
             }
 
-            services.AddControllers();
+            services.AddControllers(opts => opts.Filters.Add(new ApiExceptionFilter()));
             services.AddHttpContextAccessor();
             services.AddMvc().AddFluentValidation();
             services.AddDatabaseDeveloperPageExceptionFilter();

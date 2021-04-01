@@ -5,7 +5,7 @@ export const defaultIngredient: Ingredient = {
 	id: undefined,
 	name: "",
 	quantity: 0,
-	unitId: Units.gm,
+	unit: Units.gm,
 	notes: "",
 	orderNumber: 0,
 };
@@ -26,4 +26,5 @@ export const defaultRecipe: Recipe = {
 	prepTime: 0,
 	cookTime: 0,
 	totalTime: 0,
+	owner: undefined,
 };

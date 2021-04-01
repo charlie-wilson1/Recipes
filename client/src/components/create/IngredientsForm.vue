@@ -57,12 +57,12 @@
 			</b-col>
 			<b-col>
 				<b-form-group
-					:class="{ 'form-group--error': $v.ingredient.unitId.$error }"
+					:class="{ 'form-group--error': $v.ingredient.unit.$error }"
 				>
 					<label for="ingredient-unit">Units</label>
 					<b-form-select
 						id="ingredient-unit"
-						v-model="$v.ingredient.unitId.$model"
+						v-model="$v.ingredient.unit.$model"
 						:options="units"
 					>
 					</b-form-select>
@@ -116,17 +116,15 @@ export default class IngredientsForm extends Vue {
 			required,
 			minValue: minValue(1),
 		},
-		unitId: { required },
+		unit: { required },
 	})
 	ingredient: Ingredient = { ...defaultIngredient };
 
 	get units() {
-		return Object.keys(Units)
-			.filter(unit => !isNaN(Number(unit)))
-			.map(value => ({
-				value,
-				text: Units[parseInt(value)],
-			}));
+		return Object.keys(Units).map(value => ({
+			value,
+			text: value,
+		}));
 	}
 
 	addIngredient() {

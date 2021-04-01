@@ -192,7 +192,6 @@ import { defaultInstruction, defaultRecipe } from "@/models/DefaultModels";
 import CreateList from "@/components/create/CreateList.vue";
 import IngredientsForm from "@/components/create/IngredientsForm.vue";
 import InstructionsForm from "@/components/create/InstructionsForm.vue";
-import { Units } from "@/models/Enums";
 import { indexIsInArray } from "@/mixins/listUtils";
 
 @Component({
@@ -210,9 +209,9 @@ export default class CreateRecipe extends Vue {
 		return this.$route.path.toLowerCase().includes("edit");
 	}
 
-	get recipeId(): number | undefined {
+	get recipeId(): string | undefined {
 		if (this.isEditMode) {
-			return parseInt(this.$route.params.recipe_id);
+			return this.$route.params.recipe_id;
 		}
 		return undefined;
 	}
@@ -346,7 +345,7 @@ export default class CreateRecipe extends Vue {
 		return (this.currentRecipe.ingredients || []).map(ingredient => {
 			return {
 				defaultValue: ingredient.name,
-				additionalValue: `${ingredient.quantity} ${Units[ingredient.unitId]}`,
+				additionalValue: `${ingredient.quantity} ${ingredient.unit}`,
 				notes: ingredient.notes,
 			};
 		});

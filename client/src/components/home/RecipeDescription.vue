@@ -1,11 +1,11 @@
 <template lang="html">
 	<section class="recipe-description">
 		<b-img
-			v-if="recipe.image"
+			v-if="recipe.image.url"
 			center
 			thumbnail
 			fluid
-			:src="recipe.image.src"
+			:src="recipe.image.url"
 			:alt="recipe.name"
 		></b-img>
 		<h1 class="text-center">{{ recipe.name }}</h1>
@@ -36,8 +36,7 @@
 					>
 						<span>{{ ingredient.name }}</span>
 						<span class="float-right"
-							>{{ ingredient.quantity }}
-							{{ getUnitName(ingredient.unit) }}</span
+							>{{ ingredient.quantity }} {{ ingredient.unit }}</span
 						>
 					</b-list-group-item>
 				</b-list-group>
@@ -49,7 +48,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
 import { Recipe } from "@/models/RecipeModels";
-import { UnitsString } from "@/models/Enums";
+import { Units } from "@/models/Enums";
 import OrderedListGroup from "../shared/OrderedListGroup.vue";
 
 @Component({
@@ -61,8 +60,8 @@ export default class RecipeDescription extends Vue {
 	@Prop({ required: true })
 	recipe!: Recipe;
 
-	public getUnitName(unit: keyof typeof UnitsString): string {
-		return UnitsString[unit];
+	public getUnitName(unit: keyof typeof Units): string {
+		return Units[unit];
 	}
 
 	get instructions(): Array<string> | null {
