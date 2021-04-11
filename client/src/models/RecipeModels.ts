@@ -12,10 +12,8 @@ export interface Recipe {
 }
 
 export interface RecipeImage {
-	id?: number;
 	src: string;
 	fileName: string;
-	fullName: string;
 }
 
 export interface Ingredient {

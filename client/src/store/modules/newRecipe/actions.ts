@@ -5,9 +5,8 @@ import {
 	Recipe,
 	Ingredient,
 	Instruction,
-	// RecipeImage,
+	RecipeImage,
 } from "@/models/RecipeModels";
-import { storage } from "@/firebase/firebase";
 import router from "@/router/index";
 import Vue from "vue";
 import axios from "axios";
@@ -52,10 +51,13 @@ export const actions: ActionTree<NewRecipeState, RootState> = {
 		await axios
 			.post(recipesUrl, {
 				name: recipe.name,
-				imageId: recipe.image?.id,
 				notes: recipe.notes,
 				prepTime: recipe.prepTime,
 				cookTime: recipe.cookTime,
+				image: {
+					url: recipe.image?.src,
+					name: recipe.image?.fileName,
+				},
 				ingredients: recipe.ingredients.map(ingredient => ({
 					name: ingredient.name,
 					quantity: ingredient.quantity,
@@ -78,43 +80,32 @@ export const actions: ActionTree<NewRecipeState, RootState> = {
 			});
 	},
 
-	// async uploadRecipeImage({ commit, rootState }, image: File) {
-	//   const unixTimestamp = Math.round(new Date().getTime() / 1000);
-	//   const fileName = `${unixTimestamp}_${image.name}`;
+	async uploadRecipeImage({ commit }, image: File) {
+		const formData = new FormData();
+		formData.append("formFile", image);
 
-	//   const storageRef = storage
-	//     .ref("ajax-recipes")
-	//     .child("images")
-	//     .child(fileName);
+		const config = {
+			headers: {
+				"Content-Type": "multipart/form-data",
+			},
+		};
 
-	//   try {
-	//     await storageRef.put(image);
-	//   } catch {
-	//     Vue.$toast.error("Could not save image. Please try again.");
-	//   }
+		axios
+			.post(`${recipesUrl}/image`, formData, config)
+			.then(res => {
+				const imageResponse: RecipeImage = {
+					src: res.data,
+					fileName: image.name,
+				};
 
-	//   const fileURL = await storageRef.getDownloadURL();
-
-	//   const img: RecipeImage = {
-	//     src: fileURL,
-	//     fileName: image.name,
-	//     fullName: fileName
-	//   };
-
-	//   axios
-	//     .post(`${recipesUrl}/image`, {
-	//       data: img
-	//     })
-	//     .then(() => {
-	//       Vue.$toast.success("Saved successfully!");
-	//     })
-	//     .catch(err => {
-	//       console.log(err);
-	//       Vue.$toast.error("Could not save image. Please try again.");
-	//     });
-
-	//   commit("uploadRecipeImage", img);
-	// },
+				commit("uploadRecipeImage", imageResponse);
+				Vue.$toast.success("Saved successfully!");
+			})
+			.catch(err => {
+				console.log(err);
+				Vue.$toast.error("Could not save image. Please try again.");
+			});
+	},
 
 	insertIngredient({ commit }, ingredient: Ingredient) {
 		commit("insertIngredient", ingredient);
@@ -129,10 +120,13 @@ export const actions: ActionTree<NewRecipeState, RootState> = {
 			.put(recipesUrl, {
 				id: recipe.id,
 				name: recipe.name,
-				imageId: recipe.image?.id,
 				notes: recipe.notes,
 				prepTime: recipe.prepTime,
 				cookTime: recipe.cookTime,
+				image: {
+					url: recipe.image?.src,
+					name: recipe.image?.fileName,
+				},
 				ingredients: recipe.ingredients.map(ingredient => ({
 					id: ingredient.id,
 					name: ingredient.name,
@@ -176,30 +170,30 @@ export const actions: ActionTree<NewRecipeState, RootState> = {
 		commit("destroyNewRecipe");
 	},
 
-	async deleteImage({ commit }, fileName: string) {
-		try {
-			await storage
-				.ref("ajax-recipes")
-				.child("images")
-				.child(fileName)
-				.delete();
-		} catch (err) {
-			console.log(err);
-			Vue.$toast.error("Failed to delete image. Please try again.");
-			return;
-		}
+	// async deleteImage({ commit }, fileName: string) {
+	// 	try {
+	// 		await storage
+	// 			.ref("ajax-recipes")
+	// 			.child("images")
+	// 			.child(fileName)
+	// 			.delete();
+	// 	} catch (err) {
+	// 		console.log(err);
+	// 		Vue.$toast.error("Failed to delete image. Please try again.");
+	// 		return;
+	// 	}
 
-		await axios
-			.delete(`${recipesUrl}/image`, {
-				data: fileName,
-			})
-			.then(() => {
-				commit("deleteImage");
-				Vue.$toast.success("Deleted successfully!");
-			})
-			.catch(err => {
-				console.log(err);
-				Vue.$toast.error("Failed to delete image. Please try again.");
-			});
-	},
+	// 	await axios
+	// 		.delete(`${recipesUrl}/image`, {
+	// 			data: fileName,
+	// 		})
+	// 		.then(() => {
+	// 			commit("deleteImage");
+	// 			Vue.$toast.success("Deleted successfully!");
+	// 		})
+	// 		.catch(err => {
+	// 			console.log(err);
+	// 			Vue.$toast.error("Failed to delete image. Please try again.");
+	// 		});
+	// },
 };

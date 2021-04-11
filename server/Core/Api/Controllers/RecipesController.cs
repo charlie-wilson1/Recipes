@@ -1,7 +1,9 @@
 ﻿using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Recipes.Core.Api.Services;
 using Recipes.Core.Application.Recipes.Commands;
 using Recipes.Core.Application.Recipes.Queries;
 
@@ -50,6 +52,15 @@ namespace Recipes.Core.Api.Controllers
             var command = new DeleteRecipeCommand(id);
             await Mediator.Send(command);
             return NoContent();
+        }
+
+        [HttpPost("Image")]
+        public async Task<IActionResult> UploadImage([FromForm]IFormFile formFile)
+        {
+            var file = await formFile.ToUploadedFileDto();
+            var command = new UploadImageCommand(file);
+            var url = await Mediator.Send(command);
+            return Ok(url);
         }
     }
 }

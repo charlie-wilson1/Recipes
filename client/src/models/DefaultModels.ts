@@ -1,5 +1,10 @@
 import { Units } from "@/models/Enums";
-import { Ingredient, Instruction, Recipe } from "@/models/RecipeModels";
+import {
+	Ingredient,
+	Instruction,
+	Recipe,
+	RecipeImage,
+} from "@/models/RecipeModels";
 
 export const defaultIngredient: Ingredient = {
 	id: undefined,
@@ -14,6 +19,11 @@ export const defaultInstruction: Instruction = {
 	id: undefined,
 	orderNumber: 0,
 	description: "",
+};
+
+export const defaultImage: RecipeImage = {
+	src: "",
+	fileName: "",
 };
 
 export const defaultRecipe: Recipe = {

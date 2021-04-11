@@ -39,6 +39,7 @@ namespace Recipes.Core.Api
                 throw new ArgumentException("Settings cannot be null");
             }
 
+            services.Configure<GoogleClientSettings>(Configuration.GetSection("Google"));
             services.AddControllers(opts => opts.Filters.Add(new ApiExceptionFilter()));
             services.AddHttpContextAccessor();
             services.AddMvc().AddFluentValidation();

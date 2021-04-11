@@ -4,6 +4,7 @@ import {
 	defaultRecipe,
 	defaultIngredient,
 	defaultInstruction,
+	defaultImage,
 } from "@/models/DefaultModels";
 import {
 	Ingredient,
@@ -12,6 +13,7 @@ import {
 	RecipeImage,
 } from "@/models/RecipeModels";
 import Vue from "vue";
+import { RecipeModule } from "../recipe/module";
 
 /* eslint @typescript-eslint/no-non-null-assertion: "off" */
 export const mutations: MutationTree<NewRecipeState> = {
@@ -55,8 +57,12 @@ export const mutations: MutationTree<NewRecipeState> = {
 	},
 
 	uploadRecipeImage(state, image: RecipeImage) {
-		state.recipe!.image = image;
-		Vue.$toast.success("Uploaded image successfully");
+		if (!state.recipe!.image) {
+			state.recipe!.image = defaultImage;
+		}
+
+		state.recipe!.image!.fileName = image.fileName;
+		state.recipe!.image!.src = image.src;
 	},
 
 	updteRecipe(state, recipe: Recipe) {
