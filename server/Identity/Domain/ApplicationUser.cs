@@ -86,10 +86,9 @@ namespace Recipes.Identity.Domain
             RefreshToken = token;
         }
 
-        public void DeleteUser(string modifiedByUserId, DateTime dateTime)
+        public void DeleteUser()
         {
             IsActive = false;
-            UpdateAuditData(modifiedByUserId, dateTime);
         }
 
         public void UpdatePassword(byte[] hash, byte[] salt)

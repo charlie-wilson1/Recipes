@@ -19,21 +19,17 @@ namespace Recipes.Identity.Application.Identity.Commands
         {
             private readonly IUserRepository _userRepository;
             private readonly IUserService _userService;
-            private readonly ICurrentUserService _currentUserService;
-            private readonly IDateTime _dateTime;
 
-            public Handler(IUserRepository userRepository, IUserService userService, ICurrentUserService currentUserService, IDateTime dateTime)
+            public Handler(IUserRepository userRepository, IUserService userService)
             {
                 _userRepository = userRepository;
                 _userService = userService;
-                _currentUserService = currentUserService;
-                _dateTime = dateTime;
             }
 
             public async Task<Unit> Handle(DeleteUserCommand request, CancellationToken cancellationToken)
             {
                 var user = await _userService.GetByUsername(request.Username, cancellationToken);
-                user.DeleteUser(_currentUserService.UserId, _dateTime.UtcNow);
+                user.DeleteUser();
                 await _userRepository.UpdateAsync(user, cancellationToken);
                 return Unit.Value;
             }
