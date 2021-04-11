@@ -10,7 +10,5 @@ VUE_APP_IDENTITY_URL="https://localhost:****/api/"
 
 ## ToDo:
 
-- fix rest of front end for API (mostly completed)
-- set up an image uploading system in front end. Perhaps firebase storage?
 - pick a theme and update styling in the front end
 - write unit tests!!!
