@@ -62,7 +62,7 @@ namespace Recipes.Identity.Api.Controllers
         }
 
         [HttpPut("User")]
-        public async Task<IActionResult> UpdateUser(UpdateCurrentUserCommand command)
+        public async Task<IActionResult> UpdateUser([FromBody]UpdateCurrentUserCommand command)
         {
             var user = await Mediator.Send(command);
             return Ok(user);

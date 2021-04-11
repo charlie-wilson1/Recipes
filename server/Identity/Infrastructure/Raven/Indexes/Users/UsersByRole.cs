@@ -9,7 +9,7 @@ namespace Recipes.Identity.Infrastructure.Raven.Indexes.Users
         public Users_ByRole()
         {
             Map = users => users
-                .Select(user => new { user.Roles, user.IsActive });
+                .Select(user => new { user.Roles, user.Username, user.IsActive });
         }
     }
 }

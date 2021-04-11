@@ -31,3 +31,9 @@ export enum Images {
 	chop = "mdi-knife",
 	cool = "mdi-clock-time-five-outline",
 }
+
+export enum Roles {
+	Admin = "admin",
+	Moderator = "moderator",
+	Member = "member",
+}

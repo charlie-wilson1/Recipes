@@ -20,7 +20,7 @@ export const actions: ActionTree<NewRecipeState, RootState> = {
 	},
 
 	async setRecipeById({ commit }, recipeId: string) {
-		axios
+		await axios
 			.get(`${recipesUrl}/${recipeId}`)
 			.then(response => {
 				const recipe: Recipe = response.data;
@@ -49,7 +49,7 @@ export const actions: ActionTree<NewRecipeState, RootState> = {
 	},
 
 	async insertRecipe(_, recipe: Recipe) {
-		axios
+		await axios
 			.post(recipesUrl, {
 				name: recipe.name,
 				imageId: recipe.image?.id,
@@ -124,8 +124,8 @@ export const actions: ActionTree<NewRecipeState, RootState> = {
 		commit("insertInstruction", instruction);
 	},
 
-	updateRecipe({ commit }, recipe: Recipe) {
-		axios
+	async updateRecipe({ commit }, recipe: Recipe) {
+		await axios
 			.put(recipesUrl, {
 				id: recipe.id,
 				name: recipe.name,
@@ -189,7 +189,7 @@ export const actions: ActionTree<NewRecipeState, RootState> = {
 			return;
 		}
 
-		axios
+		await axios
 			.delete(`${recipesUrl}/image`, {
 				data: fileName,
 			})

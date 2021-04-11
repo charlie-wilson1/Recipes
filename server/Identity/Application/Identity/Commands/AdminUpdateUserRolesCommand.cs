@@ -5,16 +5,17 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Recipes.Identity.Application.Contracts.Repositories;
+using Recipes.Identity.Application.Contracts.Services;
 using Recipes.Identity.Domain;
 
 namespace Recipes.Identity.Application.Identity.Commands
 {
-    public class AdminUpdateUserRolesCommand : IRequest
+    public class AdminUpdateUserRolesCommand : IRequest<List<string>>
     {
         public string Username { get; set; }
         public List<string> Roles { get; set; }
 
-        public class Handler : IRequestHandler<AdminUpdateUserRolesCommand>
+        public class Handler : IRequestHandler<AdminUpdateUserRolesCommand, List<string>>
         {
             private readonly IUserRepository _userRepository;
             private readonly string ADMIN_ROLE = "Admin";
@@ -24,7 +25,7 @@ namespace Recipes.Identity.Application.Identity.Commands
                 _userRepository = userRepository;
             }
 
-            public async Task<Unit> Handle(AdminUpdateUserRolesCommand request, CancellationToken cancellationToken)
+            public async Task<List<string>> Handle(AdminUpdateUserRolesCommand request, CancellationToken cancellationToken)
             {
                 var user = await _userRepository.GetByUsernameAsync(request.Username, cancellationToken);
 
@@ -34,7 +35,7 @@ namespace Recipes.Identity.Application.Identity.Commands
                 }
 
                 await UpdateRoles(user, request.Roles, cancellationToken);
-                return Unit.Value;
+                return user.Roles;
             }
 
             public async Task ValidateRoleChange(ApplicationUser user, List<string> roles, CancellationToken cancellationToken)

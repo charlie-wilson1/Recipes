@@ -9,7 +9,7 @@ const recipesUrl = process.env.VUE_APP_WEB_API_URL + "recipes";
 
 export const actions: ActionTree<RecipeState, RootState> = {
 	async loadRecipeList({ commit }, query: GetAllRecipesQuery) {
-		axios
+		await axios
 			.get(recipesUrl, {
 				params: {
 					pageSize: query.resultsPerPage,
@@ -28,7 +28,7 @@ export const actions: ActionTree<RecipeState, RootState> = {
 	},
 
 	async getRecipeById({ commit }, id: string) {
-		axios
+		await axios
 			.get(`${recipesUrl}/${id}`)
 			.then(response => {
 				const recipe: Recipe = response.data;
@@ -40,7 +40,7 @@ export const actions: ActionTree<RecipeState, RootState> = {
 			});
 	},
 
-	async setSelectedRecipe({ commit }, index: number) {
+	setSelectedRecipe({ commit }, index: number) {
 		commit("setSelectedRecipe", index);
 	},
 

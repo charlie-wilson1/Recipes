@@ -15,7 +15,8 @@
 					:key="user.username"
 					:title="user.username"
 					:active="user.username === selectedUsername"
-					@click="setSelectedUser(user.username)"
+					:disabled="user.username === currentUsername"
+					@click="setSelectedUser(user)"
 					><b-card-text>
 						<div class="d-flex justify-content-between">
 							<h3>{{ user.username }}</h3>
@@ -27,7 +28,10 @@
 									><b-icon icon="pencil" class="mr-2"></b-icon>Edit
 									Roles</b-button
 								>
-								<b-button class="mb-2" variant="danger" disabled
+								<b-button
+									class="mb-2"
+									variant="danger"
+									v-b-modal.delete-user-modal
 									><b-icon icon="trash" class="mr-2"></b-icon>Delete</b-button
 								></span
 							>
@@ -70,6 +74,9 @@
 				></b-form-input>
 			</b-form-group>
 		</b-modal>
+		<b-modal id="delete-user-modal" title="Delete User" @ok="deleteUser">
+			<p>Are you sure you would like to delete user {{ selectedUsername }}</p>
+		</b-modal>
 	</section>
 </template>
 
@@ -80,6 +87,7 @@ import { validationMixin } from "vuelidate";
 import { required } from "vuelidate/lib/validators";
 import { Component, Vue } from "vue-property-decorator";
 import { capitalizeString } from "@/mixins/stringUtils";
+import { Roles } from "@/models/Enums";
 
 @Component({
 	mixins: [validationMixin],
@@ -97,28 +105,27 @@ export default class ManageUsers extends Vue {
 	}
 
 	get allRoles(): Array<string> {
-		const roles: Array<string> = this.$store.getters.allRoles;
+		const roles: Array<string> = Object.values(Roles);
 		return roles.map(role => this.capitalizeText(role));
 	}
 
 	selectedUsername: string = this.users[0].username;
 	selectedUser: User = this.users[0];
 
+	get currentUsername(): string {
+		return this.$store.getters.username;
+	}
+
 	selectedRoles: Array<string> = this.allRoles.filter(role =>
-		(this.selectedUser?.roles || [])
-			.map(userRole => userRole.toLowerCase())
-			.includes(role.toLowerCase())
+		(this.selectedUser.roles ?? [])
+			.map(userRole => this.capitalizeText(userRole))
+			.includes(role)
 	);
 
-	setSelectedUser(username: string) {
-		const user = this.users.find(user => user.username === username);
-
-		if (!user) {
-			return;
-		}
-
+	setSelectedUser(user: User) {
+		this.selectedUsername = user.username;
 		this.selectedUser = user;
-		this.selectedUsername = username;
+		this.selectedRoles = user.roles;
 	}
 
 	editRoles() {
@@ -150,9 +157,13 @@ export default class ManageUsers extends Vue {
 		this.$store.dispatch("adminRegister", register);
 	}
 
+	async deleteUser() {
+		await this.$store.dispatch("deleteUser", this.selectedUsername);
+		await this.$store.dispatch("getUsers");
+	}
+
 	beforeCreate() {
 		this.$store.dispatch("getUsers");
-		this.$store.dispatch("getRoles");
 	}
 
 	// TODO: Unsubscribe on beforeDestroy
@@ -166,6 +177,10 @@ export default class ManageUsers extends Vue {
 	h1 {
 		text-align: center;
 		margin-bottom: 1em;
+	}
+
+	.role-list-item {
+		border: 0;
 	}
 }
 </style>

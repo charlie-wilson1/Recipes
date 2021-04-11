@@ -5,7 +5,6 @@ import Vue from "vue";
 import axios from "axios";
 import {
 	AdminRegisterUserCommand,
-	AdminResetUserPasswordCommand,
 	UpdateRolesCommand,
 	User,
 } from "@/models/AdministratorModels";
@@ -14,7 +13,7 @@ const adminUrl = process.env.VUE_APP_IDENTITY_URL + "admin";
 
 export const actions: ActionTree<AdminState, RootState> = {
 	async getUsers({ commit }) {
-		axios
+		await axios
 			.get(`${adminUrl}/users`)
 			.then(response => {
 				const users: Array<User> = response.data;
@@ -29,13 +28,13 @@ export const actions: ActionTree<AdminState, RootState> = {
 	},
 
 	async inviteUser(_, command: AdminRegisterUserCommand) {
-		axios.post(adminUrl + "Invitation", command).catch(err => {
+		await axios.post(adminUrl + "Invitation", command).catch(err => {
 			Vue.$toast.error(`Error inviting new user: ${err}`);
 		});
 	},
 
 	async updateRoles({ commit }, command: UpdateRolesCommand) {
-		axios
+		await axios
 			.patch(`${adminUrl}/roles`, {
 				username: command.username,
 				roles: command.roles,
@@ -50,6 +49,17 @@ export const actions: ActionTree<AdminState, RootState> = {
 			})
 			.catch(err => {
 				Vue.$toast.error(`Error updating user roles: ${err}`);
+			});
+	},
+
+	async deleteUser(_, username: string) {
+		await axios
+			.delete(`${adminUrl}/${username}`)
+			.then(_ => {
+				Vue.$toast.success("Deleted user");
+			})
+			.catch(err => {
+				Vue.$toast.error(`Error deleting user: ${err}`);
 			});
 	},
 };

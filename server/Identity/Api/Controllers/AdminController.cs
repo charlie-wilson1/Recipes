@@ -33,6 +33,14 @@ namespace Recipes.Identity.Api.Controllers
         [HttpPatch("Roles")]
         public async Task<IActionResult> UpdateRoles(AdminUpdateUserRolesCommand command)
         {
+            var roles = await Mediator.Send(command);
+            return Ok(roles);
+        }
+
+        [HttpDelete("{username}")]
+        public async Task<IActionResult> DeleteUser([FromRoute]string username)
+        {
+            var command = new DeleteUserCommand(username);
             await Mediator.Send(command);
             return NoContent();
         }

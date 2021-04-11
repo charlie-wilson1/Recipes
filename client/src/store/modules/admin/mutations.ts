@@ -9,16 +9,15 @@ export const mutations: MutationTree<AdminState> = {
 		state.users = users;
 	},
 
-	setRoles(state, roles: Array<string>) {
-		state.allRoles = roles;
-	},
-
 	updateRoles(state, payload: { roles: Array<string>; username: string }) {
 		const userToUpdateIndex = state.users.findIndex(
 			user => user.username === payload.username
 		);
 
-		if (userToUpdateIndex > 1) {
+		console.log("payload", payload.username);
+		console.log("user", userToUpdateIndex);
+
+		if (userToUpdateIndex < 1) {
 			Vue.$toast.error("Could not find user");
 			return;
 		}
