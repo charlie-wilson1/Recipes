@@ -12,3 +12,5 @@ VUE_APP_IDENTITY_URL="https://localhost:****/api/"
 
 - pick a theme and update styling in the front end
 - write unit tests!!!
+- Create docker files
+- Create CI/CD files
