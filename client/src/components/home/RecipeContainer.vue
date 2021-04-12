@@ -14,7 +14,7 @@
 						</b-form-group>
 					</b-form>
 					<div class="recipe-list">
-						<div v-if="listIsLoading">
+						<div v-if="listIsLoading" class="loader vh-100 text-center d-flex">
 							<b-spinner label="Loading..."></b-spinner>
 						</div>
 						<div v-else>
