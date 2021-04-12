@@ -54,10 +54,13 @@ export const actions: ActionTree<NewRecipeState, RootState> = {
 				notes: recipe.notes,
 				prepTime: recipe.prepTime,
 				cookTime: recipe.cookTime,
-				image: {
-					url: recipe.image?.src,
-					name: recipe.image?.fileName,
-				},
+				image:
+					recipe.image?.src == null
+						? null
+						: {
+								url: recipe.image?.src,
+								name: recipe.image?.fileName,
+						  },
 				ingredients: recipe.ingredients.map(ingredient => ({
 					name: ingredient.name,
 					quantity: ingredient.quantity,

@@ -11,4 +11,8 @@ export const getters: GetterTree<RecipeState, RootState> = {
 	selectedRecipe(state): Recipe | undefined {
 		return state.selectedRecipe;
 	},
+
+	recipeCount(state): number {
+		return state.recipeCount;
+	},
 };

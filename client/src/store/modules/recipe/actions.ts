@@ -20,6 +20,7 @@ export const actions: ActionTree<RecipeState, RootState> = {
 			.then(response => {
 				const recipes: Array<Recipe> = response.data.data;
 				commit("setRecipeList", recipes);
+				commit("setTotalCount", response.data.total);
 			})
 			.catch(err => {
 				console.log(err);

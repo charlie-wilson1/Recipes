@@ -14,17 +14,22 @@
 						</b-form-group>
 					</b-form>
 					<div class="recipe-list">
-						<b-list-group flush>
-							<b-list-group-item
-								class="recipe-list-item"
-								v-for="(recipe, index) in recipesList"
-								:key="recipe.id"
-								:active="recipe.id === selectedRecipe.id"
-								@click="setSelectedRecipe(index)"
-							>
-								{{ recipe.name }}
-							</b-list-group-item>
-						</b-list-group>
+						<div v-if="listIsLoading">
+							<b-spinner label="Loading..."></b-spinner>
+						</div>
+						<div v-else>
+							<b-list-group flush>
+								<b-list-group-item
+									class="recipe-list-item"
+									v-for="(recipe, index) in recipes"
+									:key="recipe.id"
+									:active="recipe.id === selectedRecipe.id"
+									@click="setSelectedRecipe(index)"
+								>
+									{{ recipe.name }}
+								</b-list-group-item>
+							</b-list-group>
+						</div>
 					</div>
 				</b-col>
 				<b-col cols="8" class="recipe-description-wrapper">
@@ -36,7 +41,7 @@
 					<b-pagination
 						v-model="currentPage"
 						:current-page="currentPage"
-						:total-rows="rows"
+						:total-rows="totalRecipes"
 						:per-page="perPage"
 						aria-controls="recipesList"
 						hide-goto-end-buttons
@@ -74,9 +79,10 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Component, Vue, Watch } from "vue-property-decorator";
+import { Debounce } from "vue-debounce-decorator";
 import RecipeDescription from "./RecipeDescription.vue";
-import { Recipe } from "../../models/RecipeModels";
+import { GetAllRecipesQuery, Recipe } from "../../models/RecipeModels";
 
 @Component({
 	components: {
@@ -84,10 +90,15 @@ import { Recipe } from "../../models/RecipeModels";
 	},
 })
 export default class RecipeContainer extends Vue {
-	public rows = this.recipes.length;
 	public currentPage = 1;
 	public perPage = 9;
 	public query = "";
+
+	listIsLoading = false;
+
+	get totalRecipes(): number {
+		return this.$store.getters.recipeCount;
+	}
 
 	get startNumber(): number {
 		return this.currentPage === 1
@@ -103,6 +114,26 @@ export default class RecipeContainer extends Vue {
 		return this.$store.getters.selectedRecipe;
 	}
 
+	@Watch("query")
+	@Debounce(500)
+	async search() {
+		this.currentPage = 1;
+		await this.updateRecipeList();
+	}
+
+	@Watch("currentPage")
+	async updateRecipeList() {
+		const query: GetAllRecipesQuery = {
+			resultsPerPage: this.perPage,
+			pageNumber: this.currentPage,
+			searchQuery: this.query,
+		};
+
+		this.listIsLoading = true;
+		await this.$store.dispatch("loadRecipeList", query);
+		this.listIsLoading = false;
+	}
+
 	setSelectedRecipe(index: number) {
 		const actualIndex = this.startNumber + index - 1;
 
@@ -113,35 +144,8 @@ export default class RecipeContainer extends Vue {
 		this.$store.dispatch("setSelectedRecipe", actualIndex);
 	}
 
-	get recipesList() {
-		if (this.query?.length) {
-			this.currentPage = 1;
-		}
-
-		const recipesList = this.recipes.filter(x =>
-			x.name.toLowerCase().includes(this.query.toLowerCase())
-		);
-
-		if (!recipesList.includes(this.selectedRecipe)) {
-			const currentTopResultId = recipesList[0].id;
-			const currentTopResultIndex = this.recipes.findIndex(
-				x => x.id === currentTopResultId
-			);
-			this.$store.dispatch("setSelectedRecipe", currentTopResultIndex);
-		}
-
-		return recipesList;
-	}
-
 	getRecipeId(recipeId: string): string {
 		return recipeId.substring(recipeId.indexOf("/") + 1);
-	}
-
-	mounted() {
-		const list = this.$refs.recipeListContainer as Element;
-		const height = list.clientHeight;
-		const pixelsPerItem = 80;
-		this.perPage = Math.floor(height / pixelsPerItem);
 	}
 }
 </script>

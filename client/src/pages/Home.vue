@@ -21,7 +21,7 @@
 </template>
 
 <script lang="ts">
-import { GetAllRecipesQuery, Recipe } from "@/models/RecipeModels";
+import { GetAllRecipesQuery } from "@/models/RecipeModels";
 import { Component, Vue } from "vue-property-decorator";
 import RecipeContainer from "../components/home/RecipeContainer.vue";
 
@@ -32,8 +32,7 @@ import RecipeContainer from "../components/home/RecipeContainer.vue";
 })
 export default class Home extends Vue {
 	get userHasRecipes(): boolean {
-		const list: Array<Recipe> = this.$store.getters.currentRecipeList;
-		return list.length > 0;
+		return (this.$store.getters.recipeCount || 0) > 0;
 	}
 
 	async beforeCreate() {
@@ -50,10 +49,6 @@ export default class Home extends Vue {
 
 	get isLoading() {
 		return this.$store.getters.isLoading;
-	}
-
-	beforeDestroy() {
-		this.$store.dispatch("destroyRecipeList");
 	}
 }
 </script>

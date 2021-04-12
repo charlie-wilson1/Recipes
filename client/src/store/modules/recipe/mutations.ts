@@ -8,6 +8,10 @@ export const mutations: MutationTree<RecipeState> = {
 		state.currentRecipeList = recipeList;
 	},
 
+	setTotalCount(state, recipeCount: number) {
+		state.recipeCount = recipeCount;
+	},
+
 	setSelectedRecipe(state, index: number) {
 		state.selectedRecipe = state.currentRecipeList![index];
 	},

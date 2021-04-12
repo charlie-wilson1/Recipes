@@ -13,7 +13,6 @@ import {
 	RecipeImage,
 } from "@/models/RecipeModels";
 import Vue from "vue";
-import { RecipeModule } from "../recipe/module";
 
 /* eslint @typescript-eslint/no-non-null-assertion: "off" */
 export const mutations: MutationTree<NewRecipeState> = {
