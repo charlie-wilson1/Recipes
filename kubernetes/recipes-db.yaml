@@ -1,0 +1,151 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: recipes-db-deployment
+spec:
+  replicas: 1
+  minReadySeconds: 5
+  revisionHistoryLimit: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: recipes-db
+  template:
+    metadata:
+      labels:
+        app: recipes-db
+        project: recipes
+        environment: development
+        name: recipes-db
+    spec:
+      containers:
+      - name: recipes-db
+        image: raven/ravendb:latest
+        env:
+          - name: RAVEN_ARGS
+            value: '--Setup.Mode=None'
+          - name: RAVEN_License_Eula_Accepted
+            value: 'true'
+          - name: RAVEN_Security_Certificate_Path
+            value: '/config/certs/ravendb-admin.pfx'
+          - name: RAVEN_Security_UnsecuredAccessAllowed
+            value: 'PrivateNetwork'
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        volumeMounts:
+        - name: certs
+          mountPath: "/config/certs"
+          readOnly: true
+        ports:
+        - containerPort: 8080
+        - containerPort: 38888
+      volumes:
+      - name: certs
+        secret:
+          secretName: db-admin-cert
+
+# ---
+# apiVersion: apps/v1
+# kind: StatefulSet
+# metadata:
+#   name: recipes-db-statefulset
+# spec:
+#   selector:
+#     matchLabels:
+#       app: recipes-db
+#   serviceName: recipes-db-service
+#   replicas: 1
+#   revisionHistoryLimit: 10
+#   template:
+#     metadata:
+#       labels:
+#         app: recipes-db
+#     spec:
+#       containers:
+#       - name: recipes-db
+#         command:
+#           - /bin/sh
+#           - -c
+#           - /opt/RavenDB/Server/Raven.Server --config-path /config/$HOSTNAME
+#         image: ravendb/ravendb:latest
+#         imagePullPolicy: Always
+#         resources:
+#           limits:
+#             memory: "1900Mi"
+#             cpu: "256m"
+#           requests:
+#             memory: "1900Mi"
+#             cpu: "256m"
+#         terminationMessagePath: /dev/termination-log
+#         terminationMessagePolicy: File
+#         # env:
+#         #   - name: RAVEN_Setup_Mode
+#         #     value: None
+#         #   - name: RAVEN_Security_UnsecuredAccessAllowed
+#         #     value: PrivateNetwork
+#         #   - name: RAVEN_DataDir
+#         #     value: /data/db
+#         volumeMounts:
+#           - mountPath: /data/db
+#             name: data
+#           - mountPath: /ssl
+#             name: ssl
+#           - mountPath: /license
+#             name: license
+#           - mountPath: /config
+#             name: config
+#       dnsPolicy: ClusterFirst
+#       restartPolicy: Always
+#       schedulerName: default-scheduler
+#       securityContext: {}
+#       terminationGracePeriodSeconds: 120
+#       volumes:
+#       - name: ssl
+#         secret:
+#           defaultMode: 420
+#           secretName: raven-ssl
+#       - configMap:
+#           defaultMode: 420
+#           name: raven-settings
+#         name: config
+#       - name: license
+#         secret:
+#           defaultMode: 420
+#           secretName: ravendb-license
+#   updateStrategy:
+#       rollingUpdate:
+#         partition: 0
+#       type: RollingUpdate
+#   volumeClaimTemplates:
+#   - metadata:
+#       name: data
+#     spec:
+#       accessModes: [ "ReadWriteOnce" ]
+#       resources:
+#         requests:
+#           storage: 1Gi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: recipes-db-service
+spec:
+  clusterIP: None
+  selector:
+    app: recipes-db
+  ports:
+  - name: http-api
+    port: 8080
+    targetPort: 8080
+    protocol: TCP
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}

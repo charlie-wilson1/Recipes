@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: recipes-web-deployment
+spec:
+  selector:
+    matchLabels:
+      app: recipes-web
+  template:
+    metadata:
+      labels:
+        app: recipes-web
+    spec:
+      containers:
+      - name: recipes-web
+        image: recipes-web:v1
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+          - containerPort: 8080
+        # env:
+        #   - name: VUE_APP_IDENTITY_URL
+        #     value: '5002'
+        #   - name: VUE_APP_WEB_API_URL
+        #     value: '5000'
+        #   - name: VUE_APP_FIREBASE_API_KEY
+        #     valueFrom:
+        #       secretKeyRef:
+        #         name: recipe-secrets
+        #         key: firebase-api-key
+        #   - name: VUE_APP_FIREBASE_AUTH_DOMAIN
+        #     valueFrom:
+        #       secretKeyRef:
+        #         name: recipe-secrets
+        #         key: firebase-auth-domain
+        #   - name: VUE_APP_FIREBASE_PROJECT_ID
+        #     valueFrom:
+        #       secretKeyRef:
+        #         name: recipe-secrets
+        #         key: firebase-project-id
+        #   - name: VUE_APP_FIREBASE_STORAGE_BUCKET
+        #     valueFrom:
+        #       secretKeyRef:
+        #         name: recipe-secrets
+        #         key: firebase-storage-bucket
+        #   - name: VUE_APP_FIREBASE_MESSAGING_SENDER_ID
+        #     valueFrom:
+        #       secretKeyRef:
+        #         name: recipe-secrets
+        #         key: firebase-messaging-sender-id
+        #   - name: VUE_APP_FIREBASE_APP_ID
+        #     valueFrom:
+        #       secretKeyRef:
+        #         name: recipe-secrets
+        #         key: firebase-app-id
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: recipes-web-service
+spec:
+  selector:
+    app: recipes-web
+  ports:
+  - port: 80
+    targetPort: 8080

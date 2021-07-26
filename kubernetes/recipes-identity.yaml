@@ -1,0 +1,94 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: recipes-identity-deployment
+spec:
+  selector:
+    matchLabels:
+      app: recipes-identity
+  template:
+    metadata:
+      labels:
+        app: recipes-identity
+    spec:
+      containers:
+      - name: recipes-identity
+        image: recipes-identity:v1
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+          - containerPort: 5002
+        # env:
+        #   - name: SendGrid__ApiKey
+        #     valueFrom:
+        #       secretKeyRef:
+        #         name: recipe-secrets
+        #         key: sendgrid-api-key
+        #   - name: SendGrid__TemplateIds__RegistrationTemplateId
+        #     valueFrom:
+        #       secretKeyRef:
+        #         name: recipe-secrets
+        #         key: sendgrid-registration-id
+        #   - name: SendGrid__TemplateIds__ResetPasswordTemplateId
+        #     valueFrom:
+        #       secretKeyRef:
+        #         name: recipe-secrets
+        #         key: sendgrid-reset-password-id
+        #   - name: SendGrid__TemplateIds__ConfirmResetPasswordTemplateId
+        #     valueFrom:
+        #       secretKeyRef:
+        #         name: recipe-secrets
+        #         key: sendgrid-confirm-password-id
+        #   - name: Auth__ClientRoute
+        #     value: ""
+        #   - name: Auth__JwtBearerTokenSettings__SecretKey
+        #     valueFrom:
+        #       secretKeyRef:
+        #         name: recipe-secrets
+        #         key: jwt-secret-key
+        #   - name: Auth__JwtBearerTokenSettings__Issuer
+        #     valueFrom:
+        #       secretKeyRef:
+        #         name: recipe-secrets
+        #         key: jwt-issuer
+        #   - name: Auth__JwtBearerTokenSettings__Audience
+        #     valueFrom:
+        #       secretKeyRef:
+        #         name: recipe-secrets
+        #         key: jwt-audience
+        #   - name: Auth__JwtBearerTokenSettings__ExpiryTimeInSeconds
+        #     value: "30"
+        #   - name: RavenSettings__Urls
+        #     valueFrom:
+        #       secretKeyRef:
+        #         name: recipe-secrets
+        #         key: ravendb-urls
+        #   - name: RavenSettings__DatabaseName
+        #     valueFrom:
+        #       secretKeyRef:
+        #         name: recipe-secrets
+        #         key: ravendb-database-name
+        livenessProbe:
+          httpGet:
+            path: /health/live
+            port: 5002
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: 5002
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: recipes-identity-service
+spec:
+  clusterIP: None
+  type: LoadBalancer
+  selector:
+    app: recipes-identity
+  ports:
+  - port: 5002
+    targetPort: 5002
