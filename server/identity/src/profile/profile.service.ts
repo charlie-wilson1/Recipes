@@ -3,7 +3,6 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { PaginationQueryDto } from '../models/paginationQueryDto';
 import { CreateProfileDto } from './models/createProfileDto';
 import {
   FindProfileByEmailDto,
@@ -13,118 +12,118 @@ import { Profile } from './models/profile.schema';
 import { UpdateUsernameDto } from './models/updateUsernameDto';
 import { UpdateRolesDto } from './models/updateRolesDto';
 import { ProfileRepository } from './profile.repository';
+import { GetAllDto } from './models/getAllDto';
 
 @Injectable()
 export class ProfileService {
   constructor(private readonly profileRepository: ProfileRepository) {}
 
-  async create(profile: CreateProfileDto): Promise<Profile> {
+  async create(createDto: CreateProfileDto): Promise<Profile> {
     const existingUser = await this.profileRepository.findByEmail(
-      profile.email,
+      createDto.email,
     );
 
     if (existingUser) {
       throw new ConflictException(
-        `profile with email ${profile.email} already exists.`,
+        `profile with email ${createDto.email} already exists.`,
       );
     }
 
-    return await this.profileRepository.create(profile.email);
+    return await this.profileRepository.create(createDto.email);
   }
 
-  async getAll(
-    paginationQuery: PaginationQueryDto,
-    isActive: boolean,
-  ): Promise<Profile[]> {
+  async getAll(getAllDto: GetAllDto): Promise<Profile[]> {
+    const { paginatedRequest, isActive = true } = getAllDto;
+
     const result = await this.profileRepository.getAll(
-      paginationQuery,
+      paginatedRequest,
       isActive,
     );
 
-    if ((result || []).length === 0) {
+    if ((result ?? []).length === 0) {
       throw new NotFoundException('No profiles found.');
     }
 
     return result;
   }
 
-  async findByEmail(profile: FindProfileByEmailDto): Promise<Profile> {
-    const result = this.profileRepository.findByEmail(profile.email);
+  async findByEmail(findDto: FindProfileByEmailDto): Promise<Profile> {
+    const result = this.profileRepository.findByEmail(findDto.email);
 
     if (!result) {
       throw new NotFoundException(
-        `User with email ${profile.email} could not be found`,
+        `User with email ${findDto.email} could not be found`,
       );
     }
 
     return result;
   }
 
-  async findByUsername(profile: FindProfileByUsernameDto): Promise<Profile> {
-    const result = this.profileRepository.findByUsername(profile.username);
+  async findByUsername(findDto: FindProfileByUsernameDto): Promise<Profile> {
+    const result = this.profileRepository.findByUsername(findDto.username);
 
     if (!result) {
       throw new NotFoundException(
-        `User with email ${profile.username} could not be found`,
+        `User with username ${findDto.username} could not be found`,
       );
     }
 
     return result;
   }
 
-  async delete(profile: FindProfileByEmailDto): Promise<void> {
+  async delete(deleteDto: FindProfileByEmailDto): Promise<void> {
     const profileToDelete = await this.profileRepository.findByEmail(
-      profile.email,
+      deleteDto.email,
     );
 
     if (!profileToDelete) {
       throw new NotFoundException(
-        `User with email ${profile.email} could not be found`,
+        `User with email ${deleteDto.email} could not be found`,
       );
     }
 
     await this.profileRepository.delete(profileToDelete.id);
   }
 
-  async updateRoles(profile: UpdateRolesDto): Promise<Profile> {
+  async updateRoles(updateDto: UpdateRolesDto): Promise<Profile> {
     const profileToUpdate = await this.profileRepository.findByEmail(
-      profile.email,
+      updateDto.email,
     );
 
     if (!profileToUpdate) {
       throw new NotFoundException(
-        `User with email ${profile.email} could not be found`,
+        `User with email ${updateDto.email} could not be found`,
       );
     }
 
-    profileToUpdate.roles = profile.roles;
+    profileToUpdate.roles = updateDto.roles;
     return this.profileRepository.update(profileToUpdate.id, profileToUpdate);
   }
 
-  async updateProfileUsername(profileDto: UpdateUsernameDto): Promise<Profile> {
+  async updateProfileUsername(updateDto: UpdateUsernameDto): Promise<Profile> {
     const existingProfilesWithUsername =
       await this.profileRepository.findByUsernameNotEmail(
-        profileDto.username,
-        profileDto.email,
+        updateDto.username,
+        updateDto.email,
       );
 
-    if (existingProfilesWithUsername.length > 0) {
+    if ((existingProfilesWithUsername ?? []).length > 0) {
       throw new ConflictException(
-        `profile with username ${profileDto.username} already exists.`,
+        `profile with username ${updateDto.username} already exists.`,
       );
     }
 
     const profileToUpdate = await this.profileRepository.findByEmail(
-      profileDto.email,
+      updateDto.email,
     );
 
     if (!profileToUpdate) {
       throw new NotFoundException(
-        `User with email ${profileDto.email} could not be found`,
+        `User with email ${updateDto.email} could not be found`,
       );
     }
 
-    profileToUpdate.username = profileDto.username;
+    profileToUpdate.username = updateDto.username;
     return await this.profileRepository.update(
       profileToUpdate.id,
       profileToUpdate,

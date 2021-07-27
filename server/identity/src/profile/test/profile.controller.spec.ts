@@ -1,11 +1,27 @@
-import { getConnectionToken, MongooseModule } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
-import { Connection } from 'mongoose';
-import testDbConfig, { closeMongoConnection } from '../../../test/testDbConfig';
-import { Profile, ProfileSchema } from '../models/profile.schema';
 import { ProfileController } from '../profile.controller';
 import { ProfileService } from '../profile.service';
 import { getProfileStub } from '../../../test/support/stubs/profile.stub';
+import { ProfileRepository } from '../profile.repository';
+import { AuthenticationController } from '../../authentication/authentication.controller';
+import { ConfigModule } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
+import {
+  MongooseModule,
+  getModelToken,
+  getConnectionToken,
+} from '@nestjs/mongoose';
+import { PassportModule } from '@nestjs/passport';
+import * as Joi from 'joi';
+import { AuthenticationService } from '../../authentication/authentication.service';
+import { JwtStrategy } from '../../authentication/strategies/jwt.strategy';
+import testDbConfig, { closeMongoConnection } from '../../../test/testDbConfig';
+import { Profile, ProfileSchema } from '../models/profile.schema';
+import { ProfileModule } from '../profile.module';
+import { ProfileModelMock } from './support/profileMock.model';
+import { Connection } from 'mongoose';
+import { GetAllDto } from '../models/getAllDto';
+import { UpdateRolesDto } from '../models/updateRolesDto';
 
 const profileMock = getProfileStub();
 
@@ -14,9 +30,25 @@ describe('ProfileController', () => {
   let service: ProfileService;
   let connection: Connection;
 
-  beforeEach(async () => {
+  beforeEach(async (done) => {
     const module: TestingModule = await Test.createTestingModule({
+      controllers: [AuthenticationController],
       imports: [
+        ConfigModule.forRoot({
+          validationSchema: Joi.object({
+            JWT_SECRET: Joi.string().default('secret'),
+            JWT_ISSUER: Joi.string().default('issuer'),
+          }),
+        }),
+        JwtModule.registerAsync({
+          useFactory: async () => ({
+            secretOrPrivateKey: 'test',
+            signOptions: {
+              expiresIn: '60s',
+              issuer: 'issuer',
+            },
+          }),
+        }),
         testDbConfig({
           connectionName: (new Date().getTime() * Math.random()).toString(16),
         }),
@@ -26,18 +58,29 @@ describe('ProfileController', () => {
             schema: ProfileSchema,
           },
         ]),
+        PassportModule,
+        ProfileModule,
       ],
-      providers: [ProfileService],
-      controllers: [ProfileController],
-      exports: [ProfileService],
+      providers: [
+        ProfileService,
+        ProfileRepository,
+        AuthenticationService,
+        JwtStrategy,
+        {
+          provide: getModelToken(Profile.name),
+          useClass: ProfileModelMock,
+        },
+      ],
     }).compile();
 
     controller = module.get<ProfileController>(ProfileController);
-    service = await module.get<ProfileService>(ProfileService);
+    service = module.get<ProfileService>(ProfileService);
     connection = await module.get(getConnectionToken());
+    jest.resetAllMocks();
+    done();
   });
 
-  afterAll(async (done) => {
+  afterEach(async (done) => {
     await connection.close();
     await closeMongoConnection();
     done();
@@ -48,89 +91,124 @@ describe('ProfileController', () => {
   });
 
   describe('create', () => {
-    test('should call create', () => {
-      spyOn(service, 'create');
+    test('should call create', async () => {
+      const spy = jest
+        .spyOn(service, 'create')
+        .mockImplementation(() => Promise.resolve(profileMock));
 
-      controller.create({
+      const actual = await controller.create({
         email: profileMock.email,
       });
 
-      expect(service.create).toHaveBeenCalledTimes(1);
+      expect(service.create).toHaveBeenCalledWith({ email: profileMock.email });
+      expect(spy).toHaveBeenCalledTimes(1);
+      expect(actual).toEqual(profileMock);
     });
   });
 
   describe('getAll', () => {
-    test('should call getAll', () => {
-      spyOn(service, 'getAll');
+    test('should call getAll', async () => {
+      const spy = jest
+        .spyOn(service, 'getAll')
+        .mockImplementation(() => Promise.resolve([profileMock]));
 
-      controller.getAll({
-        limit: 10,
-        offset: 0,
-      });
+      const expectedRequest: GetAllDto = {
+        paginatedRequest: {
+          limit: 10,
+          offset: 0,
+        },
+        isActive: true,
+      };
 
-      expect(service.getAll).toHaveBeenCalledTimes(1);
+      const actual = await controller.getAll(expectedRequest);
+
+      expect(service.getAll).toHaveBeenCalledWith(expectedRequest);
+      expect(spy).toHaveBeenCalledTimes(1);
+      expect(actual).toEqual([profileMock]);
     });
   });
 
   describe('getByEmail', () => {
-    test('should call findByEmail', () => {
-      spyOn(service, 'findByEmail');
+    test('should call findByEmail', async () => {
+      const spy = jest
+        .spyOn(service, 'findByEmail')
+        .mockImplementation(() => Promise.resolve(profileMock));
 
-      controller.getByEmail({
+      const actual = await controller.getByEmail({
         email: profileMock.email,
       });
 
-      expect(service.findByEmail).toHaveBeenCalledTimes(1);
+      expect(service.findByEmail).toHaveBeenCalledWith({
+        email: profileMock.email,
+      });
+      expect(spy).toHaveBeenCalledTimes(1);
+      expect(actual).toEqual(profileMock);
     });
   });
 
   describe('getByUsername', () => {
-    test('should call findByUsername', () => {
-      spyOn(service, 'findByUsername');
+    test('should call findByUsername', async () => {
+      const spy = jest
+        .spyOn(service, 'findByUsername')
+        .mockImplementation(() => Promise.resolve(profileMock));
 
-      controller.getByUsername({
+      const actual = await controller.getByUsername({
         username: profileMock.username,
       });
 
       expect(service.findByUsername).toHaveBeenCalledTimes(1);
+      expect(spy).toHaveBeenCalledTimes(1);
+      expect(actual).toEqual(profileMock);
     });
   });
 
   describe('delete', () => {
-    test('should call delete', () => {
-      spyOn(service, 'delete');
+    test('should call delete', async () => {
+      const spy = jest
+        .spyOn(service, 'delete')
+        .mockImplementation(() => Promise.resolve());
 
-      controller.delete({
+      await controller.delete({
         email: profileMock.email,
       });
 
-      expect(service.delete).toHaveBeenCalledTimes(1);
+      expect(service.delete).toHaveBeenCalledWith({ email: profileMock.email });
+      expect(spy).toHaveBeenCalledTimes(1);
     });
   });
 
   describe('updateRoles', () => {
-    test('should call updateRoles', () => {
-      spyOn(service, 'updateRoles');
+    test('should call updateRoles', async () => {
+      const spy = jest
+        .spyOn(service, 'updateRoles')
+        .mockImplementation(() => Promise.resolve(profileMock));
 
-      controller.updateRoles({
+      const expectedRequest: UpdateRolesDto = {
         email: profileMock.email,
         roles: profileMock.roles,
-      });
+      };
 
-      expect(service.updateRoles).toHaveBeenCalledTimes(1);
+      const actual = await controller.updateRoles(expectedRequest);
+
+      expect(service.updateRoles).toHaveBeenCalledWith(expectedRequest);
+      expect(spy).toHaveBeenCalledTimes(1);
+      expect(actual).toEqual(profileMock);
     });
   });
 
   describe('updateUsername', () => {
-    test('should call updateRoles', () => {
-      spyOn(service, 'updateProfileUsername');
+    test('should call updateRoles', async () => {
+      jest
+        .spyOn(service, 'updateProfileUsername')
+        .mockImplementation(() => Promise.resolve(profileMock));
 
-      controller.updateUsername({
+      const actual = await controller.updateUsername({
         email: profileMock.email,
         username: profileMock.username,
       });
 
       expect(service.updateProfileUsername).toHaveBeenCalledTimes(1);
+      expect(actual).toEqual(profileMock);
     });
   });
 });

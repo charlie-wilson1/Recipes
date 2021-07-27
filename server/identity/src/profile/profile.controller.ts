@@ -25,6 +25,7 @@ import { UpdateUsernameDto } from './models/updateUsernameDto';
 import { UpdateRolesDto } from './models/updateRolesDto';
 import { ProfileService } from './profile.service';
 import { StatusCodes } from 'http-status-codes';
+import { GetAllDto } from './models/getAllDto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('profile')
@@ -42,11 +43,8 @@ export class ProfileController {
   @UseGuards(RolesGuard)
   @Roles(Role.Admin)
   @Get()
-  async getAll(
-    @Query() paginationQuery: PaginationQueryDto,
-    @Query() getActive = true,
-  ): Promise<Profile[]> {
-    return await this.profileService.getAll(paginationQuery, getActive);
+  async getAll(@Query() getAllDto: GetAllDto): Promise<Profile[]> {
+    return await this.profileService.getAll(getAllDto);
   }
 
   @UseGuards(RolesGuard)

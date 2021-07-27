@@ -26,14 +26,14 @@ export class AuthenticationService {
     }
 
     const payload = {
-      ...metadata,
+      publicAddress: metadata.publicAddress,
       sub: metadata.issuer,
       roles: user.roles,
       name: user.username,
     };
 
     return {
-      access_token: this.jwtService.sign(payload),
+      access_token: await this.jwtService.signAsync(payload),
     };
   }
 

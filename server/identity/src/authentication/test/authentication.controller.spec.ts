@@ -10,13 +10,20 @@ import testDbConfig, { closeMongoConnection } from '../../../test/testDbConfig';
 import { Connection } from 'mongoose';
 import { getConnectionToken } from '@nestjs/mongoose';
 import * as Joi from 'joi';
+import { getProfileStub } from '../../../test/support/stubs/profile.stub';
+import { AuthRequestDto } from '../models/loginRequestDto';
+import { MagicUserMetadata } from '@magic-sdk/admin';
+import { UnauthorizedException } from '@nestjs/common';
+
+const profileMock = getProfileStub();
+const didToken: AuthRequestDto = { didToken: 'test' };
 
 describe('IdentityController', () => {
   let controller: AuthenticationController;
   let service: AuthenticationService;
   let connection: Connection;
 
-  beforeEach(async () => {
+  beforeEach(async (done) => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AuthenticationController],
       imports: [
@@ -47,9 +54,10 @@ describe('IdentityController', () => {
     controller = module.get<AuthenticationController>(AuthenticationController);
     service = await module.get<AuthenticationService>(AuthenticationService);
     connection = await module.get(getConnectionToken());
+    done();
   });
 
-  afterAll(async (done) => {
+  afterEach(async (done) => {
     await connection.close();
     await closeMongoConnection();
     done();
@@ -60,28 +68,68 @@ describe('IdentityController', () => {
   });
 
   describe('authenticate', () => {
+    let authenticateSpy: jest.SpyInstance;
+    let createTokenSpy: jest.SpyInstance;
+
+    beforeEach((done) => {
+      authenticateSpy = jest.spyOn(service, 'authenticateDidToken');
+      createTokenSpy = jest.spyOn(service, 'createJwtFromMagicMetadata');
+      done();
+    });
+
+    test('should throw UnauthorizedException if metadata invalid', async () => {
+      authenticateSpy.mockImplementation(() => Promise.resolve(undefined));
+
+      try {
+        await controller.authenticate(didToken);
+      } catch (error) {
+        expect(error).toBeInstanceOf(UnauthorizedException);
+      }
+
+      expect(service.authenticateDidToken).toHaveBeenCalledWith(
+        didToken.didToken,
+      );
+      expect(authenticateSpy).toHaveBeenCalledTimes(1);
+      expect(createTokenSpy).not.toHaveBeenCalled();
+    });
+
     test('should call authenticateDidToken and createJwtFromMagicMetadata', async () => {
-      const authenticateSpy = spyOn(service, 'authenticateDidToken');
-      const createTokenSpy = spyOn(service, 'createJwtFromMagicMetadata');
+      const expectedMetadata: MagicUserMetadata = {
+        email: profileMock.email,
+        publicAddress: 'publicAddress',
+        issuer: 'issuer',
+      };
+      const expectedResult = 'jwt';
 
-      await controller.authenticate({
-        didToken: 'test',
-      });
+      authenticateSpy.mockImplementation(() =>
+        Promise.resolve(expectedMetadata),
+      );
+      createTokenSpy.mockImplementation(() => Promise.resolve(expectedResult));
 
-      expect(authenticateSpy).toBeCalledTimes(1);
-      expect(createTokenSpy).toBeCalledTimes(1);
+      const actual = await controller.authenticate(didToken);
+
+      expect(service.authenticateDidToken).toHaveBeenCalledWith(
+        didToken.didToken,
+      );
+      expect(service.createJwtFromMagicMetadata).toHaveBeenCalledWith(
+        expectedMetadata,
+      );
+      expect(actual).toEqual(expectedResult);
+      expect(authenticateSpy).toHaveBeenCalledTimes(1);
+      expect(createTokenSpy).toHaveBeenCalledTimes(1);
     });
   });
 
   describe('logout', () => {
     test('should call logout', async () => {
-      const logoutSpy = spyOn(service, 'logout');
+      const logoutSpy = jest
+        .spyOn(service, 'logout')
+        .mockImplementation(() => Promise.resolve());
 
-      await controller.logout({
-        didToken: 'test',
-      });
+      await controller.logout(didToken);
 
-      expect(logoutSpy).toBeCalledTimes(1);
+      expect(service.logout).toHaveBeenCalledWith(didToken.didToken);
+      expect(logoutSpy).toHaveBeenCalledTimes(1);
     });
   });
 });

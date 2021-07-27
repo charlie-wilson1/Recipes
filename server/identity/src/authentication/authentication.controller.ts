@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, UnauthorizedException } from '@nestjs/common';
 import { AuthenticationService } from './authentication.service';
 import { AuthRequestDto } from './models/loginRequestDto';
 
@@ -11,6 +11,11 @@ export class AuthenticationController {
     const metadata = await this.authenticationService.authenticateDidToken(
       loginRequestDto.didToken,
     );
+
+    if (!metadata) {
+      throw new UnauthorizedException();
+    }
+
     return await this.authenticationService.createJwtFromMagicMetadata(
       metadata,
     );
