@@ -18,7 +18,6 @@ export class RolesGuard implements CanActivate {
     }
 
     const request = context.switchToHttp().getRequest();
-    console.log(request);
     const user = request.user;
     return _.intersection(roles, user.roles).length > 0;
   }
