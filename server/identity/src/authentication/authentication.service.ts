@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { Magic, MagicUserMetadata } from '@magic-sdk/admin';
 import { JwtService } from '@nestjs/jwt';
 import { ProfileRepository } from '../profile/profile.repository';
+import { Profile } from 'src/profile/models/profile.schema';
 
 @Injectable()
 export class AuthenticationService {
@@ -16,14 +17,20 @@ export class AuthenticationService {
     return await this.magic.users.getMetadataByToken(didToken);
   }
 
-  async createJwtFromMagicMetadata(metadata: MagicUserMetadata): Promise<any> {
-    const user = await this.profileRepository.findByEmail(metadata.email);
+  private async getUser(email: string): Promise<Profile> {
+    const user = await this.profileRepository.findByEmail(email);
 
-    if (!user) {
+    if (!user?.isActive) {
       throw new UnauthorizedException(
-        `user with email ${metadata.email} is not authorized to use this application. Please contact an administrator to be invited to use the application.`,
+        `user with email ${email} is not authorized to use this application. Please contact an administrator to be invited to use the application.`,
       );
     }
+
+    return user;
+  }
+
+  async createJwtFromMagicMetadata(metadata: MagicUserMetadata): Promise<any> {
+    const user = await this.getUser(metadata.email);
 
     const payload = {
       publicAddress: metadata.publicAddress,
