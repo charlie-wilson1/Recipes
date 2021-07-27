@@ -55,12 +55,12 @@ describe('IdentityController', () => {
     done();
   });
 
-  it('should be defined', () => {
+  test('should be defined', () => {
     expect(controller).toBeDefined();
   });
 
   describe('authenticate', () => {
-    it('should call authenticateDidToken and createJwtFromMagicMetadata', async () => {
+    test('should call authenticateDidToken and createJwtFromMagicMetadata', async () => {
       const authenticateSpy = spyOn(service, 'authenticateDidToken');
       const createTokenSpy = spyOn(service, 'createJwtFromMagicMetadata');
 
@@ -74,7 +74,7 @@ describe('IdentityController', () => {
   });
 
   describe('logout', () => {
-    it('should call logout', async () => {
+    test('should call logout', async () => {
       const logoutSpy = spyOn(service, 'logout');
 
       await controller.logout({

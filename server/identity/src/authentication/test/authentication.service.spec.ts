@@ -59,12 +59,12 @@ describe('AuthenticationService', () => {
     done();
   });
 
-  it('should be defined', () => {
+  test('should be defined', () => {
     expect(service).toBeDefined();
   });
 
   describe('createJwtFromMagicMetadata', () => {
-    it('should call findByEmail', async () => {
+    test('should call findByEmail', async () => {
       const findSpy = spyOn(profileService, 'findByEmail').and.returnValue({
         email: profileMock.email,
       });

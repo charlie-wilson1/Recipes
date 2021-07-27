@@ -13,11 +13,7 @@ import { AuthenticationController } from '../../authentication/authentication.co
 import { AuthenticationService } from '../../authentication/authentication.service';
 import { JwtStrategy } from '../../authentication/strategies/jwt.strategy';
 import testDbConfig, { closeMongoConnection } from '../../../test/testDbConfig';
-import {
-  Profile,
-  ProfileDocument,
-  ProfileSchema,
-} from '../models/profile.schema';
+import { Profile, ProfileSchema } from '../models/profile.schema';
 import { ProfileModule } from '../profile.module';
 import { ProfileService } from '../profile.service';
 import { ProfileModelMock } from './support/profileMock.model';
@@ -88,25 +84,46 @@ describe('ProfileService', () => {
     done();
   });
 
-  it('should be defined', () => {
+  test('should be defined', () => {
     expect(service).toBeDefined();
   });
 
   describe('create', () => {
-    let findByEmailSpy: jest.SpyInstance<Promise<ProfileDocument>>;
-    let createSpy: jest.SpyInstance<Promise<ProfileDocument>>;
+    let findByEmailSpy: jasmine.Spy;
+    let createSpy: jasmine.Spy;
+    const functionUnderTest = async () => {
+      await service.create({ email: profileMock.email });
+    };
 
     beforeEach((done) => {
-      findByEmailSpy = jest.spyOn(repository, 'findByEmail');
-      createSpy = jest.spyOn(repository, 'create');
+      findByEmailSpy = spyOn(repository, 'findByEmail');
+      createSpy = spyOn(repository, 'create');
       done();
     });
 
-    it('should throw conflict exception when existing user not found', async () => {
-      findByEmailSpy.mockResolvedValue(null);
-      const error = () => service.create({ email: profileMock.email });
-      expect(error).toThrow(ConflictException);
+    test('should throw conflict exception when existing user not found', async () => {
+      findByEmailSpy.and.returnValue(profileMock);
+      try {
+        await functionUnderTest();
+      } catch (error) {
+        expect(error).toBeInstanceOf(ConflictException);
+        expect(error.message).toBe(
+          `profile with email ${profileMock.email} already exists.`,
+        );
+      }
+
       expect(repository.findByEmail).toHaveBeenCalledWith(profileMock.email);
+      expect(repository.create).not.toHaveBeenCalled();
+    });
+
+    test('should call repository.create to create user', async () => {
+      findByEmailSpy.and.returnValue(undefined);
+      createSpy.and.returnValue(profileMock);
+
+      await functionUnderTest();
+
+      expect(repository.findByEmail).toHaveBeenCalledWith(profileMock.email);
+      expect(repository.create).toHaveBeenCalledWith(profileMock.email);
     });
   });
 });

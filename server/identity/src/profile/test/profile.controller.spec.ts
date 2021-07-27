@@ -43,12 +43,12 @@ describe('ProfileController', () => {
     done();
   });
 
-  it('should be defined', () => {
+  test('should be defined', () => {
     expect(controller).toBeDefined();
   });
 
   describe('create', () => {
-    it('should call create', () => {
+    test('should call create', () => {
       spyOn(service, 'create');
 
       controller.create({
@@ -60,7 +60,7 @@ describe('ProfileController', () => {
   });
 
   describe('getAll', () => {
-    it('should call getAll', () => {
+    test('should call getAll', () => {
       spyOn(service, 'getAll');
 
       controller.getAll({
@@ -73,7 +73,7 @@ describe('ProfileController', () => {
   });
 
   describe('getByEmail', () => {
-    it('should call findByEmail', () => {
+    test('should call findByEmail', () => {
       spyOn(service, 'findByEmail');
 
       controller.getByEmail({
@@ -85,7 +85,7 @@ describe('ProfileController', () => {
   });
 
   describe('getByUsername', () => {
-    it('should call findByUsername', () => {
+    test('should call findByUsername', () => {
       spyOn(service, 'findByUsername');
 
       controller.getByUsername({
@@ -97,7 +97,7 @@ describe('ProfileController', () => {
   });
 
   describe('delete', () => {
-    it('should call delete', () => {
+    test('should call delete', () => {
       spyOn(service, 'delete');
 
       controller.delete({
@@ -109,7 +109,7 @@ describe('ProfileController', () => {
   });
 
   describe('updateRoles', () => {
-    it('should call updateRoles', () => {
+    test('should call updateRoles', () => {
       spyOn(service, 'updateRoles');
 
       controller.updateRoles({
@@ -122,7 +122,7 @@ describe('ProfileController', () => {
   });
 
   describe('updateUsername', () => {
-    it('should call updateRoles', () => {
+    test('should call updateRoles', () => {
       spyOn(service, 'updateProfileUsername');
 
       controller.updateUsername({
