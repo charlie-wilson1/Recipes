@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ProfileController } from '../profile.controller';
 import { ProfileService } from '../profile.service';
-import { getProfileStub } from '../../../test/support/stubs/profile.stub';
+import { getProfileStub } from './support/stubs/profile.stub';
 import { ProfileRepository } from '../profile.repository';
 import { AuthenticationController } from '../../authentication/authentication.controller';
 import { ConfigModule } from '@nestjs/config';

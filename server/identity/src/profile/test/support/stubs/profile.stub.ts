@@ -1,4 +1,4 @@
-import { Role } from '../../../src/models/roles';
+import { Role } from '../../../../models/roles';
 
 export const getProfileStub = () => {
   return {

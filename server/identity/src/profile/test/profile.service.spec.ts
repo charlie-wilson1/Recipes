@@ -17,7 +17,7 @@ import { Profile, ProfileSchema } from '../models/profile.schema';
 import { ProfileModule } from '../profile.module';
 import { ProfileService } from '../profile.service';
 import { ProfileModelMock } from './support/profileMock.model';
-import { getProfileStub } from '../../../test/support/stubs/profile.stub';
+import { getProfileStub } from './support/stubs/profile.stub';
 import { ProfileRepository } from '../profile.repository';
 import { ConflictException, NotFoundException } from '@nestjs/common';
 import { GetAllDto } from '../models/getAllDto';

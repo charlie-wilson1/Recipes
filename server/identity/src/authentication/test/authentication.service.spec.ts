@@ -10,7 +10,7 @@ import testDbConfig, { closeMongoConnection } from '../../../test/testDbConfig';
 import { Connection } from 'mongoose';
 import { getConnectionToken } from '@nestjs/mongoose';
 import * as Joi from 'joi';
-import { getProfileStub } from '../../../test/support/stubs/profile.stub';
+import { getProfileStub } from '../../profile/test/support/stubs/profile.stub';
 import { ProfileRepository } from '../../profile/profile.repository';
 import { MagicUserMetadata } from '@magic-sdk/admin';
 import { UnauthorizedException } from '@nestjs/common';
