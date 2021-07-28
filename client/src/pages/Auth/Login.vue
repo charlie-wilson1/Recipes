@@ -12,43 +12,21 @@
 				</div>
 
 				<!-- Login Form -->
-				<form @submit.prevent="login" method="POST">
-					<b-form-group :class="{ 'form-group--error': $v.username.$error }">
+				<form @submit.prevent="sendMagicToken" method="POST">
+					<b-form-group :class="{ 'form-group--error': $v.email.$error }">
 						<input
 							type="text"
-							id="login"
+							id="email"
 							class="fadeIn second"
-							name="login"
-							placeholder="login"
-							v-model.trim="$v.username.$model"
+							name="email"
+							placeholder="email@gmail.com"
+							v-model.trim="$v.email.$model"
 						/>
-						<div
-							class="error"
-							v-if="!$v.username.required && $v.username.$error"
-						>
-							Field is required
+						<div class="error" v-if="!$v.email.required && $v.email.$error">
+							Email is required
 						</div>
-					</b-form-group>
-					<b-form-group
-						class="input-icons"
-						:class="{ 'form-group--error': $v.password.$error }"
-					>
-						<input
-							:type="showPassword ? 'text' : 'password'"
-							id="password"
-							class="fadeIn third"
-							name="login"
-							placeholder="password"
-							v-model.trim="$v.password.$model"
-						/>
-						<small @click="toggleShowPassword" class="text-muted"
-							>Show password</small
-						>
-						<div
-							class="error"
-							v-if="!$v.password.required && $v.password.$error"
-						>
-							Field is required
+						<div class="error" v-if="!$v.email.email && $v.email.$error">
+							Must be in email format (email@domain.com)
 						</div>
 					</b-form-group>
 					<input
@@ -59,12 +37,7 @@
 					/>
 				</form>
 
-				<!-- Remind Passowrd -->
-				<div id="formFooter">
-					<a class="underlineHover" :href="resetPasswordRoute"
-						>Forgot Password?</a
-					>
-				</div>
+				<div id="formFooter"></div>
 			</div>
 		</div>
 	</section>
@@ -74,17 +47,16 @@
 import { Component, Vue } from "vue-property-decorator";
 import { Validate } from "vuelidate-property-decorators";
 import { validationMixin } from "vuelidate";
-import { required } from "vuelidate/lib/validators";
+import { required, email } from "vuelidate/lib/validators";
+import { Magic } from "magic-sdk";
 import { LoginRequest } from "@/models/AccountsModels";
-import ForgotPasswordModal from "@/pages/Auth/ForgotPassword.vue";
+
+const magic = new Magic(process.env.VUE_APP_MAGIC_KEY as string);
 
 @Component({
-	components: { ForgotPasswordModal },
 	mixins: [validationMixin],
 })
 export default class Login extends Vue {
-	private showPassword = false;
-
 	get redirectRoute(): string | undefined {
 		const route = this.$route.query.redirect;
 
@@ -94,23 +66,21 @@ export default class Login extends Vue {
 		return undefined;
 	}
 
-	get resetPasswordRoute(): string {
-		let route = "/forgot-password";
-
-		if (this.redirectRoute) {
-			route = route + `?redirect=${this.redirectRoute}`;
+	async beforeCreate() {
+		if (await magic.user.isLoggedIn()) {
+			const idToken = await magic.user.getIdToken();
+			const request: LoginRequest = {
+				didToken: idToken,
+				redirect: "/home",
+			};
+			this.$store.dispatch("getJwtToken", request);
 		}
-
-		return route;
 	}
 
-	@Validate({ required })
-	username = "";
+	@Validate({ required, email })
+	email = "";
 
-	@Validate({ required })
-	password = "";
-
-	login() {
+	async sendMagicToken() {
 		this.$v.$touch();
 
 		if (this.$v.$invalid) {
@@ -118,19 +88,20 @@ export default class Login extends Vue {
 			return;
 		}
 
-		const login: LoginRequest = {
-			command: {
-				username: this.username,
-				password: this.password,
-			},
-			redirect: this.redirectRoute,
-		};
+		const redirectURI = this.redirectRoute
+			? new URL(this.redirectRoute, window.location.origin).href
+			: new URL("/authenticate", window.location.origin).href;
 
-		this.$store.dispatch("login", login);
-	}
+		console.log(await magic.apiKey);
 
-	toggleShowPassword() {
-		this.showPassword = !this.showPassword;
+		try {
+			magic.auth.loginWithMagicLink({
+				email: this.email,
+				redirectURI: redirectURI,
+			});
+		} catch {
+			Vue.$toast.error("Error logging in.");
+		}
 	}
 }
 </script>
@@ -253,8 +224,7 @@ input[type="reset"]:active {
 	transform: scale(0.95);
 }
 
-input[type="text"],
-input[type="password"] {
+input[type="text"] {
 	background-color: #f6f6f6;
 	border: none;
 	color: #0d0d0d;
@@ -275,14 +245,12 @@ input[type="password"] {
 	border-radius: 5px 5px 5px 5px;
 }
 
-input[type="text"]:focus,
-input[type="password"]:focus {
+input[type="text"]:focus {
 	background-color: #fff;
 	border-bottom: 2px solid #5fbae9;
 }
 
-input[type="text"]:placeholder,
-input[type="password"]:placeholder {
+input[type="text"]:placeholder {
 	color: #cccccc;
 }
 

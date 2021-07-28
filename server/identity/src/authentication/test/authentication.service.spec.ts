@@ -117,7 +117,7 @@ describe('AuthenticationService', () => {
         sub: metadata.issuer,
         publicAddress: metadata.publicAddress,
         roles: profileMock.roles,
-        name: profileMock.username,
+        nameid: profileMock.username,
       });
 
       expect(findByEmailSpy).toHaveBeenCalledTimes(1);

@@ -1,24 +1,15 @@
 export interface RegisterUserCommand {
 	email: string;
-	username: string;
-	password: string;
-	confirmPassword: string;
-	redirect: string | undefined;
-}
-
-export interface LoginCommand {
-	username: string;
-	password: string;
 }
 
 export interface LoginRequest {
-	command: LoginCommand;
-	redirect: string | undefined;
+	didToken: string | null;
+	redirect?: string;
 }
 
-export interface UpdateCurrentUserForm {
-	updateUserCommand: UpdateCurrentUserCommand;
-	updatePasswordCommand: UpdatePasswordCommand;
+export interface MagicTokenRequest {
+	email: string;
+	redirect: string;
 }
 
 export interface UpdateCurrentUserCommand {
@@ -26,25 +17,11 @@ export interface UpdateCurrentUserCommand {
 	email: string;
 }
 
-export interface UpdatePasswordCommand {
-	currentPassword: string;
-	newPassword: string;
-	newPasswordConfirmation: string;
-}
-
-export interface ConfirmResetPasswordCommand {
-	email: string;
-	resetToken: string;
-	newPassword: string;
-	newPasswordConfirmation: string;
-	redirect: string | undefined;
-}
-
 export interface TokenResponse {
-	id: string;
-	token: string;
+	publicAddress: string;
+	roles: string[];
 	username: string;
-	roles: Array<string>;
+	token: string;
+	magicId: string;
 	tokenExpiration: number;
-	refreshToken: string;
 }

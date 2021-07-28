@@ -8,16 +8,24 @@ export const mutations: MutationTree<RootState> = {
 		state.isLoading = isLoading;
 	},
 
+	setDidToken: (state, didToken: string) => {
+		state.didToken = didToken;
+	},
+
 	setUserVariables(state, response: TokenResponse) {
 		state.token = response.token;
 		state.username = response.username;
 		state.roles = response.roles;
 		state.tokenExpiration = response.tokenExpiration;
-		state.refreshToken = response.refreshToken;
+		state.magicId = response.magicId;
 	},
 
 	setUsername(state, response: string) {
 		state.username = response;
+	},
+
+	setEmail(state, response: string) {
+		state.email = response;
 	},
 
 	logout(state) {
@@ -25,5 +33,6 @@ export const mutations: MutationTree<RootState> = {
 		state.username = undefined;
 		state.roles = undefined;
 		state.tokenExpiration = undefined;
+		state.magicId = undefined;
 	},
 };

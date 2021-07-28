@@ -2,8 +2,10 @@ export interface RootState {
 	version: string;
 	isLoading: boolean;
 	token?: string;
-	refreshToken?: string;
 	username?: string;
-	roles?: Array<string>;
+	email?: string;
+	roles?: string[];
 	tokenExpiration?: number;
+	didToken?: string;
+	magicId?: string;
 }

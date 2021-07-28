@@ -7,8 +7,10 @@ import { NewRecipeModule } from "./modules/newRecipe/module";
 import { AdminModule } from "./modules/admin/module";
 import { actions } from "./actions";
 import { mutations } from "./mutations";
+import { Magic } from "magic-sdk";
 
 Vue.use(Vuex);
+const magic = new Magic(process.env.VUE_APP_MAGIC_KEY as string);
 
 const store: StoreOptions<RootState> = {
 	plugins: [createPersistedState()],
@@ -44,8 +46,11 @@ const store: StoreOptions<RootState> = {
 		tokenExpiration: state => {
 			return state.tokenExpiration;
 		},
-		isLoggedIn: state => {
-			return !!state.token;
+		didToken: async () => {
+			return await magic.user.getIdToken();
+		},
+		isLoggedIn: async () => {
+			return await magic.user.isLoggedIn();
 		},
 		isAdmin: state => {
 			return state.roles?.includes("Admin");

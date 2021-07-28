@@ -300,3 +300,4 @@ FakesAssemblies/
 *.opt
 /recipes-firebase-adminsdk.json
 /ajax-recipes-302122-031a7d94150f.json
+**/.env

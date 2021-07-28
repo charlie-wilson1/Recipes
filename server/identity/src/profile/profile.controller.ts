@@ -13,7 +13,6 @@ import { Roles } from '../decorators/roles.decorator';
 import { CurrentUserGuard } from '../guards/currentUser.guard';
 import { JwtAuthGuard } from '../guards/jwt.guard';
 import { RolesGuard } from '../guards/roles.guard';
-import { PaginationQueryDto } from '../models/paginationQueryDto';
 import { Role } from '../models/roles';
 import { CreateProfileDto } from './models/createProfileDto';
 import {

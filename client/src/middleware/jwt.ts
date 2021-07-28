@@ -2,7 +2,7 @@ import store from "@/store/store";
 import { NavigationGuardNext } from "vue-router";
 
 export const handleTokenRefresh = (next: NavigationGuardNext<Vue>) => {
-	store.dispatch("refreshJwtToken");
+	store.dispatch("getJwtToken");
 	next();
 };
 

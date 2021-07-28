@@ -7,10 +7,6 @@ export interface UpdateRolesCommand {
 	roles: Array<string>;
 }
 
-export interface AdminResetUserPasswordCommand {
-	email: string;
-}
-
 export interface User {
 	id: string;
 	username: string;

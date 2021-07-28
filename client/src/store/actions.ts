@@ -5,87 +5,54 @@ import jwt from "jsonwebtoken";
 import router from "@/router/index";
 import {
 	UpdateCurrentUserCommand,
-	UpdatePasswordCommand,
-	ConfirmResetPasswordCommand,
 	TokenResponse,
 	LoginRequest,
-	RegisterUserCommand,
 } from "@/models/AccountsModels";
 import axios from "axios";
 
-const accountsUrl = process.env.VUE_APP_IDENTITY_URL + "accounts/";
+const authorizationUrl = process.env.VUE_APP_IDENTITY_URL + "authorization/";
+const profileUrl = process.env.VUE_APP_IDENTITY_URL + "profile/";
 
 export const actions: ActionTree<RootState, RootState> = {
 	setIsLoading: ({ commit }, isLoading: boolean) => {
 		commit("setIsLoading", isLoading);
 	},
 
-	async register({ commit }, command: RegisterUserCommand) {
-		axios
-			.post(accountsUrl + "register", {
-				email: command.email,
-				username: command.username,
-				password: command.password,
-				confirmPassword: command.confirmPassword,
-			})
-			.then(response => {
-				const token = response.data.accessToken as string;
-
-				// eslint-disable-next-line
-				const decodedToken: any = jwt.decode(token);
-
-				const data: TokenResponse = {
-					token: token,
-					id: decodedToken.nameid,
-					username: decodedToken.name,
-					roles: decodedToken.role,
-					tokenExpiration: decodedToken.exp,
-					refreshToken: response.data.refreshToken,
-				};
-
-				commit("setUserVariables", data);
-
-				if (command.redirect) {
-					router.push(command.redirect);
-				} else {
-					router.push("home");
-				}
-			})
-			.catch(err => {
-				Vue.$toast.error(`Error registering: ${err}`);
-			});
+	setDidToken: ({ commit }, didToken: string) => {
+		commit("setDidToken", didToken);
 	},
 
-	login({ commit }, payload: LoginRequest) {
-		axios
-			.post(accountsUrl + "authenticate", {
-				username: payload.command.username,
-				password: payload.command.password,
+	async getJwtToken({ commit, state }, payload: LoginRequest) {
+		const didToken = state.didToken ?? payload.didToken;
+
+		await axios
+			.post(authorizationUrl + "login", {
+				didToken,
 			})
 			.then(response => {
-				const token = response.data.accessToken as string;
+				const encodedToken = response.data.accessToken as string;
 
 				// eslint-disable-next-line
-				const decodedToken: any = jwt.decode(token);
+				const decodedToken: any = jwt.decode(encodedToken);
 
-				const data: TokenResponse = {
-					token: token,
-					id: decodedToken.nameid,
+				const tokenPayload: TokenResponse = {
+					token: encodedToken,
+					magicId: decodedToken.nameid,
 					username: decodedToken.name,
 					roles: decodedToken.role,
 					tokenExpiration: decodedToken.exp,
-					refreshToken: response.data.refreshToken,
+					publicAddress: decodedToken.publicAddress,
 				};
 
-				commit("setUserVariables", data);
+				commit("setUserVariables", tokenPayload);
 
 				delete axios.defaults.headers.common["Authorization"];
-				axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+				axios.defaults.headers.common[
+					"Authorization"
+				] = `Bearer ${encodedToken}`;
 
 				if (payload.redirect) {
 					router.push(payload.redirect);
-				} else {
-					router.push("home");
 				}
 			})
 			.catch(err => {
@@ -93,92 +60,28 @@ export const actions: ActionTree<RootState, RootState> = {
 			});
 	},
 
-	async refreshJwtToken({ commit, rootState }) {
+	async updateUsername({ commit }, command: UpdateCurrentUserCommand) {
 		await axios
-			.post(accountsUrl + "refreshToken", {
-				username: rootState.username,
-				refreshToken: rootState.refreshToken,
-			})
-			.then(response => {
-				const token = response.data.accessToken as string;
-
-				// eslint-disable-next-line
-				const decodedToken: any = jwt.decode(token);
-
-				const data: TokenResponse = {
-					token: token,
-					id: decodedToken.nameid,
-					username: decodedToken.name,
-					roles: decodedToken.role,
-					tokenExpiration: decodedToken.exp,
-					refreshToken: response.data.refreshToken,
-				};
-
-				commit("setUserVariables", data);
-				delete axios.defaults.headers.common["Authorization"];
-				axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-			})
-			.catch(err => {
-				Vue.$toast.error(`Error logging in: ${err}`);
-			});
-	},
-
-	async updateUser(_, command: UpdateCurrentUserCommand) {
-		await axios
-			.put(accountsUrl + "user", {
+			.put(profileUrl + "username", {
 				username: command.username,
 				email: command.email,
 			})
-			.then(_ => Vue.$toast.success("Successfully updated!"))
+			.then(res => {
+				commit("setUsername", res.data.username);
+				Vue.$toast.success("Successfully updated!");
+			})
 			.catch(err => {
 				Vue.$toast.error(`Error updating user: ${err}`);
 			});
 	},
 
-	async updatePassword(_, command: UpdatePasswordCommand) {
+	async logout({ commit, state }) {
 		await axios
-			.patch(accountsUrl + "resetPassword", {
-				currentPassword: command.currentPassword,
-				newPassword: command.newPassword,
-				newPasswordConfirmation: command.newPasswordConfirmation,
+			.post(authorizationUrl + "logout", { didToken: state.didToken })
+			.then(_ => {
+				delete axios.defaults.headers.common["Authorization"];
+				commit("logout");
 			})
-			.catch(err => {
-				Vue.$toast.error(`Error updating password: ${err}`);
-			});
-	},
-
-	async sendResetPasswordEmail(
-		_,
-		payload: { email: string; redirectUrl: string }
-	) {
-		await axios
-			.post(accountsUrl + "sendResetPasswordEmail", {
-				email: payload.email,
-				redirectUrl: payload.redirectUrl,
-			})
-			.then(() =>
-				Vue.$toast.success("Please check your email to reset your password")
-			)
-			.catch(err => {
-				Vue.$toast.error(`Error resetting password: ${err}`);
-			});
-	},
-
-	async tokenResetPassword(_, command: ConfirmResetPasswordCommand) {
-		await axios
-			.patch(accountsUrl + "tokenResetPassword", {
-				email: command.email,
-				resetToken: command.resetToken,
-				newPassword: command.newPassword,
-				newPasswordConfirmation: command.newPasswordConfirmation,
-			})
-			.catch(err => {
-				Vue.$toast.error(`Error resetting password: ${err}`);
-			});
-	},
-
-	logout({ commit }) {
-		delete axios.defaults.headers.common["Authorization"];
-		commit("logout");
+			.catch(err => Vue.$toast.error(`Error logging out: ${err}`));
 	},
 };

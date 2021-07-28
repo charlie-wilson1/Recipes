@@ -2,19 +2,16 @@
 	<section class="profile container">
 		<h1>Profile</h1>
 		<ProfileUpdateUser />
-		<ProfileUpdatePassword />
 	</section>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import ProfileUpdateUser from "@/components/Auth/ProfileUpdateUser.vue";
-import ProfileUpdatePassword from "@/components/Auth/ProfileUpdatePassword.vue";
 
 @Component({
 	components: {
 		ProfileUpdateUser,
-		ProfileUpdatePassword,
 	},
 })
 export default class Profile extends Vue {}

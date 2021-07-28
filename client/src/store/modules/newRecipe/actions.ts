@@ -172,31 +172,4 @@ export const actions: ActionTree<NewRecipeState, RootState> = {
 	destroyNewRecipe({ commit }) {
 		commit("destroyNewRecipe");
 	},
-
-	// async deleteImage({ commit }, fileName: string) {
-	// 	try {
-	// 		await storage
-	// 			.ref("ajax-recipes")
-	// 			.child("images")
-	// 			.child(fileName)
-	// 			.delete();
-	// 	} catch (err) {
-	// 		console.log(err);
-	// 		Vue.$toast.error("Failed to delete image. Please try again.");
-	// 		return;
-	// 	}
-
-	// 	await axios
-	// 		.delete(`${recipesUrl}/image`, {
-	// 			data: fileName,
-	// 		})
-	// 		.then(() => {
-	// 			commit("deleteImage");
-	// 			Vue.$toast.success("Deleted successfully!");
-	// 		})
-	// 		.catch(err => {
-	// 			console.log(err);
-	// 			Vue.$toast.error("Failed to delete image. Please try again.");
-	// 		});
-	// },
 };

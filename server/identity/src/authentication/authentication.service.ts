@@ -34,7 +34,7 @@ export class AuthenticationService {
 
     const payload = {
       publicAddress: metadata.publicAddress,
-      sub: metadata.issuer,
+      nameid: metadata.issuer,
       roles: user.roles,
       name: user.username,
     };
