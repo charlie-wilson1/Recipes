@@ -96,8 +96,6 @@ export const actions: ActionTree<RootState, RootState> = {
 			})
 			.then(async () => {
 				Vue.$toast.success("Successfully updated!");
-				await store.dispatch("setDidToken");
-				await store.dispatch("getJwtToken");
 			})
 			.catch(err => {
 				Vue.$toast.error(`Error updating user: ${err}`);

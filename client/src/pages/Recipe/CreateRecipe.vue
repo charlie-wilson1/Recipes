@@ -382,13 +382,13 @@ export default class CreateRecipe extends Vue {
 	}
 
 	// eslint-disable-next-line
-	handleFileUpload(event: any) {
+	async handleFileUpload(event: any) {
 		const files: FileList = event.target.files;
 		const image: File = files[0];
-		this.$store.dispatch("uploadRecipeImage", image);
+		await this.$store.dispatch("uploadRecipeImage", image);
 	}
 
-	handleSubmit(recipe: Recipe) {
+	async handleSubmit(recipe: Recipe) {
 		this.$v.$touch();
 
 		if (this.$v.$invalid) {
@@ -399,37 +399,35 @@ export default class CreateRecipe extends Vue {
 		if (this.isEditMode) {
 			// eslint-disable-next-line
 			recipe.id = this.recipeId!;
-			this.$store.dispatch("updateRecipe", recipe);
+			await this.$store.dispatch("updateRecipe", recipe);
 		} else {
-			this.$store.dispatch("insertRecipe", recipe);
+			await this.$store.dispatch("insertRecipe", recipe);
 		}
 		this.$v.$reset();
 	}
 
-	handleReset() {
+	async handleReset() {
 		if (!this.isEditMode) {
-			this.$store.dispatch("setRecipeById", this.recipeId);
+			await this.$store.dispatch("setRecipeById", this.recipeId);
 		} else {
-			this.$store.dispatch("createNewRecipe");
+			await this.$store.dispatch("createNewRecipe");
 		}
 		this.$v.$reset();
 	}
 
-	handleDeleteImage(fullName: string) {
-		this.$store.dispatch("deleteImage", fullName);
+	async handleDeleteImage(fullName: string) {
+		await this.$store.dispatch("deleteImage", fullName);
 	}
 
 	async beforeCreate() {
 		await this.$store.dispatch("setIsLoading", true);
-		await this.$store.dispatch("setDidToken");
-		await this.$store.dispatch("getJwtToken");
 	}
 
-	created() {
+	async created() {
 		if (this.isEditMode) {
-			this.$store.dispatch("setRecipeById", this.recipeId);
+			await this.$store.dispatch("setRecipeById", this.recipeId);
 		} else {
-			this.$store.dispatch("createNewRecipe");
+			await this.$store.dispatch("createNewRecipe");
 		}
 		this.$store.dispatch("setIsLoading", false);
 

@@ -43,8 +43,6 @@ export default class Home extends Vue {
 		};
 
 		await this.$store.dispatch("setIsLoading", true);
-		await this.$store.dispatch("setDidToken");
-		await this.$store.dispatch("getJwtToken");
 		await this.$store.dispatch("loadRecipeList", query);
 		await this.$store.dispatch("setIsLoading", false);
 	}

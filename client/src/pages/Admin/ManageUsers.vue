@@ -156,7 +156,6 @@ export default class ManageUsers extends Vue {
 			roles: this.selectedRoles,
 		};
 
-		await this.$store.dispatch("getJwtToken");
 		await this.$store.dispatch("updateRoles", request);
 	}
 
@@ -172,20 +171,23 @@ export default class ManageUsers extends Vue {
 			email: this.addedUserEmail,
 		};
 
-		await this.$store.dispatch("getJwtToken");
+		await this.$store.dispatch("setIsLoading", true);
 		await this.$store.dispatch("createUser", register);
 		await this.$store.dispatch("getUsers");
+		await this.$store.dispatch("setIsLoading", false);
 	}
 
 	async deleteUser() {
-		await this.$store.dispatch("getJwtToken");
+		await this.$store.dispatch("setIsLoading", true);
 		await this.$store.dispatch("deleteUser", this.selectedEmail);
 		await this.$store.dispatch("getUsers");
+		await this.$store.dispatch("setIsLoading", false);
 	}
 
 	async beforeCreate() {
-		await this.$store.dispatch("getJwtToken");
+		await this.$store.dispatch("setIsLoading", true);
 		await this.$store.dispatch("getUsers");
+		await this.$store.dispatch("setIsLoading", false);
 	}
 
 	// TODO: Unsubscribe on beforeDestroy
