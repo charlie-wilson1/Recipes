@@ -4,19 +4,19 @@ import { RootState } from "@/store/state";
 import Vue from "vue";
 import axios from "axios";
 import {
-	AdminRegisterUserCommand,
-	UpdateRolesCommand,
+	CreateUserRequest,
+	UpdateRolesRequest,
 	User,
 } from "@/models/AdministratorModels";
 
-const adminUrl = process.env.VUE_APP_IDENTITY_URL + "admin";
+const adminUrl = process.env.VUE_APP_IDENTITY_URL + "profile";
 
 export const actions: ActionTree<AdminState, RootState> = {
 	async getUsers({ commit }) {
 		await axios
-			.get(`${adminUrl}/users`)
+			.get(`${adminUrl}?limit=100&offset=0`)
 			.then(response => {
-				const users: Array<User> = response.data;
+				const users: User[] = response.data;
 				commit("setUsers", users);
 			})
 			.catch(err => {
@@ -27,22 +27,22 @@ export const actions: ActionTree<AdminState, RootState> = {
 			});
 	},
 
-	async inviteUser(_, command: AdminRegisterUserCommand) {
-		await axios.post(adminUrl + "Invitation", command).catch(err => {
+	async createUser(_, command: CreateUserRequest) {
+		await axios.post(adminUrl, command).catch(err => {
 			Vue.$toast.error(`Error inviting new user: ${err}`);
 		});
 	},
 
-	async updateRoles({ commit }, command: UpdateRolesCommand) {
+	async updateRoles({ commit }, command: UpdateRolesRequest) {
 		await axios
-			.patch(`${adminUrl}/roles`, {
-				username: command.username,
+			.put(`${adminUrl}/roles`, {
+				email: command.email,
 				roles: command.roles,
 			})
 			.then(response => {
 				const payload = {
-					roles: response.data,
-					username: command.username,
+					roles: response.data.roles,
+					username: response.data.username,
 				};
 
 				commit("updateRoles", payload);
@@ -52,10 +52,10 @@ export const actions: ActionTree<AdminState, RootState> = {
 			});
 	},
 
-	async deleteUser(_, username: string) {
+	async deleteUser(_, email: string) {
 		await axios
-			.delete(`${adminUrl}/${username}`)
-			.then(_ => {
+			.put(`${adminUrl}/delete`, { email: email })
+			.then(() => {
 				Vue.$toast.success("Deleted user");
 			})
 			.catch(err => {

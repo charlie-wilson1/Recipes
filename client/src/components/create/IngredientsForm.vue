@@ -135,7 +135,8 @@ export default class IngredientsForm extends Vue {
 			return;
 		}
 
-		this.ingredient.orderNumber = this.$store.getters.highestIngredientOrderNumber;
+		this.ingredient.orderNumber =
+			this.$store.getters.highestIngredientOrderNumber + 1;
 		this.$store.dispatch("insertIngredient", this.ingredient);
 		this.$v.$reset();
 		this.ingredient = { ...defaultIngredient };

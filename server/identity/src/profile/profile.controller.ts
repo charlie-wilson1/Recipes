@@ -7,6 +7,7 @@ import {
   Post,
   Put,
   Query,
+  Param,
   UseGuards,
 } from '@nestjs/common';
 import { Roles } from '../decorators/roles.decorator';
@@ -63,7 +64,7 @@ export class ProfileController {
   @UseGuards(RolesGuard)
   @Roles(Role.Admin)
   @HttpCode(StatusCodes.NO_CONTENT)
-  @Delete()
+  @Put('delete')
   async delete(@Body() dto: FindProfileByEmailDto): Promise<void> {
     await this.profileService.delete(dto);
   }

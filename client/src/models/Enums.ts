@@ -33,7 +33,7 @@ export enum Images {
 }
 
 export enum Roles {
-	Admin = "admin",
-	Moderator = "moderator",
-	Member = "member",
+	Admin = "Administrator",
+	Moderator = "Moderator",
+	Member = "Member",
 }

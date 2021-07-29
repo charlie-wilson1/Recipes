@@ -72,9 +72,8 @@ export class ProfileService {
   }
 
   async delete(deleteDto: FindProfileByEmailDto): Promise<void> {
-    const profileToDelete = await this.profileRepository.findByEmail(
-      deleteDto.email,
-    );
+    const email = decodeURI(deleteDto.email);
+    const profileToDelete = await this.profileRepository.findByEmail(email);
 
     if (!profileToDelete) {
       throw new NotFoundException(

@@ -4,71 +4,100 @@ import { RootState } from "@/store/state";
 import jwt from "jsonwebtoken";
 import router from "@/router/index";
 import {
-	UpdateCurrentUserCommand,
+	UpdateCurrentUserRequest,
 	TokenResponse,
 	LoginRequest,
 } from "@/models/AccountsModels";
 import axios from "axios";
+import { Magic } from "magic-sdk";
+import store from "./store";
 
 const authorizationUrl = process.env.VUE_APP_IDENTITY_URL + "authorization/";
 const profileUrl = process.env.VUE_APP_IDENTITY_URL + "profile/";
+const magic = new Magic(process.env.VUE_APP_MAGIC_KEY as string);
 
 export const actions: ActionTree<RootState, RootState> = {
 	setIsLoading: ({ commit }, isLoading: boolean) => {
 		commit("setIsLoading", isLoading);
 	},
 
-	setDidToken: ({ commit }, didToken: string) => {
-		commit("setDidToken", didToken);
+	async setIsLoggedIn({ commit }) {
+		const isLoggedIn = await magic.user.isLoggedIn();
+		commit("setIsLoggedIn", isLoggedIn);
+	},
+
+	async setDidToken({ commit }) {
+		const token = await magic.user.getIdToken();
+		commit("setDidToken", token);
 	},
 
 	async getJwtToken({ commit, state }, payload: LoginRequest) {
-		const didToken = state.didToken ?? payload.didToken;
+		if (payload?.triedOnce) {
+			await store.dispatch("setDidToken");
+		}
+
+		const didToken = payload?.didToken ?? state.didToken;
+
+		if ((didToken ?? "").length === 0) {
+			Vue.$toast.error(`Error logging in. Please login again`);
+			router.push("/login");
+			return;
+		}
 
 		await axios
 			.post(authorizationUrl + "login", {
 				didToken,
 			})
 			.then(response => {
-				const encodedToken = response.data.accessToken as string;
+				const encodedToken = response.data as string;
 
 				// eslint-disable-next-line
 				const decodedToken: any = jwt.decode(encodedToken);
 
 				const tokenPayload: TokenResponse = {
 					token: encodedToken,
-					magicId: decodedToken.nameid,
 					username: decodedToken.name,
-					roles: decodedToken.role,
+					email: decodedToken.nameid,
+					roles: decodedToken.roles,
 					tokenExpiration: decodedToken.exp,
-					publicAddress: decodedToken.publicAddress,
 				};
 
 				commit("setUserVariables", tokenPayload);
 
 				delete axios.defaults.headers.common["Authorization"];
+
 				axios.defaults.headers.common[
 					"Authorization"
 				] = `Bearer ${encodedToken}`;
 
-				if (payload.redirect) {
+				if (payload?.redirect) {
 					router.push(payload.redirect);
 				}
 			})
-			.catch(err => {
-				Vue.$toast.error(`Error logging in: ${err}`);
+			.catch(() => {
+				if (!payload?.triedOnce) {
+					payload = {
+						...payload,
+						triedOnce: true,
+					};
+
+					store.dispatch("getJwtToken", payload);
+				}
+
+				Vue.$toast.error("Error logging in. Please try again.");
 			});
 	},
 
-	async updateUsername({ commit }, command: UpdateCurrentUserCommand) {
+	async updateUsername(_, command: UpdateCurrentUserRequest) {
 		await axios
 			.put(profileUrl + "username", {
 				username: command.username,
 				email: command.email,
 			})
-			.then(res => {
-				commit("setUsername", res.data.username);
+			.then(async () => {
 				Vue.$toast.success("Successfully updated!");
+				await store.dispatch("setDidToken");
+				await store.dispatch("getJwtToken");
 			})
 			.catch(err => {
 				Vue.$toast.error(`Error updating user: ${err}`);
@@ -78,7 +107,7 @@ export const actions: ActionTree<RootState, RootState> = {
 	async logout({ commit, state }) {
 		await axios
 			.post(authorizationUrl + "logout", { didToken: state.didToken })
-			.then(_ => {
+			.then(() => {
 				delete axios.defaults.headers.common["Authorization"];
 				commit("logout");
 			})

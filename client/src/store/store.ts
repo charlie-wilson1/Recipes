@@ -7,19 +7,19 @@ import { NewRecipeModule } from "./modules/newRecipe/module";
 import { AdminModule } from "./modules/admin/module";
 import { actions } from "./actions";
 import { mutations } from "./mutations";
-import { Magic } from "magic-sdk";
 
 Vue.use(Vuex);
-const magic = new Magic(process.env.VUE_APP_MAGIC_KEY as string);
 
 const store: StoreOptions<RootState> = {
 	plugins: [createPersistedState()],
 	state: {
 		version: "1.0.0",
 		isLoading: false,
+		isLoggedIn: false,
 		token: undefined,
+		email: undefined,
 		username: undefined,
-		roles: undefined,
+		roles: [],
 		tokenExpiration: undefined,
 	},
 	modules: {
@@ -28,32 +28,13 @@ const store: StoreOptions<RootState> = {
 		AdminModule,
 	},
 	getters: {
-		version: state => {
-			return state.version;
-		},
-		isLoading: state => {
-			return state.isLoading;
-		},
-		roles: state => {
-			return state.roles ?? [];
-		},
-		username: state => {
-			return state.username;
-		},
-		token: state => {
-			return state.token;
-		},
-		tokenExpiration: state => {
-			return state.tokenExpiration;
-		},
-		didToken: async () => {
-			return await magic.user.getIdToken();
-		},
-		isLoggedIn: async () => {
-			return await magic.user.isLoggedIn();
+		isTokenExpired: state => {
+			return state.tokenExpiration
+				? state.tokenExpiration <= Math.floor(Date.now() / 1000)
+				: true;
 		},
 		isAdmin: state => {
-			return state.roles?.includes("Admin");
+			return state.roles?.includes("Administrator");
 		},
 	},
 	mutations,

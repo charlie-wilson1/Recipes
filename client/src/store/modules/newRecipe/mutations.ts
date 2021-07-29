@@ -22,7 +22,7 @@ export const mutations: MutationTree<NewRecipeState> = {
 		state.recipe.instructions = [];
 	},
 
-	setRecipeById(state, recipe: Recipe) {
+	setRecipe(state, recipe: Recipe) {
 		state.recipe = recipe;
 	},
 
@@ -51,8 +51,16 @@ export const mutations: MutationTree<NewRecipeState> = {
 		state.recipe!.ingredients.push(ingredient);
 	},
 
+	overrideIngredients(state, ingredients: Ingredient[]) {
+		state.recipe!.ingredients = ingredients;
+	},
+
 	insertInstruction(state, instruction: Instruction) {
 		state.recipe!.instructions.push(instruction);
+	},
+
+	overrideInstructions(state, instructions: Instruction[]) {
+		state.recipe!.instructions = instructions;
 	},
 
 	uploadRecipeImage(state, image: RecipeImage) {

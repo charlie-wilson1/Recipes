@@ -1,7 +1,7 @@
 import { User } from "@/models/AdministratorModels";
 
 export interface AdminState {
-	users: Array<User>;
+	users: User[];
 }
 
 export const state: AdminState = {

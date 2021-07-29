@@ -5,7 +5,7 @@
 				variant="link"
 				class="edit-button"
 				@click="editingOrder = !editingOrder"
-				>Edit Order
+				>{{ editLinkText }}
 			</b-button>
 		</div>
 		<b-list-group>
@@ -43,15 +43,15 @@
 								>
 									<b-icon
 										icon="arrow-up"
+										:class="downArrowClass(index)"
 										scale="1"
-										:disabled="index >= values.length - 1"
 									></b-icon>
 								</b-button>
 								<b-button
 									variant="primary-outline"
 									size="sm"
+									:class="upArrowClass(index)"
 									@click="handleMove(index, index + 1)"
-									:disabled="index <= values.length - 1"
 								>
 									<b-icon icon="arrow-down" scale="1"></b-icon>
 								</b-button>
@@ -93,9 +93,6 @@ export default class CreateListItem extends Vue {
 	})
 	deletable!: boolean;
 
-	// @Prop({ required: true })
-	// handleString!: string;
-
 	@Prop({ required: false })
 	handleEdit!: Function;
 
@@ -106,6 +103,18 @@ export default class CreateListItem extends Vue {
 	handleMove!: Function;
 
 	public editingOrder = false;
+
+	get editLinkText(): string {
+		return this.editingOrder ? "Confirm Order" : "Edit Order";
+	}
+
+	downArrowClass(index: number): string {
+		return index === 0 ? "invisible" : "";
+	}
+
+	upArrowClass(index: number): string {
+		return index === this.values.length - 1 ? "invisible" : "";
+	}
 }
 </script>
 

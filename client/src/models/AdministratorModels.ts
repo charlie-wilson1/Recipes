@@ -1,14 +1,15 @@
-export interface AdminRegisterUserCommand {
+export interface CreateUserRequest {
 	email: string;
 }
 
-export interface UpdateRolesCommand {
-	username: string;
-	roles: Array<string>;
+export interface UpdateRolesRequest {
+	email: string;
+	roles: string[];
 }
 
 export interface User {
 	id: string;
 	username: string;
-	roles: Array<string>;
+	email: string;
+	roles: string[];
 }

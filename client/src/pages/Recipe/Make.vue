@@ -39,30 +39,30 @@ import OrderedListGroup from "@/components/shared/OrderedListGroup.vue";
 })
 export default class Make extends Vue {
 	get recipe(): Recipe {
-		return this.$store.getters.selectedRecipe;
+		return this.$store.state.RecipeModule.selectedRecipe;
 	}
 
 	get instructions() {
 		const sorted = this.sortOrderableObjectArray(
 			this.recipe?.instructions
-		) as Array<Instruction>;
+		) as Instruction[];
 		return sorted.map(x => x.description);
 	}
 
 	get ingredients() {
 		const sorted = this.sortOrderableObjectArray(
 			this.recipe?.ingredients
-		) as Array<Ingredient>;
+		) as Ingredient[];
 		return sorted.map(x => x.name);
 	}
 
 	get isLoading() {
-		return this.$store.getters.isLoading;
+		return this.$store.state.isLoading;
 	}
 
 	sortOrderableObjectArray(
-		orderableArray: Array<Instruction> | Array<Ingredient> | undefined
-	): Array<Instruction> | Array<Ingredient> {
+		orderableArray: Instruction[] | Ingredient[] | undefined
+	): Instruction[] | Ingredient[] {
 		if (!orderableArray) {
 			return [];
 		}

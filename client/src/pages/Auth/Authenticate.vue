@@ -29,8 +29,8 @@ export default class Authenticate extends Vue {
 		);
 
 		const payload: LoginRequest = {
-			didToken: didToken,
-			redirect: this.redirectRoute ?? `${window.location.host}/home`,
+			didToken,
+			redirect: this.redirectRoute ?? "/home",
 		};
 
 		this.$store.dispatch("getJwtToken", payload);

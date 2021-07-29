@@ -21,6 +21,7 @@ export const actions: ActionTree<RecipeState, RootState> = {
 				const recipes: Array<Recipe> = response.data.data;
 				commit("setRecipeList", recipes);
 				commit("setTotalCount", response.data.total);
+				commit("setRecipe", recipes[0]);
 			})
 			.catch(err => {
 				console.log(err);
@@ -41,8 +42,8 @@ export const actions: ActionTree<RecipeState, RootState> = {
 			});
 	},
 
-	setSelectedRecipe({ commit }, index: number) {
-		commit("setSelectedRecipe", index);
+	setSelectedRecipe({ commit }, recipe: Recipe) {
+		commit("setSelectedRecipe", recipe);
 	},
 
 	destroyRecipeList({ commit }) {

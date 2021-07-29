@@ -12,9 +12,9 @@
 			<b-tabs pills card vertical class="users">
 				<b-tab
 					v-for="user in users"
-					:key="user.username"
-					:title="user.username"
-					:active="user.username === selectedUsername"
+					:key="user.email"
+					:title="user.username || user.email"
+					:active="user.email === selectedEmail"
 					:disabled="user.username === currentUsername"
 					@click="setSelectedUser(user)"
 					><b-card-text>
@@ -51,7 +51,7 @@
 		</b-card>
 		<b-modal
 			id="manage-user-roles-modal"
-			:title="selectedUsername"
+			:title="selectedUserTag"
 			@ok="editRoles"
 		>
 			<b-form-group label="Current Roles" v-slot="{ ariaDescribedby }">
@@ -75,13 +75,17 @@
 			</b-form-group>
 		</b-modal>
 		<b-modal id="delete-user-modal" title="Delete User" @ok="deleteUser">
-			<p>Are you sure you would like to delete user {{ selectedUsername }}</p>
+			<p>Are you sure you would like to delete user {{ selectedUserTag }}</p>
 		</b-modal>
 	</section>
 </template>
 
 <script lang="ts">
-import { AdminRegisterUserCommand, User } from "@/models/AdministratorModels";
+import {
+	CreateUserRequest,
+	UpdateRolesRequest,
+	User,
+} from "@/models/AdministratorModels";
 import { Validate } from "vuelidate-property-decorators";
 import { validationMixin } from "vuelidate";
 import { required } from "vuelidate/lib/validators";
@@ -101,48 +105,62 @@ export default class ManageUsers extends Vue {
 	capitalizeText = capitalizeString;
 
 	get users(): Array<User> {
-		return this.$store.getters.users || [];
+		return this.$store.state.AdminModule.users || [];
 	}
 
 	get allRoles(): Array<string> {
-		const roles: Array<string> = Object.values(Roles);
+		const roles: string[] = Object.values(Roles);
 		return roles.map(role => this.capitalizeText(role));
 	}
 
-	selectedUsername: string = this.users[0].username;
-	selectedUser: User = this.users[0];
+	selectedEmail: string = this.firstSelectedUser.email;
+	selectedUserTag: string =
+		this.firstSelectedUser.username ?? this.firstSelectedUser.email;
+	selectedUser: User = this.firstSelectedUser;
 
 	get currentUsername(): string {
-		return this.$store.getters.username;
+		return this.$store.state.username;
 	}
 
-	selectedRoles: Array<string> = this.allRoles.filter(role =>
+	get firstSelectedUser(): User {
+		const filteredUsers = this.users.filter(
+			user => user.username !== this.currentUsername
+		)[0];
+		if (filteredUsers) {
+			return filteredUsers;
+		}
+		return this.users[0];
+	}
+
+	selectedRoles: string[] = this.allRoles.filter(role =>
 		(this.selectedUser.roles ?? [])
 			.map(userRole => this.capitalizeText(userRole))
 			.includes(role)
 	);
 
 	setSelectedUser(user: User) {
-		this.selectedUsername = user.username;
+		this.selectedEmail = user.email;
+		this.selectedUserTag = user.username ?? user.email;
 		this.selectedUser = user;
 		this.selectedRoles = user.roles;
 	}
 
-	editRoles() {
+	async editRoles() {
 		if (!this.selectedRoles) {
 			this.$toast.error("Please select roles");
 			return;
 		}
 
-		const request = {
-			username: this.selectedUsername,
+		const request: UpdateRolesRequest = {
+			email: this.selectedEmail,
 			roles: this.selectedRoles,
 		};
 
-		this.$store.dispatch("updateRoles", request);
+		await this.$store.dispatch("getJwtToken");
+		await this.$store.dispatch("updateRoles", request);
 	}
 
-	login() {
+	async login() {
 		this.$v.$touch();
 
 		if (this.$v.$invalid) {
@@ -150,20 +168,24 @@ export default class ManageUsers extends Vue {
 			return;
 		}
 
-		const register: AdminRegisterUserCommand = {
+		const register: CreateUserRequest = {
 			email: this.addedUserEmail,
 		};
 
-		this.$store.dispatch("adminRegister", register);
-	}
-
-	async deleteUser() {
-		await this.$store.dispatch("deleteUser", this.selectedUsername);
+		await this.$store.dispatch("getJwtToken");
+		await this.$store.dispatch("createUser", register);
 		await this.$store.dispatch("getUsers");
 	}
 
-	beforeCreate() {
-		this.$store.dispatch("getUsers");
+	async deleteUser() {
+		await this.$store.dispatch("getJwtToken");
+		await this.$store.dispatch("deleteUser", this.selectedEmail);
+		await this.$store.dispatch("getUsers");
+	}
+
+	async beforeCreate() {
+		await this.$store.dispatch("getJwtToken");
+		await this.$store.dispatch("getUsers");
 	}
 
 	// TODO: Unsubscribe on beforeDestroy

@@ -12,8 +12,6 @@ import { getConnectionToken } from '@nestjs/mongoose';
 import * as Joi from 'joi';
 import { getProfileStub } from '../../profile/test/support/stubs/profile.stub';
 import { ProfileRepository } from '../../profile/profile.repository';
-import { MagicUserMetadata } from '@magic-sdk/admin';
-import { UnauthorizedException } from '@nestjs/common';
 
 const profileMock = getProfileStub();
 
@@ -69,59 +67,45 @@ describe('AuthenticationService', () => {
     expect(service).toBeDefined();
   });
 
-  describe('createJwtFromMagicMetadata', () => {
+  describe('getProfile', () => {
     let findByEmailSpy: jest.SpyInstance;
-    let signSpy: jest.SpyInstance;
-    const metadata: MagicUserMetadata = {
-      email: profileMock.email,
-      publicAddress: 'address',
-      issuer: 'issuer',
-    };
 
     beforeEach((done) => {
       findByEmailSpy = jest.spyOn(profileRepository, 'findByEmail');
-      signSpy = jest.spyOn(jwtService, 'signAsync');
       done();
-    });
-
-    test('should throw UnauthorizedException when user not found', async () => {
-      findByEmailSpy.mockImplementation(() => Promise.resolve());
-
-      try {
-        await service.createJwtFromMagicMetadata(metadata);
-      } catch (error) {
-        expect(error).toBeInstanceOf(UnauthorizedException);
-        expect(error.message).toBe(
-          `user with email ${metadata.email} is not authorized to use this application. Please contact an administrator to be invited to use the application.`,
-        );
-      }
-
-      expect(profileRepository.findByEmail).toHaveBeenCalledWith(
-        profileMock.email,
-      );
-      expect(findByEmailSpy).toHaveBeenCalledTimes(1);
-      expect(signSpy).not.toHaveBeenCalled();
     });
 
     test('should call findByEmail', async () => {
       findByEmailSpy.mockImplementation(() => Promise.resolve(profileMock));
-      signSpy.mockImplementation(() => Promise.resolve());
-
-      await service.createJwtFromMagicMetadata(metadata);
+      await service.getProfile(profileMock.email);
+      expect(findByEmailSpy).toHaveBeenCalledTimes(1);
 
       expect(profileRepository.findByEmail).toHaveBeenCalledWith(
         profileMock.email,
       );
+    });
+  });
 
-      expect(jwtService.signAsync).toHaveBeenCalledWith({
-        sub: metadata.issuer,
-        publicAddress: metadata.publicAddress,
-        roles: profileMock.roles,
-        nameid: profileMock.username,
-      });
+  describe('createJwtFromProfile', () => {
+    let signSpy: jest.SpyInstance;
 
-      expect(findByEmailSpy).toHaveBeenCalledTimes(1);
+    beforeEach((done) => {
+      signSpy = jest.spyOn(jwtService, 'sign');
+      done();
+    });
+
+    test('should sign jwt with username and roles', async () => {
+      const expectedResult = 'jwtToken';
+      signSpy.mockImplementation(() => expectedResult);
+      const actual = service.createJwtFromProfile(profileMock);
       expect(signSpy).toHaveBeenCalledTimes(1);
+      expect(actual).toEqual(expectedResult);
+
+      expect(jwtService.sign).toHaveBeenCalledWith({
+        roles: profileMock.roles,
+        name: profileMock.username,
+        nameid: profileMock.email,
+      });
     });
   });
 });

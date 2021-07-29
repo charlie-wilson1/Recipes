@@ -14,7 +14,6 @@ import {
 	handleUnauthorized,
 	matchesUnauthorizedMeta,
 } from "@/middleware/unauthorized";
-import { handleTokenRefresh, tokenExpired } from "@/middleware/jwt";
 
 Vue.use(VueRouter);
 
@@ -111,18 +110,15 @@ const router = new VueRouter({
 	routes,
 });
 
-router.beforeEach((to, _, next) => {
+router.beforeEach(async (to, _, next) => {
 	if (matchesLogoutMeta(to)) {
 		handleLogout(next);
 	}
 	if (matchesLoginMeta(to)) {
-		handleLogin(next);
+		await handleLogin(next);
 	}
 	if (matchesUnauthorizedMeta(to)) {
 		handleUnauthorized(next);
-	}
-	if (tokenExpired) {
-		handleTokenRefresh(next);
 	}
 
 	next();

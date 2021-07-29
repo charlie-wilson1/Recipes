@@ -49,7 +49,9 @@ import { defaultInstruction } from "@/models/DefaultModels";
 	mixins: [validationMixin],
 })
 export default class InstructionsForm extends Vue {
-	@PropSync("instruction", { required: true })
+	@PropSync("instruction", {
+		required: true,
+	})
 	@Validate({
 		description: { required },
 	})
@@ -63,7 +65,8 @@ export default class InstructionsForm extends Vue {
 			return;
 		}
 
-		this._instruction.orderNumber = this.$store.getters.highestInstructionOrderNumber;
+		this._instruction.orderNumber =
+			this.$store.getters.highestInstructionOrderNumber + 1;
 		this.$store.dispatch("insertInstruction", this._instruction);
 		this.$v.$reset();
 		this._instruction = { ...defaultInstruction };

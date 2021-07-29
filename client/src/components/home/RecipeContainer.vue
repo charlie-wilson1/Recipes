@@ -21,10 +21,10 @@
 							<b-list-group flush>
 								<b-list-group-item
 									class="recipe-list-item"
-									v-for="(recipe, index) in recipes"
+									v-for="recipe in recipes"
 									:key="recipe.id"
 									:active="recipe.id === selectedRecipe.id"
-									@click="setSelectedRecipe(index)"
+									@click="setSelectedRecipe(recipe)"
 								>
 									{{ recipe.name }}
 								</b-list-group-item>
@@ -91,13 +91,13 @@ import { GetAllRecipesQuery, Recipe } from "../../models/RecipeModels";
 })
 export default class RecipeContainer extends Vue {
 	public currentPage = 1;
-	public perPage = 9;
+	public perPage = 8;
 	public query = "";
 
 	listIsLoading = false;
 
 	get totalRecipes(): number {
-		return this.$store.getters.recipeCount;
+		return this.$store.state.RecipeModule.recipeCount;
 	}
 
 	get startNumber(): number {
@@ -107,11 +107,11 @@ export default class RecipeContainer extends Vue {
 	}
 
 	get recipes(): Array<Recipe> {
-		return this.$store.getters.currentRecipeList;
+		return this.$store.state.RecipeModule.currentRecipeList;
 	}
 
 	get selectedRecipe(): Recipe {
-		return this.$store.getters.selectedRecipe;
+		return this.$store.state.RecipeModule.selectedRecipe;
 	}
 
 	@Watch("query")
@@ -134,14 +134,8 @@ export default class RecipeContainer extends Vue {
 		this.listIsLoading = false;
 	}
 
-	setSelectedRecipe(index: number) {
-		const actualIndex = this.startNumber + index - 1;
-
-		if (this.recipes.length - 1 < actualIndex) {
-			return;
-		}
-
-		this.$store.dispatch("setSelectedRecipe", actualIndex);
+	setSelectedRecipe(recipe: Recipe) {
+		this.$store.dispatch("setSelectedRecipe", recipe);
 	}
 
 	getRecipeId(recipeId: string): string {

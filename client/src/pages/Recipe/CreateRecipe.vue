@@ -193,6 +193,7 @@ import CreateList from "@/components/create/CreateList.vue";
 import IngredientsForm from "@/components/create/IngredientsForm.vue";
 import InstructionsForm from "@/components/create/InstructionsForm.vue";
 import { indexIsInArray } from "@/mixins/listUtils";
+import * as _ from "lodash";
 
 @Component({
 	components: {
@@ -221,7 +222,7 @@ export default class CreateRecipe extends Vue {
 	}
 
 	get isLoading(): boolean {
-		return this.$store.getters.isLoading;
+		return this.$store.state.isLoading;
 	}
 
 	@Validate({
@@ -238,7 +239,7 @@ export default class CreateRecipe extends Vue {
 		cookTime: { required, minValue: minValue(1) },
 	})
 	get currentRecipe(): Recipe {
-		let recipe: Recipe = this.$store.getters.recipe;
+		let recipe: Recipe = this.$store.state.NewRecipeModule.recipe;
 
 		if (!recipe) {
 			recipe = { ...defaultRecipe };
@@ -269,26 +270,31 @@ export default class CreateRecipe extends Vue {
 	}
 
 	changeIngredientOrder(fromIndex: number, toIndex: number) {
-		const ingredientListLength = this.currentRecipe.ingredients.length;
+		const ingredientsList = this.currentRecipe.ingredients;
+		const ingredientListLength = ingredientsList.length;
 
 		if (
 			!indexIsInArray(fromIndex, ingredientListLength) ||
-			!indexIsInArray(fromIndex, ingredientListLength)
+			!indexIsInArray(toIndex, ingredientListLength)
 		) {
 			this.$toast.error("Could not find selected ingredient.");
 			return;
 		}
 
-		const fromOrderNumber = this.currentRecipe.ingredients[fromIndex]
-			.orderNumber;
-		const toOrderNumber = this.currentRecipe.ingredients[toIndex].orderNumber;
+		const fromOrderNumber = ingredientsList[fromIndex].orderNumber;
+		const toOrderNumber = ingredientsList[toIndex].orderNumber;
 
-		this.currentRecipe.ingredients[fromIndex].orderNumber = toOrderNumber;
-		this.currentRecipe.ingredients[toIndex].orderNumber = fromOrderNumber;
+		ingredientsList[fromIndex].orderNumber = toOrderNumber;
+		ingredientsList[toIndex].orderNumber = fromOrderNumber;
 
-		this.currentRecipe.ingredients = this.currentRecipe.ingredients.sort(
-			i => i.orderNumber
-		);
+		const orderedIngredientsList = _.sortBy(ingredientsList, "orderNumber");
+
+		for (let index = 0; index < orderedIngredientsList.length; index++) {
+			const ingredient = orderedIngredientsList[index];
+			ingredient.orderNumber = index + 1;
+		}
+
+		this.currentRecipe.ingredients = orderedIngredientsList;
 	}
 
 	deleteInstruction(index: number) {
@@ -298,6 +304,11 @@ export default class CreateRecipe extends Vue {
 		}
 
 		const orderNumber = this.currentRecipe.instructions[index].orderNumber;
+
+		if ((this.instruction.orderNumber ?? -1) === orderNumber) {
+			this.instruction = defaultInstruction;
+		}
+
 		this.currentRecipe.instructions.splice(index);
 
 		this.currentRecipe.instructions
@@ -309,7 +320,6 @@ export default class CreateRecipe extends Vue {
 	}
 
 	editInstruction(index: number) {
-		console.log(index);
 		if (!indexIsInArray(index, this.currentRecipe.instructions.length)) {
 			this.$toast.error("Could not find selected instruction.");
 			return;
@@ -319,44 +329,56 @@ export default class CreateRecipe extends Vue {
 	}
 
 	changeInstructionOrder(fromIndex: number, toIndex: number) {
-		const instructionListLength = this.currentRecipe.instructions.length;
+		const instructionList = this.currentRecipe.instructions;
+		const instructionListLength = instructionList.length;
 
 		if (
 			!indexIsInArray(fromIndex, instructionListLength) ||
-			!indexIsInArray(fromIndex, instructionListLength)
+			!indexIsInArray(toIndex, instructionListLength)
 		) {
 			this.$toast.error("Could not find selected instruction.");
 			return;
 		}
 
-		const fromOrderNumber = this.currentRecipe.instructions[fromIndex]
-			.orderNumber;
-		const toOrderNumber = this.currentRecipe.instructions[toIndex].orderNumber;
+		const fromOrderNumber = instructionList[fromIndex].orderNumber;
+		const toOrderNumber = instructionList[toIndex].orderNumber;
 
-		this.currentRecipe.instructions[fromIndex].orderNumber = toOrderNumber;
-		this.currentRecipe.instructions[toIndex].orderNumber = fromOrderNumber;
+		instructionList[fromIndex].orderNumber = toOrderNumber;
+		instructionList[toIndex].orderNumber = fromOrderNumber;
 
-		this.currentRecipe.instructions = this.currentRecipe.instructions.sort(
-			i => i.orderNumber
+		const orderedInstructionList = _.sortBy(
+			this.currentRecipe.instructions,
+			"orderNumber"
 		);
+
+		for (let index = 0; index < orderedInstructionList.length; index++) {
+			const instruction = orderedInstructionList[index];
+			instruction.orderNumber = index + 1;
+		}
+
+		this.currentRecipe.instructions = orderedInstructionList;
 	}
 
 	getIngredientString() {
-		return (this.currentRecipe.ingredients || []).map(ingredient => {
-			return {
-				defaultValue: ingredient.name,
-				additionalValue: `${ingredient.quantity} ${ingredient.unit}`,
-				notes: ingredient.notes,
-			};
-		});
+		return _.orderBy(this.currentRecipe.ingredients || [], "orderNumber").map(
+			ingredient => {
+				return {
+					defaultValue: ingredient.name,
+					additionalValue: `${ingredient.quantity} ${ingredient.unit}`,
+					notes: ingredient.notes,
+				};
+			}
+		);
 	}
 
 	getInstructionString() {
-		return (this.currentRecipe.instructions || []).map(instruction => {
-			return {
-				defaultValue: instruction.description,
-			};
-		});
+		return _.orderBy(this.currentRecipe.instructions || [], "orderNumber").map(
+			instruction => {
+				return {
+					defaultValue: instruction.description,
+				};
+			}
+		);
 	}
 
 	// eslint-disable-next-line
@@ -397,8 +419,10 @@ export default class CreateRecipe extends Vue {
 		this.$store.dispatch("deleteImage", fullName);
 	}
 
-	beforeCreate() {
-		this.$store.dispatch("setIsLoading", true);
+	async beforeCreate() {
+		await this.$store.dispatch("setIsLoading", true);
+		await this.$store.dispatch("setDidToken");
+		await this.$store.dispatch("getJwtToken");
 	}
 
 	created() {

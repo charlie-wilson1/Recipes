@@ -1,10 +1,11 @@
-export interface RegisterUserCommand {
+export interface RegisterUserRequest {
 	email: string;
 }
 
 export interface LoginRequest {
-	didToken: string | null;
+	didToken?: string | null;
 	redirect?: string;
+	triedOnce?: boolean;
 }
 
 export interface MagicTokenRequest {
@@ -12,16 +13,15 @@ export interface MagicTokenRequest {
 	redirect: string;
 }
 
-export interface UpdateCurrentUserCommand {
+export interface UpdateCurrentUserRequest {
 	username: string;
 	email: string;
 }
 
 export interface TokenResponse {
-	publicAddress: string;
 	roles: string[];
 	username: string;
+	email: string;
 	token: string;
-	magicId: string;
 	tokenExpiration: number;
 }

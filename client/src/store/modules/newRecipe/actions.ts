@@ -10,6 +10,7 @@ import {
 import router from "@/router/index";
 import Vue from "vue";
 import axios from "axios";
+import * as _ from "lodash";
 
 const recipesUrl = process.env.VUE_APP_WEB_API_URL + "recipes";
 
@@ -23,7 +24,7 @@ export const actions: ActionTree<NewRecipeState, RootState> = {
 			.get(`${recipesUrl}/${recipeId}`)
 			.then(response => {
 				const recipe: Recipe = response.data;
-				commit("setRecipeById", recipe);
+				commit("setRecipe", recipe);
 			})
 			.catch(err => {
 				console.log(err);
@@ -114,8 +115,16 @@ export const actions: ActionTree<NewRecipeState, RootState> = {
 		commit("insertIngredient", ingredient);
 	},
 
+	overrideIngredients({ commit }, ingredients: Ingredient[]) {
+		commit("overrideIngredients", _.sortBy(ingredients, "orderNumber"));
+	},
+
 	insertInstruction({ commit }, instruction: Instruction) {
 		commit("insertInstruction", instruction);
+	},
+
+	overrideInstructions({ commit }, instructions: Instruction[]) {
+		commit("overrideInstruction", _.sortBy(instructions, "orderNumber"));
 	},
 
 	async updateRecipe({ commit }, recipe: Recipe) {

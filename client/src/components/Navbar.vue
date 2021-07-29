@@ -29,25 +29,16 @@
 </template>
 
 <script lang="ts">
-import axios from "axios";
 import { Component, Vue } from "vue-property-decorator";
 
 @Component({})
 export default class Navbar extends Vue {
 	get isLoggedIn(): boolean {
-		const loggedIn = this.$store.getters.isLoggedIn;
-
-		if (loggedIn) {
-			const token = this.$store.getters.token;
-			delete axios.defaults.headers.common["Authorization"];
-			axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-		}
-
-		return loggedIn;
+		return this.$store.state.isLoggedIn;
 	}
 
 	get isAdmin(): boolean {
-		if (!this.isLoggedIn) {
+		if (!this.$store.state.isLoggedIn) {
 			return false;
 		}
 
@@ -55,7 +46,7 @@ export default class Navbar extends Vue {
 	}
 
 	get username(): string {
-		return `Hello ${this.$store.getters.username}`;
+		return `Hello ${this.$store.state.username}`;
 	}
 }
 </script>

@@ -8,19 +8,25 @@ export class AuthenticationController {
 
   @Post('login')
   async authenticate(@Body() loginRequestDto: AuthRequestDto): Promise<any> {
-    console.log('gets here');
     const metadata = await this.authenticationService.authenticateDidToken(
       loginRequestDto.didToken,
     );
 
     if (!metadata) {
-      this.authenticationService.logout(loginRequestDto.didToken);
+      await this.authenticationService.logout(loginRequestDto.didToken);
       throw new UnauthorizedException();
     }
 
-    return await this.authenticationService.createJwtFromMagicMetadata(
-      metadata,
-    );
+    const profile = await this.authenticationService.getProfile(metadata.email);
+
+    if (!profile?.isActive) {
+      await this.authenticationService.logout(loginRequestDto.didToken);
+      throw new UnauthorizedException(
+        `User with email ${metadata.email} is not authorized to use this application. Please contact an administrator to be invited to use the application.`,
+      );
+    }
+
+    return await this.authenticationService.createJwtFromProfile(profile);
   }
 
   @Post('logout')

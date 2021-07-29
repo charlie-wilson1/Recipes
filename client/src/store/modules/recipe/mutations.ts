@@ -4,7 +4,7 @@ import { RecipeState } from "./state";
 
 /* eslint @typescript-eslint/no-non-null-assertion: "off" */
 export const mutations: MutationTree<RecipeState> = {
-	setRecipeList(state, recipeList: Array<Recipe>) {
+	setRecipeList(state, recipeList: Recipe[]) {
 		state.currentRecipeList = recipeList;
 	},
 
@@ -12,8 +12,8 @@ export const mutations: MutationTree<RecipeState> = {
 		state.recipeCount = recipeCount;
 	},
 
-	setSelectedRecipe(state, index: number) {
-		state.selectedRecipe = state.currentRecipeList![index];
+	setSelectedRecipe(state, recipe: Recipe) {
+		state.selectedRecipe = recipe;
 	},
 
 	setRecipe(state, recipe: Recipe) {
@@ -22,6 +22,6 @@ export const mutations: MutationTree<RecipeState> = {
 
 	destroyRecipeList(state) {
 		state.selectedRecipe = undefined;
-		state.currentRecipeList = undefined;
+		state.currentRecipeList = [];
 	},
 };

@@ -92,8 +92,6 @@ export default class Login extends Vue {
 			? new URL(this.redirectRoute, window.location.origin).href
 			: new URL("/authenticate", window.location.origin).href;
 
-		console.log(await magic.apiKey);
-
 		try {
 			magic.auth.loginWithMagicLink({
 				email: this.email,

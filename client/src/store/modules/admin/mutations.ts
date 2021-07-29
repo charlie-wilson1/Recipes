@@ -14,9 +14,6 @@ export const mutations: MutationTree<AdminState> = {
 			user => user.username === payload.username
 		);
 
-		console.log("payload", payload.username);
-		console.log("user", userToUpdateIndex);
-
 		if (userToUpdateIndex < 1) {
 			Vue.$toast.error("Could not find user");
 			return;

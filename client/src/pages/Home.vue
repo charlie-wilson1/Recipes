@@ -32,23 +32,25 @@ import RecipeContainer from "../components/home/RecipeContainer.vue";
 })
 export default class Home extends Vue {
 	get userHasRecipes(): boolean {
-		return (this.$store.getters.recipeCount || 0) > 0;
+		return (this.$store.state.RecipeModule.recipeCount || 0) > 0;
 	}
 
 	async beforeCreate() {
 		const query: GetAllRecipesQuery = {
-			resultsPerPage: 9,
+			resultsPerPage: 8,
 			pageNumber: 1,
 			searchQuery: undefined,
 		};
 
 		await this.$store.dispatch("setIsLoading", true);
+		await this.$store.dispatch("setDidToken");
+		await this.$store.dispatch("getJwtToken");
 		await this.$store.dispatch("loadRecipeList", query);
 		await this.$store.dispatch("setIsLoading", false);
 	}
 
 	get isLoading() {
-		return this.$store.getters.isLoading;
+		return this.$store.state.isLoading;
 	}
 }
 </script>

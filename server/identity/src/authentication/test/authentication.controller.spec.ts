@@ -69,16 +69,27 @@ describe('IdentityController', () => {
 
   describe('authenticate', () => {
     let authenticateSpy: jest.SpyInstance;
+    let logoutSpy: jest.SpyInstance;
+    let getProfileSpy: jest.SpyInstance;
     let createTokenSpy: jest.SpyInstance;
+
+    const expectedMetadata: MagicUserMetadata = {
+      email: profileMock.email,
+      publicAddress: 'publicAddress',
+      issuer: 'issuer',
+    };
 
     beforeEach((done) => {
       authenticateSpy = jest.spyOn(service, 'authenticateDidToken');
-      createTokenSpy = jest.spyOn(service, 'createJwtFromMagicMetadata');
+      getProfileSpy = jest.spyOn(service, 'getProfile');
+      logoutSpy = jest.spyOn(service, 'logout');
+      createTokenSpy = jest.spyOn(service, 'createJwtFromProfile');
       done();
     });
 
     test('should throw UnauthorizedException if metadata invalid', async () => {
       authenticateSpy.mockImplementation(() => Promise.resolve(undefined));
+      logoutSpy.mockImplementation();
 
       try {
         await controller.authenticate(didToken);
@@ -89,21 +100,46 @@ describe('IdentityController', () => {
       expect(service.authenticateDidToken).toHaveBeenCalledWith(
         didToken.didToken,
       );
+      expect(service.logout).toHaveBeenCalledWith(didToken.didToken);
       expect(authenticateSpy).toHaveBeenCalledTimes(1);
+      expect(logoutSpy).toHaveBeenCalledTimes(1);
+      expect(createTokenSpy).not.toHaveBeenCalled();
+    });
+
+    test('should throw UnauthorizedException if metadata invalid', async () => {
+      authenticateSpy.mockImplementation(() =>
+        Promise.resolve(expectedMetadata),
+      );
+      getProfileSpy.mockImplementation(() =>
+        Promise.resolve({ ...profileMock, isActive: false }),
+      );
+      logoutSpy.mockImplementation();
+
+      try {
+        await controller.authenticate(didToken);
+      } catch (error) {
+        expect(error).toBeInstanceOf(UnauthorizedException);
+      }
+
+      expect(service.authenticateDidToken).toHaveBeenCalledWith(
+        didToken.didToken,
+      );
+
+      expect(service.getProfile).toHaveBeenCalledWith(expectedMetadata.email);
+      expect(service.logout).toHaveBeenCalledWith(didToken.didToken);
+      expect(authenticateSpy).toHaveBeenCalledTimes(1);
+      expect(getProfileSpy).toHaveBeenCalledTimes(1);
+      expect(logoutSpy).toHaveBeenCalledTimes(1);
       expect(createTokenSpy).not.toHaveBeenCalled();
     });
 
     test('should call authenticateDidToken and createJwtFromMagicMetadata', async () => {
-      const expectedMetadata: MagicUserMetadata = {
-        email: profileMock.email,
-        publicAddress: 'publicAddress',
-        issuer: 'issuer',
-      };
       const expectedResult = 'jwt';
 
       authenticateSpy.mockImplementation(() =>
         Promise.resolve(expectedMetadata),
       );
+      getProfileSpy.mockImplementation(() => Promise.resolve(profileMock));
       createTokenSpy.mockImplementation(() => Promise.resolve(expectedResult));
 
       const actual = await controller.authenticate(didToken);
@@ -111,9 +147,8 @@ describe('IdentityController', () => {
       expect(service.authenticateDidToken).toHaveBeenCalledWith(
         didToken.didToken,
       );
-      expect(service.createJwtFromMagicMetadata).toHaveBeenCalledWith(
-        expectedMetadata,
-      );
+      expect(service.getProfile).toHaveBeenCalledWith(expectedMetadata.email);
+      expect(service.createJwtFromProfile).toHaveBeenCalledWith(profileMock);
       expect(actual).toEqual(expectedResult);
       expect(authenticateSpy).toHaveBeenCalledTimes(1);
       expect(createTokenSpy).toHaveBeenCalledTimes(1);

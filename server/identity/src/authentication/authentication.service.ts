@@ -17,31 +17,18 @@ export class AuthenticationService {
     return await this.magic.users.getMetadataByToken(didToken);
   }
 
-  private async getUser(email: string): Promise<Profile> {
-    const user = await this.profileRepository.findByEmail(email);
-
-    if (!user?.isActive) {
-      throw new UnauthorizedException(
-        `user with email ${email} is not authorized to use this application. Please contact an administrator to be invited to use the application.`,
-      );
-    }
-
-    return user;
+  async getProfile(email: string): Promise<Profile> {
+    return await this.profileRepository.findByEmail(email);
   }
 
-  async createJwtFromMagicMetadata(metadata: MagicUserMetadata): Promise<any> {
-    const user = await this.getUser(metadata.email);
-
+  createJwtFromProfile(profile: Profile): string {
     const payload = {
-      publicAddress: metadata.publicAddress,
-      nameid: metadata.issuer,
-      roles: user.roles,
-      name: user.username,
+      roles: profile.roles,
+      name: profile.username,
+      nameid: profile.email,
     };
 
-    return {
-      access_token: await this.jwtService.signAsync(payload),
-    };
+    return this.jwtService.sign(payload);
   }
 
   async logout(didToken: string): Promise<void> {

@@ -34,7 +34,13 @@ export class ProfileRepository {
     paginationQuery: PaginationQueryDto,
     isActive,
   ): Promise<ProfileDocument[]> {
-    const { limit = 20, offset = 0 } = paginationQuery;
+    let limit = 10;
+    let offset = 0;
+
+    if (paginationQuery) {
+      limit = paginationQuery.limit;
+      offset = paginationQuery.offset;
+    }
 
     const result = await this.profileModel
       .find({ isActive })

@@ -1,20 +1,73 @@
 <template lang="html">
 	<section class="profile container">
 		<h1>Profile</h1>
-		<ProfileUpdateUser />
+		<b-form @submit.prevent="handleSubmit">
+			<b-form-row>
+				<b-col md="4" offset="4">
+					<b-form-group
+						label="Username"
+						label-for="username"
+						:class="{
+							'form-group--error': $v.username.$error,
+						}"
+					>
+						<b-form-input
+							class="form__input"
+							type="text"
+							id="username"
+							v-model.trim="$v.username.$model"
+							required
+						></b-form-input>
+						<p class="error" v-if="!$v.username.required && $v.username.$error">
+							Field is required
+						</p>
+					</b-form-group>
+				</b-col>
+			</b-form-row>
+			<b-form-group class="text-center button-wrapper">
+				<b-button type="submit" variant="success mr-2" :disabled="$v.$invalid"
+					>Submit
+				</b-button>
+				<b-button type="reset" variant="primary">Clear </b-button>
+			</b-form-group>
+		</b-form>
 	</section>
 </template>
 
 <script lang="ts">
+import { Validate } from "vuelidate-property-decorators";
+import { validationMixin } from "vuelidate";
+import { required } from "vuelidate/lib/validators";
 import { Component, Vue } from "vue-property-decorator";
-import ProfileUpdateUser from "@/components/Auth/ProfileUpdateUser.vue";
+import { UpdateCurrentUserCommand } from "@/models/AccountsModels";
 
 @Component({
-	components: {
-		ProfileUpdateUser,
-	},
+	mixins: [validationMixin],
 })
-export default class Profile extends Vue {}
+export default class Profile extends Vue {
+	get currentUsername(): string {
+		return this.$store.state.username;
+	}
+
+	@Validate({ required })
+	username = this.currentUsername;
+
+	handleSubmit() {
+		this.$v.$touch();
+
+		if (this.$v.$invalid) {
+			Vue.$toast.error("Please fix invalid fields.");
+			return;
+		}
+
+		const payload: UpdateCurrentUserCommand = {
+			username: this.username,
+			email: this.$store.state.email,
+		};
+
+		this.$store.dispatch("updateUser", payload);
+	}
+}
 </script>
 
 <style scoped lang="scss">

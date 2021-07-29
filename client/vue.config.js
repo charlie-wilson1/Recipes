@@ -1,7 +1,9 @@
-// module.exports = {
-// 	parserOptions: {
-// 		project: "tsconfig.json",
-// 		tsconfigRootDir: __dirname,
-// 		sourceType: "module",
-// 	},
-// };
+module.exports = {
+	devServer: {
+		overlay: {
+			warnings: false,
+			errors: true,
+		},
+	},
+	lintOnSave: process.env.NODE_ENV !== "production",
+};
