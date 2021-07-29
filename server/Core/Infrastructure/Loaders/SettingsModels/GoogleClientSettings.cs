@@ -3,5 +3,6 @@
     public class GoogleClientSettings
     {
         public string BucketName { get; set; }
+        public string CredentialsFilePath { get; set; }
     }
 }

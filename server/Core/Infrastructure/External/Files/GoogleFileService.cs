@@ -4,7 +4,6 @@ using Microsoft.Extensions.Options;
 using Recipes.Core.Application.Common.Models;
 using Recipes.Core.Application.Contracts.Services;
 using Recipes.Core.Infrastructure.Loaders.SettingsModels;
-using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,7 +18,7 @@ namespace Recipes.Core.Infrastructure.External.Files
         public GoogleFileService(IOptions<GoogleClientSettings> googleClientSettings)
         {
             _googleClientSettings = googleClientSettings.Value;
-            var filePath = Environment.GetEnvironmentVariable("GoogleCredentialsFilePath");
+            var filePath = _googleClientSettings.CredentialsFilePath;
             var credential = GoogleCredential.FromFile(filePath);
             _storageClient = StorageClient.Create(credential);
         }

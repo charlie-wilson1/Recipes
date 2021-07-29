@@ -58,7 +58,8 @@ DATABASE_CONNECTION_STRING=****
     }
   },
   "Google": {
-    "BucketName": "****" 
+    "BucketName": "****",
+    "CredentialsFilePath":  "****"
   }
 }
 ```

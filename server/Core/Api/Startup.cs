@@ -14,6 +14,7 @@ using Recipes.Core.Application;
 using Recipes.Core.Application.Contracts.Services;
 using Recipes.Core.Api.Services;
 using Recipes.Core.Api.Filters;
+using System.IO;
 
 namespace Recipes.Core.Api
 {
@@ -33,8 +34,9 @@ namespace Recipes.Core.Api
         {
             var jwtSettings = Configuration.GetSection("Auth:JwtBearerTokenSettings").Get<JwtBearerTokenSettings>();
             var clientRoute = Configuration.GetSection("Auth:ClientRoute").Value;
+            var googleSettings = Configuration.GetSection("Google").Get<GoogleClientSettings>();
 
-            if (jwtSettings == null || clientRoute == null)
+            if (jwtSettings == null || clientRoute == null || googleSettings == null || !File.Exists(googleSettings.CredentialsFilePath))
             {
                 throw new ArgumentException("Settings cannot be null");
             }
