@@ -29,9 +29,8 @@ VUE_APP_MAGIC_KEY=pk_*****
 MAGIC_KEY=sk_****
 JWT_SECRET=****
 JWT_ISSUER=****
-DATABASE_CONNECTION_STRING=****
-JWT_ISSUER=****
 JWT_AUDIENCE=****
+DATABASE_CONNECTION_STRING=****
 ```
 
 #### Appsettings.json
