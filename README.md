@@ -66,8 +66,7 @@ JWT_AUDIENCE=****
 
 ## ToDo
 
-- finish rewriting front-end auth
-- update Core API auth (possibly rewrite recipes API to use mongo?)
 - pick a theme and update styling in the front end
-- write unit tests for Vue and Core API!!!
 - Create CI/CD files
+- write unit tests for Vue and Core API!!!
+- possibly rewrite recipes API to use mongo?
