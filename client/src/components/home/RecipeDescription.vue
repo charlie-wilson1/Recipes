@@ -74,11 +74,10 @@ export default class RecipeDescription extends Vue {
 @import "public/css/values.scss";
 
 .recipe-description {
-	height: $recipe-container-text-height;
 	width: 102%;
-	overflow-y: scroll;
+	height: 100%;
 	overflow-x: hidden;
-	padding-bottom: 100px;
+	overflow-y: scroll;
 	padding-left: 10px;
 	padding-right: 10px;
 	padding-top: 0;
@@ -90,11 +89,12 @@ export default class RecipeDescription extends Vue {
 
 	&::-webkit-scrollbar-track {
 		background: #f1f1f1;
+		border-radius: 10px;
 	}
 
 	&::-webkit-scrollbar-thumb {
 		background: #888;
-		outline: 1px solid slategrey;
+		border-radius: 10px;
 	}
 
 	&::-webkit-scrollbar-thumb:hover {
@@ -137,6 +137,12 @@ export default class RecipeDescription extends Vue {
 	.list-group-item {
 		border: none;
 		padding-left: 0px;
+	}
+
+	.list-group:after {
+		content: "";
+		display: table;
+		clear: both;
 	}
 
 	.list-group-index {

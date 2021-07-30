@@ -14,7 +14,7 @@ namespace Recipes.Core.Application.Recipes.Validators
             RuleForEach(x => x.Instructions).NotNull().SetValidator(new InstructionRequestValidator());
             RuleFor(x => x.Ingredients.Count).GreaterThan(0);
             RuleFor(x => x.Instructions.Count).GreaterThan(0);
-            RuleFor(x => x.Image).SetValidator(new ImageRequestValidator()).When(x => x.Image != null);
+            RuleFor(x => x.Image).SetValidator(new ImageRequestValidator());
         }
     }
 }

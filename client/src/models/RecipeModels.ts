@@ -11,9 +11,26 @@ export interface Recipe {
 	owner?: string;
 }
 
+export interface UpdateRecipe {
+	id?: string;
+	name: string;
+	image?: UpdateRecipeImage | null;
+	ingredients: Array<Ingredient>;
+	instructions: Array<Instruction>;
+	notes?: string;
+	prepTime: number;
+	cookTime: number;
+	owner?: string;
+}
+
 export interface RecipeImage {
 	src: string;
 	fileName: string;
+}
+
+export interface UpdateRecipeImage {
+	url?: string;
+	name?: string;
 }
 
 export interface Ingredient {

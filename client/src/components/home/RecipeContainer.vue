@@ -1,42 +1,54 @@
 <template lang="html">
-	<section class="recipe-container">
-		<b-container>
-			<b-row class="recipe-main">
-				<b-col cols="4" class="list-col" ref="recipeListContainer">
-					<b-form>
-						<b-form-group id="search-recipes-group" class="search-recipes">
-							<b-form-input
-								id="search-recipes-input"
-								v-model.trim="query"
-								type="text"
-								placeholder="Search Recipes"
-							></b-form-input>
-						</b-form-group>
-					</b-form>
-					<div class="recipe-list">
-						<div v-if="listIsLoading" class="loader vh-100 text-center d-flex">
-							<b-spinner label="Loading..."></b-spinner>
-						</div>
-						<div v-else>
-							<b-list-group flush>
-								<b-list-group-item
-									class="recipe-list-item"
-									v-for="recipe in recipes"
-									:key="recipe.id"
-									:active="recipe.id === selectedRecipe.id"
-									@click="setSelectedRecipe(recipe)"
+	<section>
+		<b-container class="recipe-container">
+			<b-row class="recipe-main mb-5">
+				<b-col cols="4" class="list-col flex-column" ref="recipeListContainer">
+					<b-container>
+						<b-row>
+							<b-col class="p-0">
+								<b-form>
+									<b-form-group id="search-recipes-group">
+										<b-form-input
+											id="search-recipes-input"
+											v-model.trim="query"
+											type="text"
+											placeholder="Search Recipes"
+										></b-form-input>
+									</b-form-group>
+								</b-form>
+							</b-col>
+						</b-row>
+						<b-row class="list-row">
+							<b-col>
+								<div
+									v-if="listIsLoading"
+									class="loader vh-100 text-center d-flex"
 								>
-									{{ recipe.name }}
-								</b-list-group-item>
-							</b-list-group>
-						</div>
-					</div>
+									<b-spinner label="Loading..."></b-spinner>
+								</div>
+								<b-list-group
+									class="recipe-list-group flex-container h-100 pb-5"
+									v-else
+								>
+									<b-list-group-item
+										class="recipe-list-item row flex-grow-1"
+										v-for="recipe in recipes"
+										:key="recipe.id"
+										:active="recipe.id === selectedRecipe.id"
+										@click="setSelectedRecipe(recipe)"
+									>
+										{{ recipe.name }}
+									</b-list-group-item>
+								</b-list-group>
+							</b-col>
+						</b-row>
+					</b-container>
 				</b-col>
 				<b-col cols="8" class="recipe-description-wrapper">
 					<RecipeDescription :recipe="selectedRecipe" />
 				</b-col>
 			</b-row>
-			<b-row class="recipe-buttons">
+			<b-row class="recipe-buttons align-middle pb-4">
 				<b-col cols="4" class="pagination">
 					<b-pagination
 						v-model="currentPage"
@@ -51,7 +63,7 @@
 					>
 					</b-pagination>
 				</b-col>
-				<b-col cols="8" class="text-center">
+				<b-col cols="8" class="text-center description-buttons">
 					<b-button
 						:to="{
 							name: 'make',
@@ -91,7 +103,7 @@ import { GetAllRecipesQuery, Recipe } from "../../models/RecipeModels";
 })
 export default class RecipeContainer extends Vue {
 	public currentPage = 1;
-	public perPage = 8;
+	public perPage = 10;
 	public query = "";
 
 	listIsLoading = false;
@@ -148,104 +160,92 @@ export default class RecipeContainer extends Vue {
 @import "public/css/values.scss";
 
 .recipe-container {
-	padding: $recipe-padding 0;
-	margin: $recipe-margin;
-	height: $recipe-container-height;
-	min-height: 860px;
-	border: 2px solid lightgrey;
-	overflow: hidden;
-	border-radius: 10px;
+	padding: 10px;
+	padding-bottom: 0;
+	height: 90vh;
 
-	.list-col {
-		padding-left: 0;
+	.row {
+		flex: none;
 	}
 
-	.search-recipes {
-		margin-left: 15px;
-		margin-right: 15px;
-	}
-
-	.recipe-list {
-		height: 93%;
-		overflow-x: hidden;
-		overflow-y: scroll;
-
-		&::-webkit-scrollbar {
-			width: 5px;
-		}
-
-		&::-webkit-scrollbar-track {
-			background: #f1f1f1;
-		}
-
-		&::-webkit-scrollbar-thumb {
-			background: #888;
-			outline: 1px solid slategrey;
-		}
-
-		&::-webkit-scrollbar-thumb:hover {
-			background: #555;
-		}
-	}
-
-	.recipe-list-item {
-		align-items: center;
-		line-height: 50px;
-		width: 104.55%;
-		font-size: 1.5em;
+	.recipe-main {
+		height: 92%;
+		margin-bottom: 2%;
 		overflow: hidden;
-		text-overflow: ellipsis;
-		word-wrap: break-word;
-		white-space: nowrap;
-		display: block;
-		border-left: none;
-		border-right: none;
-		border-radius: 0;
 
-		&:first-child {
-			border-top: none;
+		.container {
+			height: 100%;
+
+			.list-row {
+				height: 100%;
+			}
+
+			.recipe-list-group {
+				width: 100%;
+				border-radius: 0;
+
+				.recipe-list-item {
+					font-size: 1.5em;
+					overflow-x: hidden;
+					text-overflow: ellipsis;
+					word-wrap: break-word;
+					white-space: nowrap;
+					border-right: none;
+					border-left: none;
+					display: flex;
+					flex-direction: row;
+					align-items: center;
+
+					&:hover {
+						cursor: pointer;
+					}
+
+					&:first-child {
+						border-top: none;
+					}
+
+					&:last-child {
+						border-bottom: none;
+					}
+
+					&:hover {
+						cursor: pointer;
+					}
+				}
+
+				.list-group-item:last-of-type {
+					border-bottom: none;
+				}
+			}
 		}
 
-		&:hover {
-			cursor: pointer;
+		.recipe-description-wrapper {
+			height: 100%;
 		}
-	}
-
-	.list-group-item {
-		border-bottom: 2px solid lightgrey;
-	}
-
-	.list-group-item:last-of-type {
-		border-bottom: none;
-	}
-
-	.recipe-description-wrapper::before {
-		position: absolute;
-		left: 0;
-		right: -20px;
-		top: -20px;
-		bottom: 0;
-		content: " ";
-		display: block;
-		border-left: 2px solid lightgrey;
-		border-radius: 0 0 0 5px;
-		-webkit-box-shadow: 0px 0px 23px 5px rgba(0, 0, 0, 0.1);
-		box-shadow: 0px 0px 23px 5px rgba(0, 0, 0, 0.1);
 	}
 
 	.recipe-buttons {
-		min-height: $recipe-button-height;
-		margin-top: 30px;
+		min-height: 30px;
 
 		.btn {
-			margin: 10px;
+			margin: auto;
 			padding: 0.75em 1.5em;
 		}
 
 		.pagination {
-			margin-top: -18px;
 			margin-right: auto;
 			margin-left: auto;
+			margin-bottom: auto !important;
+			margin-top: auto !important;
+		}
+
+		.description-buttons {
+			margin-bottom: auto;
+			margin-top: auto;
+
+			.btn {
+				margin: 0 10px;
+			}
 		}
 	}
 }

@@ -6,6 +6,7 @@ import {
 	Ingredient,
 	Instruction,
 	RecipeImage,
+	UpdateRecipe,
 } from "@/models/RecipeModels";
 import router from "@/router/index";
 import Vue from "vue";
@@ -128,31 +129,41 @@ export const actions: ActionTree<NewRecipeState, RootState> = {
 	},
 
 	async updateRecipe({ commit }, recipe: Recipe) {
+		const body: UpdateRecipe = {
+			id: recipe.id,
+			name: recipe.name,
+			notes: recipe.notes,
+			prepTime: recipe.prepTime,
+			cookTime: recipe.cookTime,
+			image: {
+				url: recipe.image?.src,
+				name: recipe.image?.fileName,
+			},
+			ingredients: recipe.ingredients.map(ingredient => ({
+				id: ingredient.id,
+				name: ingredient.name,
+				quantity: ingredient.quantity,
+				unit: ingredient.unit,
+				orderNumber: ingredient.orderNumber + 1,
+				notes: ingredient.notes,
+			})),
+			instructions: recipe.instructions.map(instruction => ({
+				id: instruction.id,
+				orderNumber: instruction.orderNumber,
+				description: instruction.description,
+			})),
+		};
+
+		if (!recipe.image?.fileName || !recipe.image?.src) {
+			if (recipe.image?.fileName || recipe.image?.src) {
+				Vue.$toast.warning("Image is incorrect. Please save your image again.");
+			}
+
+			delete body.image;
+		}
+
 		await axios
-			.put(recipesUrl, {
-				id: recipe.id,
-				name: recipe.name,
-				notes: recipe.notes,
-				prepTime: recipe.prepTime,
-				cookTime: recipe.cookTime,
-				image: {
-					url: recipe.image?.src,
-					name: recipe.image?.fileName,
-				},
-				ingredients: recipe.ingredients.map(ingredient => ({
-					id: ingredient.id,
-					name: ingredient.name,
-					quantity: ingredient.quantity,
-					unit: ingredient.unit,
-					orderNumber: ingredient.orderNumber + 1,
-					notes: ingredient.notes,
-				})),
-				instructions: recipe.instructions.map(instruction => ({
-					id: instruction.id,
-					orderNumber: instruction.orderNumber,
-					description: instruction.description,
-				})),
-			})
+			.put(recipesUrl, body)
 			.then(() => {
 				Vue.$toast.success("Saved successfully!");
 				commit("updateRecipe", recipe);

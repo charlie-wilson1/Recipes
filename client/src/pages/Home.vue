@@ -37,7 +37,7 @@ export default class Home extends Vue {
 
 	async beforeCreate() {
 		const query: GetAllRecipesQuery = {
-			resultsPerPage: 8,
+			resultsPerPage: 10,
 			pageNumber: 1,
 			searchQuery: undefined,
 		};

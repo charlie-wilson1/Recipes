@@ -33,6 +33,7 @@ export default class OrderedListGroup extends Vue {
 .indexed-list-group {
 	.list-group-item {
 		border: none;
+		font-size: 1.2em;
 	}
 }
 </style>
