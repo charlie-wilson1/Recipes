@@ -31,11 +31,13 @@
 									v-else
 								>
 									<b-list-group-item
-										class="recipe-list-item row flex-grow-1"
-										v-for="recipe in recipes"
-										:key="recipe.id"
+										v-for="(recipe, index) in displayedRecipes"
+										:key="index"
 										:active="recipe.id === selectedRecipe.id"
+										class="recipe-list-item row flex-grow-1"
+										:class="{ 'remove-border': !recipe.id }"
 										@click="setSelectedRecipe(recipe)"
+										:disabled="!recipe.id"
 									>
 										{{ recipe.name }}
 									</b-list-group-item>
@@ -95,6 +97,7 @@ import { Component, Vue, Watch } from "vue-property-decorator";
 import { Debounce } from "vue-debounce-decorator";
 import RecipeDescription from "./RecipeDescription.vue";
 import { GetAllRecipesQuery, Recipe } from "../../models/RecipeModels";
+import { defaultRecipe } from "@/models/DefaultModels";
 
 @Component({
 	components: {
@@ -118,8 +121,20 @@ export default class RecipeContainer extends Vue {
 			: (this.currentPage - 1) * this.perPage + 1;
 	}
 
-	get recipes(): Array<Recipe> {
+	get recipes(): Recipe[] {
 		return this.$store.state.RecipeModule.currentRecipeList;
+	}
+
+	get extraRecipes(): Recipe[] {
+		const extraItems = [];
+		for (let i = 0; i < this.perPage - this.recipes.length; i++) {
+			extraItems.push(defaultRecipe);
+		}
+		return extraItems;
+	}
+
+	get displayedRecipes(): Recipe[] {
+		return this.recipes.concat(this.extraRecipes);
 	}
 
 	get selectedRecipe(): Recipe {
@@ -153,6 +168,11 @@ export default class RecipeContainer extends Vue {
 	getRecipeId(recipeId: string): string {
 		return recipeId.substring(recipeId.indexOf("/") + 1);
 	}
+
+	displayBorder(id: string): boolean {
+		console.log(id);
+		return !id;
+	}
 }
 </script>
 
@@ -182,6 +202,10 @@ export default class RecipeContainer extends Vue {
 				width: 100%;
 				border-radius: 0;
 				overflow-y: visible;
+
+				.remove-border {
+					border: none !important;
+				}
 
 				.recipe-list-item {
 					font-size: 1.2em;
