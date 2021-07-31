@@ -134,6 +134,15 @@
 						/>
 					</b-col>
 				</b-form-row>
+				<b-form-row
+					v-if="
+						!$v.currentRecipe.ingredients.required &&
+							$v.currentRecipe.ingredients.$error
+					"
+					class="error"
+				>
+					Please add at least 1 ingredient.
+				</b-form-row>
 				<hr />
 				<b-form-row>
 					<b-col md="7">
@@ -149,6 +158,15 @@
 							:handle-delete="deleteInstruction"
 						/>
 					</b-col>
+				</b-form-row>
+				<b-form-row
+					v-if="
+						!$v.currentRecipe.instructions.required &&
+							$v.currentRecipe.instructions.$error
+					"
+					class="error"
+				>
+					Please add at least 1 instruction.
 				</b-form-row>
 				<hr />
 				<b-form-row>
@@ -259,7 +277,7 @@ export default class CreateRecipe extends Vue {
 		}
 
 		const orderNumber = this.currentRecipe.ingredients[index].orderNumber;
-		this.currentRecipe.ingredients.splice(index);
+		this.currentRecipe.ingredients.splice(index, 1);
 
 		this.currentRecipe.ingredients
 			.filter(i => i.orderNumber >= orderNumber)
@@ -309,7 +327,7 @@ export default class CreateRecipe extends Vue {
 			this.instruction = defaultInstruction;
 		}
 
-		this.currentRecipe.instructions.splice(index);
+		this.currentRecipe.instructions.splice(index, 1);
 
 		this.currentRecipe.instructions
 			.filter(i => i.orderNumber >= orderNumber)

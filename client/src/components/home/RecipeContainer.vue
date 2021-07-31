@@ -157,8 +157,6 @@ export default class RecipeContainer extends Vue {
 </script>
 
 <style scoped lang="scss">
-@import "public/css/values.scss";
-
 .recipe-container {
 	padding: 10px;
 	padding-bottom: 0;
@@ -183,9 +181,10 @@ export default class RecipeContainer extends Vue {
 			.recipe-list-group {
 				width: 100%;
 				border-radius: 0;
+				overflow-y: visible;
 
 				.recipe-list-item {
-					font-size: 1.5em;
+					font-size: 1.2em;
 					overflow-x: hidden;
 					text-overflow: ellipsis;
 					word-wrap: break-word;

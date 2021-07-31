@@ -71,8 +71,6 @@ export default class RecipeDescription extends Vue {
 </script>
 
 <style scoped lang="scss">
-@import "public/css/values.scss";
-
 .recipe-description {
 	width: 102%;
 	height: 100%;
