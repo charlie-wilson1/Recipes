@@ -1,11 +1,36 @@
+// bootstrap overrides
+$primary: #dfb4c5;
+$secondary: #acafbe;
+$info: #e9d9c0;
+$danger: #f7022a;
+
+// DFB4C5   E7EBEE   E9D9C0    ACAFBE     413F44
+
+.btn-primary {
+	color: #fff !important;
+}
+
+.btn-secondary {
+	color: #fff !important;
+}
+
+.btn-info {
+	color: #fff !important;
+}
+
+$theme-colors: (
+	"cancel": $secondary,
+	"proceed": $primary,
+);
+
 // Forms
 .error {
-	color: red;
+	color: var(--danger);
 }
 
 .form-group--error {
 	input {
-		border-color: red;
+		border-color: var(--danger);
 	}
 }
 
@@ -32,3 +57,6 @@ label:focus,
 	-webkit-appearance: none;
 	box-shadow: none !important;
 }
+
+@import "~bootstrap/scss/bootstrap.scss";
+@import "~bootstrap-vue/src/index.scss";

@@ -15,7 +15,10 @@
 						placeholder="Start typing instructions"
 					></b-form-textarea>
 					<b-input-group-append>
-						<b-button @click="addInstruction" :disabled="$v.$invalid"
+						<b-button
+							@click="addInstruction"
+							:disabled="$v.$invalid"
+							variant="secondary"
 							>Add
 						</b-button>
 					</b-input-group-append>

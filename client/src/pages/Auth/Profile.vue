@@ -25,10 +25,10 @@
 				</b-col>
 			</b-form-row>
 			<b-form-group class="text-center button-wrapper">
-				<b-button type="submit" variant="success mr-2" :disabled="$v.$invalid"
+				<b-button type="submit" variant="primary mr-2" :disabled="$v.$invalid"
 					>Submit
 				</b-button>
-				<b-button type="reset" variant="primary">Clear </b-button>
+				<b-button type="reset" variant="secondary">Clear </b-button>
 			</b-form-group>
 		</b-form>
 	</section>

@@ -18,7 +18,7 @@ export default class App extends Vue {}
 </script>
 
 <style lang="scss">
-@import "node_modules/bootstrap/scss/bootstrap.scss";
+@import "public/css/styles.scss";
 
 #nav {
 	padding: 30px;

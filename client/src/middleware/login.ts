@@ -5,6 +5,10 @@ export const handleLogin = async (next: NavigationGuardNext<Vue>) => {
 	await store.dispatch("setDidToken");
 	await store.dispatch("getJwtToken");
 	await store.dispatch("setIsLoggedIn");
+
+	if (!store.state.username) {
+		next("/profile");
+	}
 	next();
 };
 

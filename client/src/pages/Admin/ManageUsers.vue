@@ -3,7 +3,7 @@
 		<b-row class="d-flex justify-content-between">
 			<h1>Manage Users</h1>
 			<span
-				><b-button class="mb-2 mr-2" variant="success" v-b-modal.add-users-modal
+				><b-button class="mb-2 mr-2" variant="primary" v-b-modal.add-users-modal
 					><b-icon icon="plus" class="mr-2"></b-icon>Add Users</b-button
 				></span
 			>
@@ -23,14 +23,14 @@
 							<span class="card-icons">
 								<b-button
 									class="mb-2 mr-2"
-									variant="warning"
+									variant="secondary"
 									v-b-modal.manage-user-roles-modal
 									><b-icon icon="pencil" class="mr-2"></b-icon>Edit
 									Roles</b-button
 								>
 								<b-button
 									class="mb-2"
-									variant="danger"
+									variant="primary"
 									v-b-modal.delete-user-modal
 									><b-icon icon="trash" class="mr-2"></b-icon>Delete</b-button
 								></span
@@ -64,7 +64,13 @@
 				></b-form-checkbox-group>
 			</b-form-group>
 		</b-modal>
-		<b-modal id="add-users-modal" title="Add User" @ok="login">
+		<b-modal
+			id="add-users-modal"
+			title="Add User"
+			@ok="login"
+			cancel-variant="secondary"
+			ok-variant="primary"
+		>
 			<b-form-group :class="{ 'form-group--error': $v.addedUserEmail.$error }">
 				<label for="email">Email:</label>
 				<b-form-input
@@ -74,7 +80,13 @@
 				></b-form-input>
 			</b-form-group>
 		</b-modal>
-		<b-modal id="delete-user-modal" title="Delete User" @ok="deleteUser">
+		<b-modal
+			id="delete-user-modal"
+			title="Delete User"
+			@ok="deleteUser"
+			cancel-variant="secondary"
+			ok-variant="primary"
+		>
 			<p>Are you sure you would like to delete user {{ selectedUserTag }}</p>
 		</b-modal>
 	</section>

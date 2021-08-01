@@ -70,6 +70,7 @@
 			</b-col>
 			<b-col md="1">
 				<b-button
+					variant="secondary"
 					class="ingredient-button"
 					:disabled="$v.$invalid"
 					@click="addIngredient"

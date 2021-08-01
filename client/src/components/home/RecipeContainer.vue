@@ -81,11 +81,11 @@
 							name: 'edit',
 							params: { recipe_id: getRecipeId(selectedRecipe.id) },
 						}"
-						variant="warning"
+						variant="secondary"
 					>
 						Edit
 					</b-button>
-					<b-button variant="success">Buy</b-button>
+					<b-button variant="info">Buy</b-button>
 				</b-col>
 			</b-row>
 		</b-container>

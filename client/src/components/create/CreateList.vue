@@ -127,6 +127,7 @@ export default class CreateListItem extends Vue {
 		margin-top: 0;
 		padding-top: 0;
 		padding-bottom: 0;
+		color: var(--info);
 	}
 
 	.list-group {

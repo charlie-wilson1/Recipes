@@ -12,7 +12,7 @@
 		<b-button
 			:to="{ name: 'create' }"
 			absolute
-			variant="success"
+			variant="primary"
 			class="create-btn"
 		>
 			Create

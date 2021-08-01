@@ -182,7 +182,7 @@
 					</b-col>
 				</b-form-row>
 				<b-form-group class="text-center button-wrapper">
-					<b-button type="submit" variant="success mr-2">Submit </b-button>
+					<b-button type="submit" variant="secondary mr-2">Submit </b-button>
 					<b-button variant="primary" v-b-modal.clear-modal>Clear </b-button>
 				</b-form-group>
 			</b-form>
@@ -460,8 +460,9 @@ export default class CreateRecipe extends Vue {
 
 <style scoped lang="scss">
 .create-recipe {
+	color: #585858;
 	margin-top: 30px;
-	background-color: #e9ecef;
+	background-color: #faf9f6;
 	border-radius: 20px;
 	padding: 30px 5%;
 
