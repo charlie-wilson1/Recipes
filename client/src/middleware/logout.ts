@@ -1,8 +1,9 @@
 import store from "@/store/store";
 import { NavigationGuardNext, Route } from "vue-router";
 
-export const handleLogout = (next: NavigationGuardNext<Vue>) => {
-	store.dispatch("logout");
+export const handleLogout = async (next: NavigationGuardNext<Vue>) => {
+	await store.dispatch("logout");
+	await store.dispatch("setIsLoggedIn");
 	next("/Login");
 };
 

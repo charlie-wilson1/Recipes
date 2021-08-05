@@ -15,6 +15,9 @@ using Recipes.Core.Application.Contracts.Services;
 using Recipes.Core.Api.Services;
 using Recipes.Core.Api.Filters;
 using System.IO;
+using AspNetCoreRateLimit;
+using AspNetCoreRateLimit.Redis;
+using StackExchange.Redis;
 
 namespace Recipes.Core.Api
 {
@@ -34,9 +37,16 @@ namespace Recipes.Core.Api
         {
             var jwtSettings = Configuration.GetSection("Auth:JwtBearerTokenSettings").Get<JwtBearerTokenSettings>();
             var clientRoute = Configuration.GetSection("Auth:ClientRoute").Value;
+            var redisConnectionString = Configuration.GetConnectionString("Redis");
+            var ipRateLimitOptions = Configuration.GetSection("IpRateLimiting").Get<IpRateLimitOptions>();
             var googleSettings = Configuration.GetSection("Google").Get<GoogleClientSettings>();
 
-            if (jwtSettings == null || clientRoute == null || googleSettings == null || !File.Exists(googleSettings.CredentialsFilePath))
+            if (jwtSettings == null
+                || string.IsNullOrWhiteSpace(clientRoute)
+                || string.IsNullOrWhiteSpace(redisConnectionString)
+                || ipRateLimitOptions == null
+                || googleSettings == null
+                || !File.Exists(googleSettings.CredentialsFilePath))
             {
                 throw new ArgumentException("Settings cannot be null");
             }
@@ -47,6 +57,16 @@ namespace Recipes.Core.Api
             services.AddMvc().AddFluentValidation();
             services.AddDatabaseDeveloperPageExceptionFilter();
             services.AddTransient<ICurrentUserService, CurrentUserService>();
+
+            // throttling
+            services.AddDistributedMemoryCache();
+
+            services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+            services.Configure<IpRateLimitOptions>(Configuration.GetSection("IpRateLimiting"));
+            services.AddSingleton<IConnectionMultiplexer>(_ => ConnectionMultiplexer.Connect(redisConnectionString));
+
+            services.AddRedisRateLimiting();
+            // end throttling section
 
             services.AddSwaggerGen(options =>
             {
@@ -105,6 +125,7 @@ namespace Recipes.Core.Api
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Recipes.Core v1"));
             }
 
+            app.UseIpRateLimiting();
             app.UseHttpsRedirection();
             app.UseCors(AllowClientOrigin);
             app.UseRouting();

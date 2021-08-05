@@ -112,7 +112,7 @@ const router = new VueRouter({
 
 router.beforeEach(async (to, _, next) => {
 	if (matchesLogoutMeta(to)) {
-		handleLogout(next);
+		await handleLogout(next);
 	}
 	if (matchesLoginMeta(to)) {
 		await handleLogin(next);
