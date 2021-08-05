@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { APP_GUARD } from '@nestjs/core';
 import { MongooseModule } from '@nestjs/mongoose';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import * as Joi from 'joi';
 import { AuthenticationModule } from './authentication/authentication.module';
 import { ProfileModule } from './profile/profile.module';
@@ -14,6 +16,8 @@ import { ProfileModule } from './profile/profile.module';
           .default('development'),
         PORT: Joi.number().default(3000),
         DATABASE_CONNECTION_STRING: Joi.string().required(),
+        THROTTLE_TTL: Joi.string().default(15),
+        THROTTLE_LIMIT: Joi.string().default(4),
       }),
     }),
     MongooseModule.forRootAsync({
@@ -27,8 +31,22 @@ import { ProfileModule } from './profile/profile.module';
       }),
       inject: [ConfigService],
     }),
+    ThrottlerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        ttl: configService.get('THROTTLE_TTL'),
+        limit: configService.get('THROTTLE_LIMIT'),
+      }),
+    }),
     AuthenticationModule,
     ProfileModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
   ],
 })
 export class AppModule {}
