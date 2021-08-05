@@ -4,6 +4,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import * as Joi from 'joi';
+import { ThrottlerStorageRedisService } from 'nestjs-throttler-storage-redis';
 import { AuthenticationModule } from './authentication/authentication.module';
 import { ProfileModule } from './profile/profile.module';
 
@@ -18,6 +19,7 @@ import { ProfileModule } from './profile/profile.module';
         DATABASE_CONNECTION_STRING: Joi.string().required(),
         THROTTLE_TTL: Joi.string().default(15),
         THROTTLE_LIMIT: Joi.string().default(4),
+        REDIS: Joi.string().required(),
       }),
     }),
     MongooseModule.forRootAsync({
@@ -37,6 +39,7 @@ import { ProfileModule } from './profile/profile.module';
       useFactory: async (configService: ConfigService) => ({
         ttl: configService.get('THROTTLE_TTL'),
         limit: configService.get('THROTTLE_LIMIT'),
+        storage: new ThrottlerStorageRedisService(configService.get('REDIS')),
       }),
     }),
     AuthenticationModule,

@@ -10,6 +10,7 @@ Magic link allows this app to be run completely passwordless. In order to run th
 - [Magic Link](https://dashboard.magic.link/signup) (authentication)
 - [Mongodb](https://www.mongodb.com/cloud/atlas) (identity db)
 - [Ravendb](https://ravendb.net/) (core db)
+- [Redis](https://hub.docker.com/_/redis) (rate limiting)
 - docker
 - kubernetes? (not set up yet)
 
@@ -31,6 +32,9 @@ JWT_SECRET=****
 JWT_ISSUER=****
 JWT_AUDIENCE=****
 DATABASE_CONNECTION_STRING=****
+THROTTLE_TTL=15
+THROTTLE_LIMIT=4
+REDIS=localhost:6379
 ```
 
 #### Appsettings.json
@@ -60,6 +64,38 @@ DATABASE_CONNECTION_STRING=****
   "Google": {
     "BucketName": "****",
     "CredentialsFilePath":  "****"
+  },
+  "ConnectionStrings": {
+    "Redis": "localhost:6379"
+  },
+  "IpRateLimiting": {
+    "EnableEndpointRateLimiting": true,
+    "StackBlockedRequests": false,
+    "RealIpHeader": "X-Real-IP",
+    "ClientIdHeader": "X-ClientId",
+    "HttpStatusCode": 429,
+    "GeneralRules": [
+      {
+        "Endpoint": "get:/api/recipes*",
+        "Period": "30s",
+        "Limit": 15
+      },
+      {
+        "Endpoint": "post:*",
+        "Period": "15s",
+        "Limit": 4
+      },
+      {
+        "Endpoint": "put:*",
+        "Period": "15s",
+        "Limit": 4
+      },
+      {
+        "Endpoint": "delete:*",
+        "Period": "15s",
+        "Limit": 4
+      }
+    ]
   }
 }
 ```
