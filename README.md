@@ -102,7 +102,7 @@ REDIS=localhost:6379
 
 ## ToDo
 
-- pick a theme and update styling in the front end
 - Create CI/CD files
 - write unit tests for Vue and Core API!!!
+- create mobile app (get list of recipes and view details only)
 - possibly rewrite recipes API to use mongo?
