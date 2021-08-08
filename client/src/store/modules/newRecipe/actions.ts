@@ -112,6 +112,15 @@ export const actions: ActionTree<NewRecipeState, RootState> = {
 			});
 	},
 
+	insertYouTubeUrl({ commit }, uri: string) {
+		commit("insertYouTubeUrl", uri);
+	},
+
+	removeYouTubeUrl({ commit, state }, uri: string) {
+		const newUrls = state.recipe?.youTubeUrls.filter(x => x !== uri);
+		commit("overrideYouTubeUrls", newUrls);
+	},
+
 	insertIngredient({ commit }, ingredient: Ingredient) {
 		commit("insertIngredient", ingredient);
 	},
@@ -135,6 +144,7 @@ export const actions: ActionTree<NewRecipeState, RootState> = {
 			notes: recipe.notes,
 			prepTime: recipe.prepTime,
 			cookTime: recipe.cookTime,
+			youTubeUrls: recipe.youTubeUrls,
 			image: {
 				url: recipe.image?.src,
 				name: recipe.image?.fileName,

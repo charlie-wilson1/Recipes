@@ -42,29 +42,49 @@
 				</b-list-group>
 			</b-col>
 		</b-row>
+		<b-row v-if="youTubeUrls">
+			<b-carousel :model="slide" :interval="0" indicators controls>
+				<b-carousel-slide
+					v-for="(url, index) in youTubeUrls"
+					:key="index"
+					img-blank
+				>
+					<template #img>
+						<youtube
+							:video-id="getYouTubeId(url)"
+							ref="youtube"
+							resize
+							width="1000"
+						></youtube>
+					</template> </b-carousel-slide
+			></b-carousel>
+		</b-row>
 	</section>
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
+import { Component, Vue } from "vue-property-decorator";
 import { Recipe } from "@/models/RecipeModels";
 import { Units } from "@/models/Enums";
 import OrderedListGroup from "../shared/OrderedListGroup.vue";
+import VueYoutube from "vue-youtube";
 
 @Component({
 	components: {
 		OrderedListGroup,
+		VueYoutube,
 	},
 })
 export default class RecipeDescription extends Vue {
-	@Prop({ required: true })
-	recipe!: Recipe;
+	get recipe(): Recipe {
+		return this.$store.state.RecipeModule.selectedRecipe;
+	}
 
 	public getUnitName(unit: keyof typeof Units): string {
 		return Units[unit];
 	}
 
-	get instructions(): Array<string> | null {
+	get instructions(): string[] | null {
 		return this.recipe.instructions?.map(i => i.description);
 	}
 }

@@ -3,10 +3,8 @@
 		<b-list-group>
 			<b-list-group-item v-for="(value, index) in values" :key="index">
 				<b-row>
-					<b-col v-if="isIndexed" cols="1" class="list-group-index"
-						>{{ ++index }}.</b-col
-					>
-					<b-col cols="10">{{ value }}</b-col>
+					<span v-if="isIndexed" class="list-group-index">{{ ++index }}.</span>
+					<span>{{ value }}</span>
 				</b-row>
 			</b-list-group-item>
 		</b-list-group>
@@ -34,6 +32,11 @@ export default class OrderedListGroup extends Vue {
 	.list-group-item {
 		border: none;
 		font-size: 1.2em;
+
+		.list-group-index {
+			width: 1.5em;
+			margin-right: 1.25%;
+		}
 	}
 }
 </style>

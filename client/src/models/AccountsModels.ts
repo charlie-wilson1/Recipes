@@ -13,7 +13,7 @@ export interface MagicTokenRequest {
 	redirect: string;
 }
 
-export interface UpdateCurrentUserRequest {
+export interface UpdateUsernameRequest {
 	username: string;
 	email: string;
 }

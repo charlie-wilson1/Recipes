@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Recipes.Core.Domain
 {
@@ -13,7 +12,7 @@ namespace Recipes.Core.Domain
             Instructions = new List<Instruction>();
         }
 
-        public Recipe(string id, string name, int prepTime, int cookTime, string notes, DateTime createdDate, DateTime? lastModifiedDate, bool isDeleted, Image image, string owner, ICollection<Ingredient> ingredients, ICollection<Instruction> instructions)
+        public Recipe(string id, string name, int prepTime, int cookTime, string notes, DateTime createdDate, DateTime? lastModifiedDate, bool isDeleted, Image image, string owner, ICollection<Ingredient> ingredients, ICollection<Instruction> instructions, ICollection<string> youTubeUrls)
         {
             Id = id;
             Name = name;
@@ -27,6 +26,7 @@ namespace Recipes.Core.Domain
             Owner = owner;
             Ingredients = ingredients ?? new List<Ingredient>();
             Instructions = instructions ?? new List<Instruction>();
+            YouTubeUrls = youTubeUrls ?? new List<string>();
         }
 
         public string Id { get; protected set; }
@@ -40,6 +40,7 @@ namespace Recipes.Core.Domain
         public virtual Image Image { get; private set; }
         public virtual ICollection<Ingredient> Ingredients { get; set; }
         public virtual ICollection<Instruction> Instructions { get; set; }
+        public virtual ICollection<string> YouTubeUrls { get; set; }
         public DateTime CreatedDate { get; protected set; }
         public DateTime? LastModifiedDate { get; protected set; }
 
@@ -48,11 +49,9 @@ namespace Recipes.Core.Domain
             int prepTime,
             int cookTime,
             string notes,
+            List<string> youTubeUrls,
             string owner,
-            DateTime dateTime,
-            Image image = null,
-            List<Ingredient> ingredients = null,
-            List<Instruction> instructions = null)
+            DateTime dateTime)
         {
             if (owner is null)
             {
@@ -63,9 +62,7 @@ namespace Recipes.Core.Domain
             PrepTime = prepTime;
             CookTime = cookTime;
             Notes = notes;
-            Image = image ?? new Image();
-            Ingredients = ingredients ?? new List<Ingredient>();
-            Instructions = instructions ?? new List<Instruction>();
+            YouTubeUrls = youTubeUrls ?? new List<string>();
 
             CreateAuditData(owner, dateTime);
         }
@@ -82,17 +79,28 @@ namespace Recipes.Core.Domain
             UpdateAuditData(dateTime);
         }
 
+        public void Update(string name,
+            int prepTime,
+            int cookTime,
+            string notes,
+            DateTime dateTime)
+        {
+            Update(name, prepTime, cookTime, notes, new List<string>(), dateTime);
+        }
+
         public void Update(
             string name,
             int prepTime,
             int cookTime,
             string notes,
+            List<string> YouTubeUrls,
             DateTime dateTime)
         {
             Name = name;
             PrepTime = prepTime;
             CookTime = cookTime;
             Notes = notes;
+            UpdateYouTubeUrls(YouTubeUrls);
 
             UpdateAuditData(dateTime);
         }
@@ -119,9 +127,10 @@ namespace Recipes.Core.Domain
             Instructions = instructions;
         }
 
-        public void Copy(Recipe recipe, string newOwner, DateTime dateTime)
+        private void UpdateYouTubeUrls(List<string> youTubeUrls)
         {
-            Create(recipe.Name, recipe.PrepTime, recipe.CookTime, recipe.Notes, newOwner, dateTime, recipe.Image, recipe.Ingredients.ToList(), recipe.Instructions.ToList());
+            YouTubeUrls.Clear();
+            YouTubeUrls = youTubeUrls;
         }
 
         private void CreateAuditData(string owner, DateTime dateTime)
@@ -133,22 +142,6 @@ namespace Recipes.Core.Domain
         private void UpdateAuditData(DateTime dateTime)
         {
             CreatedDate = dateTime;
-        }
-
-        private void EnsureIngredients()
-        {
-            if (Ingredients is null)
-            {
-                Ingredients = new List<Ingredient>();
-            }
-        }
-
-        private void EnsureInstructions()
-        {
-            if (Instructions is null)
-            {
-                Instructions = new List<Instruction>();
-            }
         }
     }
 }

@@ -23,6 +23,26 @@
 					/>
 				</b-col>
 			</b-row>
+			<b-row v-if="youTubeUrls">
+				<b-carousel :model="slide" :interval="0" indicators controls>
+					<b-carousel-slide
+						v-for="(url, index) in youTubeUrls"
+						:key="index"
+						img-blank
+						fluid-grow
+					>
+						<template #img>
+							<b-embed
+								class="youtube-player"
+								:src="`https://www.youtube.com/embed/${getYouTubeId(url)}`"
+								ref="youtube"
+								width="100%"
+								height="650px"
+								aspect="16by9"
+							></b-embed>
+						</template> </b-carousel-slide
+				></b-carousel>
+			</b-row>
 		</b-container>
 	</section>
 </template>
@@ -78,6 +98,27 @@ export default class Make extends Vue {
 		);
 	}
 
+	slide = 0;
+
+	get youTubeUrls(): string[] | undefined {
+		return this.recipe.youTubeUrls;
+	}
+
+	get player() {
+		// eslint-disable-next-line  @typescript-eslint/no-explicit-any
+		const youTube = this.$refs.youtube as any;
+		return youTube.player;
+	}
+
+	getYouTubeId(url: string): string {
+		const uri = new URL(url);
+		if (uri && uri.searchParams.get("v") !== null) {
+			// eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
+			return uri.searchParams.get("v")!.toString();
+		}
+		return "";
+	}
+
 	async beforeCreate() {
 		await this.$store.dispatch("setIsLoading", true);
 
@@ -94,6 +135,16 @@ export default class Make extends Vue {
 </script>
 
 <style scoped lang="scss">
+@keyframes fade-in-up {
+	0% {
+		opacity: 0;
+	}
+	100% {
+		transform: translateY(0);
+		opacity: 1;
+	}
+}
+
 .make {
 	margin-top: 30px;
 
@@ -106,6 +157,16 @@ export default class Make extends Vue {
 		overflow-y: scroll;
 		word-wrap: break-word;
 		height: 80vh;
+	}
+
+	.carousel {
+		width: 100%;
+		margin-top: 50px;
+
+		.carousel-inner {
+			margin-left: auto;
+			margin-right: auto;
+		}
 	}
 }
 </style>

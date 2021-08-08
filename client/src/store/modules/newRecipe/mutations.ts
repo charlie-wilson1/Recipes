@@ -42,6 +42,17 @@ export const mutations: MutationTree<NewRecipeState> = {
 		state.selectedInstruction = state.recipe!.instructions[index];
 	},
 
+	insertYouTubeUrl(state, uri: string) {
+		if (!state.recipe!.youTubeUrls) {
+			state.recipe!.youTubeUrls = [];
+		}
+		state.recipe!.youTubeUrls?.push(uri);
+	},
+
+	overrideYouTubeUrls(state, uris: string[]) {
+		state.recipe!.youTubeUrls = uris ?? [];
+	},
+
 	insertRecipe(state, recipe: Recipe) {
 		state.recipe = recipe;
 		Vue.$toast.success("Saved successfully");

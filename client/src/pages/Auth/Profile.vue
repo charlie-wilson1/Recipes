@@ -39,7 +39,7 @@ import { Validate } from "vuelidate-property-decorators";
 import { validationMixin } from "vuelidate";
 import { required } from "vuelidate/lib/validators";
 import { Component, Vue } from "vue-property-decorator";
-import { UpdateCurrentUserRequest } from "@/models/AccountsModels";
+import { UpdateUsernameRequest } from "@/models/AccountsModels";
 
 @Component({
 	mixins: [validationMixin],
@@ -60,7 +60,7 @@ export default class Profile extends Vue {
 			return;
 		}
 
-		const payload: UpdateCurrentUserRequest = {
+		const payload: UpdateUsernameRequest = {
 			username: this.username,
 			email: this.$store.state.email,
 		};

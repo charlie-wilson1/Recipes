@@ -32,6 +32,7 @@ export const defaultRecipe: Recipe = {
 	image: undefined,
 	ingredients: [],
 	instructions: [],
+	youTubeUrls: [],
 	notes: "",
 	prepTime: 0,
 	cookTime: 0,

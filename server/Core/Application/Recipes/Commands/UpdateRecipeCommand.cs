@@ -16,6 +16,7 @@ namespace Recipes.Core.Application.Recipes.Commands
         public int PrepTime { get; set; }
         public int CookTime { get; set; }
         public string Notes { get; set; }
+        public List<string> YouTubeUrls { get; set; } = new List<string>();
 
         public ImageRequest Image { get; set; }
         public List<IngredientRequest> Ingredients { get; set; }
@@ -62,6 +63,7 @@ namespace Recipes.Core.Application.Recipes.Commands
                     request.PrepTime,
                     request.CookTime,
                     request.Notes,
+                    request.YouTubeUrls,
                     _dateTime.Now);
 
                 UpsertLinkingProperties(recipe, request);

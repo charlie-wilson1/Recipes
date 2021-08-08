@@ -2,12 +2,13 @@ export interface Recipe {
 	id?: string;
 	name: string;
 	image?: RecipeImage;
-	ingredients: Array<Ingredient>;
-	instructions: Array<Instruction>;
+	ingredients: Ingredient[];
+	instructions: Instruction[];
 	notes?: string;
 	prepTime: number;
 	cookTime: number;
 	totalTime: number;
+	youTubeUrls: string[];
 	owner?: string;
 }
 
@@ -15,9 +16,10 @@ export interface UpdateRecipe {
 	id?: string;
 	name: string;
 	image?: UpdateRecipeImage | null;
-	ingredients: Array<Ingredient>;
-	instructions: Array<Instruction>;
+	ingredients: Ingredient[];
+	instructions: Instruction[];
 	notes?: string;
+	youTubeUrls?: string[];
 	prepTime: number;
 	cookTime: number;
 	owner?: string;

@@ -47,7 +47,7 @@
 					</b-container>
 				</b-col>
 				<b-col cols="8" class="recipe-description-wrapper">
-					<RecipeDescription :recipe="selectedRecipe" />
+					<RecipeDescription />
 				</b-col>
 			</b-row>
 			<b-row class="recipe-buttons align-middle pb-4">

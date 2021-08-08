@@ -170,6 +170,11 @@
 				</b-form-row>
 				<hr />
 				<b-form-row>
+					<b-col md="7"><YouTubeForm /></b-col>
+					<b-col><YouTubeList /></b-col>
+				</b-form-row>
+				<hr />
+				<b-form-row>
 					<b-col md="12">
 						<b-form-group label="Notes" label-for="notes">
 							<b-form-textarea
@@ -210,6 +215,8 @@ import { defaultInstruction, defaultRecipe } from "@/models/DefaultModels";
 import CreateList from "@/components/create/CreateList.vue";
 import IngredientsForm from "@/components/create/IngredientsForm.vue";
 import InstructionsForm from "@/components/create/InstructionsForm.vue";
+import YouTubeForm from "@/components/create/YouTubeForm.vue";
+import YouTubeList from "@/components/create/YouTubeList.vue";
 import { indexIsInArray } from "@/mixins/listUtils";
 import * as _ from "lodash";
 
@@ -218,6 +225,8 @@ import * as _ from "lodash";
 		CreateList,
 		IngredientsForm,
 		InstructionsForm,
+		YouTubeForm,
+		YouTubeList,
 	},
 	mixins: [validationMixin],
 })
@@ -425,7 +434,7 @@ export default class CreateRecipe extends Vue {
 	}
 
 	async handleReset() {
-		if (!this.isEditMode) {
+		if (this.isEditMode) {
 			await this.$store.dispatch("setRecipeById", this.recipeId);
 		} else {
 			await this.$store.dispatch("createNewRecipe");

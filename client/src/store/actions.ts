@@ -4,7 +4,7 @@ import { RootState } from "@/store/state";
 import jwt from "jsonwebtoken";
 import router from "@/router/index";
 import {
-	UpdateCurrentUserRequest,
+	UpdateUsernameRequest,
 	TokenResponse,
 	LoginRequest,
 } from "@/models/AccountsModels";
@@ -88,7 +88,7 @@ export const actions: ActionTree<RootState, RootState> = {
 			});
 	},
 
-	async updateUsername(_, command: UpdateCurrentUserRequest) {
+	async updateUsername(_, command: UpdateUsernameRequest) {
 		await axios
 			.put(profileUrl + "username", {
 				username: command.username,
