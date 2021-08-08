@@ -67,12 +67,10 @@ import { Component, Vue } from "vue-property-decorator";
 import { Recipe } from "@/models/RecipeModels";
 import { Units } from "@/models/Enums";
 import OrderedListGroup from "../shared/OrderedListGroup.vue";
-import VueYoutube from "vue-youtube";
 
 @Component({
 	components: {
 		OrderedListGroup,
-		VueYoutube,
 	},
 })
 export default class RecipeDescription extends Vue {

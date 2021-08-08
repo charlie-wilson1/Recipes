@@ -104,12 +104,6 @@ export default class Make extends Vue {
 		return this.recipe.youTubeUrls;
 	}
 
-	get player() {
-		// eslint-disable-next-line  @typescript-eslint/no-explicit-any
-		const youTube = this.$refs.youtube as any;
-		return youTube.player;
-	}
-
 	getYouTubeId(url: string): string {
 		const uri = new URL(url);
 		if (uri && uri.searchParams.get("v") !== null) {
