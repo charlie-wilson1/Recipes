@@ -50,7 +50,7 @@ export default class Profile extends Vue {
 	}
 
 	@Validate({ required })
-	username = this.currentUsername;
+	username = this.currentUsername ?? "";
 
 	handleSubmit() {
 		this.$v.$touch();
@@ -65,7 +65,7 @@ export default class Profile extends Vue {
 			email: this.$store.state.email,
 		};
 
-		this.$store.dispatch("updateUser", payload);
+		this.$store.dispatch("updateUsername", payload);
 	}
 }
 </script>
@@ -78,6 +78,10 @@ export default class Profile extends Vue {
 
 	h1 {
 		text-align: center;
+	}
+
+	.form-control:focus {
+		border: 1px solid #ced4da;
 	}
 }
 </style>

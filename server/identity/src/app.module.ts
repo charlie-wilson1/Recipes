@@ -1,12 +1,14 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
-import { MongooseModule } from '@nestjs/mongoose';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import * as Joi from 'joi';
 import { ThrottlerStorageRedisService } from 'nestjs-throttler-storage-redis';
 import { AuthenticationModule } from './authentication/authentication.module';
-import { ProfileModule } from './profile/profile.module';
+import { UserModule } from './user/user.module';
+import { User } from './user/entities/user.entity';
+import { RequestLoggerMiddleware } from './middleware/request-logger.middleware';
 
 @Module({
   imports: [
@@ -22,16 +24,18 @@ import { ProfileModule } from './profile/profile.module';
         REDIS: Joi.string().required(),
       }),
     }),
-    MongooseModule.forRootAsync({
+    TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
+      inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
-        uri: configService.get('DATABASE_CONNECTION_STRING'),
+        type: 'mongodb',
+        url: configService.get('DATABASE_CONNECTION_STRING'),
+        synchronize: true,
         useNewUrlParser: true,
         useUnifiedTopology: true,
-        useCreateIndex: true,
-        useFindAndModify: false,
+        database: 'users',
+        entities: [User],
       }),
-      inject: [ConfigService],
     }),
     ThrottlerModule.forRootAsync({
       imports: [ConfigModule],
@@ -43,7 +47,7 @@ import { ProfileModule } from './profile/profile.module';
       }),
     }),
     AuthenticationModule,
-    ProfileModule,
+    UserModule,
   ],
   providers: [
     {
@@ -52,4 +56,8 @@ import { ProfileModule } from './profile/profile.module';
     },
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer): void {
+    consumer.apply(RequestLoggerMiddleware).forRoutes('*');
+  }
+}

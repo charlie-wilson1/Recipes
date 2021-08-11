@@ -1,14 +1,16 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Magic, MagicUserMetadata } from '@magic-sdk/admin';
 import { JwtService } from '@nestjs/jwt';
-import { ProfileRepository } from '../profile/profile.repository';
-import { Profile } from 'src/profile/models/profile.schema';
+import { UserRepository } from '../user/user.repository';
+import { InjectRepository } from '@nestjs/typeorm';
+import { User } from '../user/entities/user.entity';
 
 @Injectable()
 export class AuthenticationService {
   constructor(
+    @InjectRepository(User)
+    private readonly userRepository: UserRepository,
     private readonly jwtService: JwtService,
-    private readonly profileRepository: ProfileRepository,
   ) {}
   private readonly magic = new Magic(process.env.MAGIC_KEY);
 
@@ -17,15 +19,17 @@ export class AuthenticationService {
     return await this.magic.users.getMetadataByToken(didToken);
   }
 
-  async getProfile(email: string): Promise<Profile> {
-    return await this.profileRepository.findByEmail(email);
+  async getUser(email: string): Promise<User> {
+    return await this.userRepository.findOne({ email });
   }
 
-  createJwtFromProfile(profile: Profile): string {
+  createJwtFromUser(user: User): string {
     const payload = {
-      roles: profile.roles,
-      name: profile.username,
-      nameid: profile.email,
+      roles: user.roles,
+      name: user.username,
+      username: user.username,
+      email: user.email,
+      nameid: user.email,
     };
 
     return this.jwtService.sign(payload);

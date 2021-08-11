@@ -3,12 +3,9 @@ import { NavigationGuardNext, Route } from "vue-router";
 
 export const handleLogin = async (next: NavigationGuardNext<Vue>) => {
 	await store.dispatch("setDidToken");
-	await store.dispatch("getJwtToken");
+	console.log("coming from handleLogin");
+	await store.dispatch("getJwtToken", { handleRedirect: false });
 	await store.dispatch("setIsLoggedIn");
-
-	if (!store.state.username) {
-		next("/profile");
-	}
 	next();
 };
 

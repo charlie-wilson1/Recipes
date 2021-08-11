@@ -9,7 +9,7 @@ import {
 	User,
 } from "@/models/AdministratorModels";
 
-const adminUrl = process.env.VUE_APP_IDENTITY_URL + "profile";
+const adminUrl = process.env.VUE_APP_IDENTITY_URL + "user";
 
 export const actions: ActionTree<AdminState, RootState> = {
 	async getUsers({ commit }) {

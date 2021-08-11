@@ -13,7 +13,7 @@ import { Magic } from "magic-sdk";
 import store from "./store";
 
 const authorizationUrl = process.env.VUE_APP_IDENTITY_URL + "authorization/";
-const profileUrl = process.env.VUE_APP_IDENTITY_URL + "profile/";
+const userUrl = process.env.VUE_APP_IDENTITY_URL + "user";
 const magic = new Magic(process.env.VUE_APP_MAGIC_KEY as string);
 
 export const actions: ActionTree<RootState, RootState> = {
@@ -70,32 +70,37 @@ export const actions: ActionTree<RootState, RootState> = {
 					"Authorization"
 				] = `Bearer ${encodedToken}`;
 
-				if (payload?.redirect) {
-					router.push(payload.redirect);
+				if (payload.handleRedirect) {
+					if (!tokenPayload.username) {
+						router.push({ name: "profile" });
+					} else if (payload?.redirect) {
+						router.push(payload.redirect);
+					}
 				}
 			})
 			.catch(() => {
-				if (!payload?.triedOnce) {
-					payload = {
-						...payload,
-						triedOnce: true,
-					};
+				// if (!payload?.triedOnce) {
+				// 	payload = {
+				// 		...payload,
+				// 		triedOnce: true,
+				// 	};
 
-					store.dispatch("getJwtToken", payload);
-				}
+				// 	store.dispatch("getJwtToken", payload);
+				// }
 
 				Vue.$toast.error("Error logging in. Please try again.");
 			});
 	},
 
-	async updateUsername(_, command: UpdateUsernameRequest) {
+	async updateUsername(_, request: UpdateUsernameRequest) {
 		await axios
-			.put(profileUrl + "username", {
-				username: command.username,
-				email: command.email,
+			.put(`${userUrl}/username`, {
+				username: request.username,
+				email: request.email,
 			})
 			.then(async () => {
 				Vue.$toast.success("Successfully updated!");
+				await this.dispatch("getJwtToken");
 			})
 			.catch(err => {
 				Vue.$toast.error(`Error updating user: ${err}`);

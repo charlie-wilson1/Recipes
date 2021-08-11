@@ -6,6 +6,7 @@ export interface LoginRequest {
 	didToken?: string | null;
 	redirect?: string;
 	triedOnce?: boolean;
+	handleRedirect?: boolean;
 }
 
 export interface MagicTokenRequest {

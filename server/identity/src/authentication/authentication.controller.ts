@@ -17,16 +17,16 @@ export class AuthenticationController {
       throw new UnauthorizedException();
     }
 
-    const profile = await this.authenticationService.getProfile(metadata.email);
+    const user = await this.authenticationService.getUser(metadata.email);
 
-    if (!profile?.isActive) {
+    if (!user?.isActive) {
       await this.authenticationService.logout(loginRequestDto.didToken);
       throw new UnauthorizedException(
         `User with email ${metadata.email} is not authorized to use this application. Please contact an administrator to be invited to use the application.`,
       );
     }
 
-    return await this.authenticationService.createJwtFromProfile(profile);
+    return await this.authenticationService.createJwtFromUser(user);
   }
 
   @Post('logout')

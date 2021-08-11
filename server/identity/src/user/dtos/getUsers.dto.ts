@@ -1,9 +1,9 @@
 import { IsOptional } from 'class-validator';
 import { PaginationQueryDto } from '../../models/paginationQueryDto';
 
-export class GetAllDto {
+export class GetUsersDto {
   @IsOptional()
-  readonly paginatedRequest: PaginationQueryDto;
+  paginatedRequest: PaginationQueryDto;
 
   @IsOptional()
   isActive: boolean;

@@ -1,6 +1,6 @@
 import { IsEmail } from 'class-validator';
 
-export class CreateProfileDto {
+export class CreateUserDto {
   @IsEmail()
   readonly email: string;
 }
