@@ -27,7 +27,6 @@ export class AuthenticationService {
     const payload = {
       roles: user.roles,
       name: user.username,
-      username: user.username,
       email: user.email,
       nameid: user.email,
     };

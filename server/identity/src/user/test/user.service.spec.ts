@@ -20,7 +20,6 @@ const mockUserRepository = () => ({
 
 const mockUser: User = {
   _id: '1',
-  id: '1',
   username: 'username',
   roles: [Role.Member],
   email: 'test@test.com',
@@ -291,32 +290,24 @@ describe('UserService', () => {
   });
 
   describe('updateRoles', () => {
-    let findByUsernameNotEmailSpy: jest.SpyInstance;
     let findOneSpy: jest.SpyInstance;
     let saveSpy: jest.SpyInstance;
 
     const expectedRequestDto: UpdateUsernameDto = {
-      email: mockUser.email,
       username: `${mockUser.username}_2`,
     };
 
     beforeEach((done) => {
-      findByUsernameNotEmailSpy = jest.spyOn(
-        repository,
-        'findByUsernameNotEmail',
-      );
       findOneSpy = jest.spyOn(repository, 'findOne');
       saveSpy = jest.spyOn(repository, 'save');
       done();
     });
 
     test('should throw ConflictException when another existing user with username found', async () => {
-      findByUsernameNotEmailSpy.mockImplementation(() =>
-        Promise.resolve([mockUser]),
-      );
+      findOneSpy.mockImplementation(() => Promise.resolve([mockUser]));
 
       try {
-        await service.updateUsername(expectedRequestDto);
+        await service.updateUsername(expectedRequestDto, mockUser);
       } catch (error) {
         expect(error).toBeInstanceOf(ConflictException);
         expect(error.message).toBe(
@@ -324,22 +315,16 @@ describe('UserService', () => {
         );
       }
 
-      expect(repository.findByUsernameNotEmail).toHaveBeenCalledWith(
-        expectedRequestDto.username,
-        expectedRequestDto.email,
-      );
-
-      expect(findByUsernameNotEmailSpy).toHaveBeenCalledTimes(1);
-      expect(findOneSpy).not.toHaveBeenCalled();
+      expect(findOneSpy).toHaveBeenCalledTimes(1);
       expect(saveSpy).not.toHaveBeenCalled();
     });
 
     test('should throw NotFoundException when user with email not found', async () => {
-      findByUsernameNotEmailSpy.mockImplementation(() => Promise.resolve());
+      findOneSpy.mockImplementation(() => Promise.resolve());
       findOneSpy.mockImplementation(() => Promise.resolve());
 
       try {
-        await service.updateUsername(expectedRequestDto);
+        await service.updateUsername(expectedRequestDto, mockUser);
       } catch (error) {
         expect(error).toBeInstanceOf(NotFoundException);
         expect(error.message).toBe(
@@ -347,16 +332,11 @@ describe('UserService', () => {
         );
       }
 
-      expect(repository.findByUsernameNotEmail).toHaveBeenCalledWith(
-        expectedRequestDto.username,
-        expectedRequestDto.email,
-      );
       expect(repository.findOne).toHaveBeenCalledWith({
-        email: expectedRequestDto.email,
+        email: mockUser.email,
       });
 
-      expect(findByUsernameNotEmailSpy).toHaveBeenCalledTimes(1);
-      expect(findOneSpy).toHaveBeenCalledTimes(1);
+      expect(findOneSpy).toHaveBeenCalledTimes(2);
       expect(saveSpy).not.toHaveBeenCalled();
     });
 
@@ -366,26 +346,14 @@ describe('UserService', () => {
         username: expectedRequestDto.username,
       };
 
-      findByUsernameNotEmailSpy.mockImplementation(() => Promise.resolve());
-      findOneSpy.mockImplementation(() =>
-        Promise.resolve({ ...mockUser, id: '1' }),
-      );
+      findOneSpy
+        .mockReturnValueOnce(undefined)
+        .mockReturnValueOnce({ ...mockUser, id: '1' });
       saveSpy.mockImplementation(() => Promise.resolve(expectedResponse));
 
-      const actual = await service.updateUsername(expectedRequestDto);
+      const actual = await service.updateUsername(expectedRequestDto, mockUser);
 
-      expect(repository.findByUsernameNotEmail).toHaveBeenCalledWith(
-        expectedRequestDto.username,
-        expectedRequestDto.email,
-      );
-      expect(repository.findOne).toHaveBeenCalledWith({
-        email: expectedRequestDto.email,
-      });
-
-      expect(repository.save).toHaveBeenCalledWith(expectedResponse);
-
-      expect(findByUsernameNotEmailSpy).toHaveBeenCalledTimes(1);
-      expect(findOneSpy).toHaveBeenCalledTimes(1);
+      expect(findOneSpy).toHaveBeenCalledTimes(2);
       expect(saveSpy).toHaveBeenCalledTimes(1);
       expect(actual).toEqual(expectedResponse);
     });

@@ -13,7 +13,6 @@ const mockUserRepository = () => ({});
 
 const mockUser: User = {
   _id: '1',
-  id: '1',
   username: 'username',
   roles: [Role.Member],
   email: 'test@test.com',

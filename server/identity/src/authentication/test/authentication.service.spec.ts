@@ -11,7 +11,6 @@ const mockUserRepository = () => ({
 
 const mockUser: User = {
   _id: '1',
-  id: '1',
   username: 'username',
   roles: [Role.Member],
   email: 'test@test.com',
@@ -90,6 +89,7 @@ describe('AuthenticationService', () => {
       expect(jwtService.sign).toHaveBeenCalledWith({
         roles: mockUser.roles,
         name: mockUser.username,
+        email: mockUser.email,
         nameid: mockUser.email,
       });
     });
