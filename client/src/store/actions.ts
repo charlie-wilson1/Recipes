@@ -79,14 +79,14 @@ export const actions: ActionTree<RootState, RootState> = {
 				}
 			})
 			.catch(() => {
-				// if (!payload?.triedOnce) {
-				// 	payload = {
-				// 		...payload,
-				// 		triedOnce: true,
-				// 	};
+				if (!payload?.triedOnce) {
+					payload = {
+						...payload,
+						triedOnce: true,
+					};
 
-				// 	store.dispatch("getJwtToken", payload);
-				// }
+					store.dispatch("getJwtToken", payload);
+				}
 
 				Vue.$toast.error("Error logging in. Please try again.");
 			});
