@@ -27,13 +27,20 @@ export const actions: ActionTree<RootState, RootState> = {
 	},
 
 	async setDidToken({ commit }) {
-		const token = await magic.user.getIdToken();
+		const token = await magic.user.getIdToken().catch(() => {
+			Vue.$toast.error(`Error logging in. Please login again`);
+			router.push("/login");
+			return;
+		});
 		commit("setDidToken", token);
 	},
 
 	async getJwtToken({ commit, state }, payload: LoginRequest) {
 		if (payload?.triedOnce) {
 			await store.dispatch("setDidToken");
+			if (!state.token) {
+				return;
+			}
 		}
 
 		const didToken = payload?.didToken ?? state.didToken;
