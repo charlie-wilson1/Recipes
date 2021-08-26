@@ -1,13 +1,19 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserService } from '../user.service';
 import { UserRepository } from '../user.repository';
-import { ConflictException, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  LoggerService,
+  NotFoundException,
+} from '@nestjs/common';
 import { GetUsersDto } from '../dtos/getUsers.dto';
 import { FindUserByEmailDto } from '../dtos/findUserByEmail.dto';
 import { FindUserByUsernameDto } from '../dtos/FindUserByUsername.dto';
 import { UpdateUsernameDto } from '../dtos/updateUsername.dto';
 import { User } from '../entities/user.entity';
 import { Role } from '../../models/roles';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
+import { UpdateRolesDto } from '../dtos/updateRoles.dto';
 
 const mockUserRepository = () => ({
   findOne: jest.fn(),
@@ -29,17 +35,23 @@ const mockUser: User = {
 describe('UserService', () => {
   let service: UserService;
   let repository: UserRepository;
+  let logger: LoggerService;
 
   beforeEach(async (done) => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         UserService,
         { provide: UserRepository, useFactory: mockUserRepository },
+        {
+          provide: WINSTON_MODULE_NEST_PROVIDER,
+          useFactory: () => require('winston'),
+        },
       ],
     }).compile();
 
     service = module.get<UserService>(UserService);
     repository = module.get<UserRepository>(UserRepository);
+    logger = module.get<LoggerService>(WINSTON_MODULE_NEST_PROVIDER);
     jest.resetAllMocks();
     done();
   });
@@ -51,10 +63,12 @@ describe('UserService', () => {
   describe('create', () => {
     let findOneSpy: jest.SpyInstance;
     let createUserSpy: jest.SpyInstance;
+    let logSpy: jest.SpyInstance;
 
     beforeEach((done) => {
       findOneSpy = jest.spyOn(repository, 'findOne');
       createUserSpy = jest.spyOn(repository, 'createUser');
+      logSpy = jest.spyOn(logger, 'log');
       done();
     });
 
@@ -73,8 +87,13 @@ describe('UserService', () => {
       expect(repository.findOne).toHaveBeenCalledWith({
         email: mockUser.email,
       });
+      expect(logger.log).toHaveBeenCalledWith(
+        `create: User with email ${mockUser.email} already exists.`,
+        UserService.name,
+      );
 
       expect(findOneSpy).toHaveBeenCalledTimes(1);
+      expect(logSpy).toHaveBeenCalledTimes(1);
       expect(createUserSpy).not.toHaveBeenCalled();
     });
 
@@ -91,6 +110,7 @@ describe('UserService', () => {
 
       expect(findOneSpy).toHaveBeenCalledTimes(1);
       expect(createUserSpy).toHaveBeenCalledTimes(1);
+      expect(logSpy).not.toHaveBeenCalled();
       expect(actual).toBe(mockUser);
     });
   });
@@ -239,6 +259,7 @@ describe('UserService', () => {
   describe('delete', () => {
     let findOneSpy: jest.SpyInstance;
     let saveSpy: jest.SpyInstance;
+    let logSpy: jest.SpyInstance;
 
     const expectedRequestDto: FindUserByEmailDto = {
       email: mockUser.email,
@@ -247,6 +268,7 @@ describe('UserService', () => {
     beforeEach((done) => {
       findOneSpy = jest.spyOn(repository, 'findOne');
       saveSpy = jest.spyOn(repository, 'save');
+      logSpy = jest.spyOn(logger, 'log');
       done();
     });
 
@@ -254,7 +276,7 @@ describe('UserService', () => {
       findOneSpy.mockImplementation(() => Promise.resolve());
 
       try {
-        await service.findByEmail(expectedRequestDto);
+        await service.delete(expectedRequestDto);
       } catch (error) {
         expect(error).toBeInstanceOf(NotFoundException);
         expect(error.message).toBe(
@@ -265,7 +287,14 @@ describe('UserService', () => {
       expect(repository.findOne).toHaveBeenCalledWith({
         email: expectedRequestDto.email,
       });
+
+      expect(logger.log).toHaveBeenCalledWith(
+        `delete: User with email ${mockUser.email} not found.`,
+        UserService.name,
+      );
+
       expect(findOneSpy).toHaveBeenCalledTimes(1);
+      expect(logSpy).toHaveBeenCalledTimes(1);
     });
 
     test('should call delete', async () => {
@@ -286,12 +315,79 @@ describe('UserService', () => {
         email: expectedRequestDto.email,
       });
       expect(repository.save).toHaveBeenCalledWith(userToDelete);
+
+      expect(logSpy).not.toHaveBeenCalled();
     });
   });
 
   describe('updateRoles', () => {
     let findOneSpy: jest.SpyInstance;
     let saveSpy: jest.SpyInstance;
+    let logSpy: jest.SpyInstance;
+
+    const expectedRequestDto: UpdateRolesDto = {
+      email: mockUser.email,
+      roles: [Role.Admin, Role.Member],
+    };
+
+    beforeEach((done) => {
+      findOneSpy = jest.spyOn(repository, 'findOne');
+      saveSpy = jest.spyOn(repository, 'save');
+      logSpy = jest.spyOn(logger, 'log');
+      done();
+    });
+
+    test('should throw NotFoundException when user with email not found', async () => {
+      findOneSpy.mockImplementation(() => Promise.resolve(undefined));
+
+      try {
+        await service.updateRoles(expectedRequestDto);
+      } catch (error) {
+        expect(error).toBeInstanceOf(NotFoundException);
+        expect(error.message).toBe(
+          `User with email ${expectedRequestDto.email} could not be found.`,
+        );
+      }
+
+      expect(repository.findOne).toHaveBeenCalledWith({
+        email: expectedRequestDto.email,
+      });
+
+      expect(logger.log).toHaveBeenCalledWith(
+        `updateRoles: User with email ${expectedRequestDto.email} not found.`,
+        UserService.name,
+      );
+
+      expect(findOneSpy).toHaveBeenCalledTimes(1);
+      expect(logSpy).toHaveBeenCalledTimes(1);
+      expect(saveSpy).not.toHaveBeenCalled();
+    });
+
+    test('should update user roles', async () => {
+      findOneSpy.mockImplementation(() => Promise.resolve(mockUser));
+
+      await service.updateRoles(expectedRequestDto);
+
+      expect(repository.findOne).toHaveBeenCalledWith({
+        email: expectedRequestDto.email,
+      });
+
+      expect(repository.save).toHaveBeenCalledWith({
+        ...mockUser,
+        roles: expectedRequestDto.roles,
+      });
+
+      expect(findOneSpy).toHaveBeenCalledTimes(1);
+      expect(saveSpy).toHaveBeenCalledTimes(1);
+      expect(logSpy).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('updateUsername', () => {
+    let findOneSpy: jest.SpyInstance;
+    let saveSpy: jest.SpyInstance;
+    let logSpy: jest.SpyInstance;
+    let errorSpy: jest.SpyInstance;
 
     const expectedRequestDto: UpdateUsernameDto = {
       username: `${mockUser.username}_2`,
@@ -300,6 +396,8 @@ describe('UserService', () => {
     beforeEach((done) => {
       findOneSpy = jest.spyOn(repository, 'findOne');
       saveSpy = jest.spyOn(repository, 'save');
+      logSpy = jest.spyOn(logger, 'log');
+      errorSpy = jest.spyOn(logger, 'error');
       done();
     });
 
@@ -315,7 +413,13 @@ describe('UserService', () => {
         );
       }
 
+      expect(logger.log).toHaveBeenCalledWith(
+        `updateUsername: User with username ${expectedRequestDto.username} already exists.`,
+        UserService.name,
+      );
+
       expect(findOneSpy).toHaveBeenCalledTimes(1);
+      expect(logSpy).toHaveBeenCalledTimes(1);
       expect(saveSpy).not.toHaveBeenCalled();
     });
 
@@ -336,7 +440,14 @@ describe('UserService', () => {
         email: mockUser.email,
       });
 
+      expect(logger.error).toHaveBeenCalledWith(
+        `updateUsername: User with email ${mockUser.email} not found.`,
+        UserService.name,
+      );
+
       expect(findOneSpy).toHaveBeenCalledTimes(2);
+      expect(errorSpy).toHaveBeenCalledTimes(1);
+      expect(logSpy).not.toHaveBeenCalled();
       expect(saveSpy).not.toHaveBeenCalled();
     });
 
@@ -355,6 +466,8 @@ describe('UserService', () => {
 
       expect(findOneSpy).toHaveBeenCalledTimes(2);
       expect(saveSpy).toHaveBeenCalledTimes(1);
+      expect(logSpy).not.toHaveBeenCalled();
+      expect(errorSpy).not.toHaveBeenCalled();
       expect(actual).toEqual(expectedResponse);
     });
   });

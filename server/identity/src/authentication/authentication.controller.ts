@@ -1,10 +1,23 @@
-import { Body, Controller, Post, UnauthorizedException } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Inject,
+  LoggerService,
+  Post,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { AuthenticationService } from './authentication.service';
 import { AuthRequestDto } from './models/loginRequestDto';
 
 @Controller('authorization')
 export class AuthenticationController {
-  constructor(private readonly authenticationService: AuthenticationService) {}
+  constructor(
+    private readonly authenticationService: AuthenticationService,
+
+    @Inject(WINSTON_MODULE_NEST_PROVIDER)
+    private readonly logger: LoggerService,
+  ) {}
 
   @Post('login')
   async authenticate(@Body() loginRequestDto: AuthRequestDto): Promise<any> {
@@ -13,6 +26,7 @@ export class AuthenticationController {
     );
 
     if (!metadata) {
+      this.logger.log('didToken invalid.', AuthenticationController.name);
       await this.authenticationService.logout(loginRequestDto.didToken);
       throw new UnauthorizedException();
     }
@@ -20,6 +34,10 @@ export class AuthenticationController {
     const user = await this.authenticationService.getUser(metadata.email);
 
     if (!user?.isActive) {
+      this.logger.log(
+        `User with email ${metadata.email} is inactive.`,
+        AuthenticationController.name,
+      );
       await this.authenticationService.logout(loginRequestDto.didToken);
       throw new UnauthorizedException(
         `User with email ${metadata.email} is not authorized to use this application. Please contact an administrator to be invited to use the application.`,

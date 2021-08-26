@@ -4,10 +4,11 @@ import { AuthenticationController } from '../authentication.controller';
 import { AuthenticationService } from '../authentication.service';
 import { AuthRequestDto } from '../models/loginRequestDto';
 import { MagicUserMetadata } from '@magic-sdk/admin';
-import { UnauthorizedException } from '@nestjs/common';
+import { LoggerService, UnauthorizedException } from '@nestjs/common';
 import { User } from '../../user/entities/user.entity';
 import { Role } from '../../models/roles';
 import { UserRepository } from '../../user/user.repository';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 
 const mockUserRepository = () => ({});
 
@@ -24,6 +25,7 @@ const didToken: AuthRequestDto = { didToken: 'test' };
 describe('IdentityController', () => {
   let controller: AuthenticationController;
   let service: AuthenticationService;
+  let logger: LoggerService;
 
   beforeEach(async (done) => {
     const module: TestingModule = await Test.createTestingModule({
@@ -42,11 +44,17 @@ describe('IdentityController', () => {
       providers: [
         AuthenticationService,
         { provide: UserRepository, useFactory: mockUserRepository },
+        {
+          provide: WINSTON_MODULE_NEST_PROVIDER,
+          useFactory: () => require('winston'),
+        },
       ],
     }).compile();
 
     controller = module.get<AuthenticationController>(AuthenticationController);
     service = await module.get<AuthenticationService>(AuthenticationService);
+    logger = await module.get<LoggerService>(WINSTON_MODULE_NEST_PROVIDER);
+    jest.resetAllMocks();
     done();
   });
 
@@ -59,6 +67,7 @@ describe('IdentityController', () => {
     let logoutSpy: jest.SpyInstance;
     let getUserSpy: jest.SpyInstance;
     let createTokenSpy: jest.SpyInstance;
+    let logSpy: jest.SpyInstance;
 
     const expectedMetadata: MagicUserMetadata = {
       email: mockUser.email,
@@ -71,6 +80,7 @@ describe('IdentityController', () => {
       getUserSpy = jest.spyOn(service, 'getUser');
       logoutSpy = jest.spyOn(service, 'logout');
       createTokenSpy = jest.spyOn(service, 'createJwtFromUser');
+      logSpy = jest.spyOn(logger, 'log');
       done();
     });
 
@@ -87,20 +97,28 @@ describe('IdentityController', () => {
       expect(service.authenticateDidToken).toHaveBeenCalledWith(
         didToken.didToken,
       );
+
+      expect(logger.log).toHaveBeenCalledWith(
+        'didToken invalid.',
+        AuthenticationController.name,
+      );
+
+      expect(service.logout).toHaveBeenCalledWith(didToken.didToken);
+
       expect(service.logout).toHaveBeenCalledWith(didToken.didToken);
       expect(authenticateSpy).toHaveBeenCalledTimes(1);
+      expect(logSpy).toHaveBeenCalledTimes(1);
       expect(logoutSpy).toHaveBeenCalledTimes(1);
       expect(createTokenSpy).not.toHaveBeenCalled();
     });
 
-    test('should throw UnauthorizedException if metadata invalid', async () => {
+    test('should throw UnauthorizedException if user not active', async () => {
       authenticateSpy.mockImplementation(() =>
         Promise.resolve(expectedMetadata),
       );
       getUserSpy.mockImplementation(() =>
         Promise.resolve({ ...mockUser, isActive: false }),
       );
-      logoutSpy.mockImplementation();
 
       try {
         await controller.authenticate(didToken);
@@ -112,10 +130,18 @@ describe('IdentityController', () => {
         didToken.didToken,
       );
 
+      expect(logger.log).toHaveBeenCalledWith(
+        `User with email ${mockUser.email} is inactive.`,
+        AuthenticationController.name,
+      );
+
+      expect(service.logout).toHaveBeenCalledWith(didToken.didToken);
+
       expect(service.getUser).toHaveBeenCalledWith(expectedMetadata.email);
       expect(service.logout).toHaveBeenCalledWith(didToken.didToken);
       expect(authenticateSpy).toHaveBeenCalledTimes(1);
       expect(getUserSpy).toHaveBeenCalledTimes(1);
+      expect(logSpy).toHaveBeenCalledTimes(1);
       expect(logoutSpy).toHaveBeenCalledTimes(1);
       expect(createTokenSpy).not.toHaveBeenCalled();
     });
@@ -139,6 +165,7 @@ describe('IdentityController', () => {
       expect(actual).toEqual(expectedResult);
       expect(authenticateSpy).toHaveBeenCalledTimes(1);
       expect(createTokenSpy).toHaveBeenCalledTimes(1);
+      expect(logoutSpy).not.toHaveBeenCalled();
     });
   });
 

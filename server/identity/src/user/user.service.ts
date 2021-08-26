@@ -1,6 +1,8 @@
 import {
   ConflictException,
+  Inject,
   Injectable,
+  LoggerService,
   NotFoundException,
 } from '@nestjs/common';
 import { CreateUserDto } from './dtos/createUser.dto';
@@ -13,12 +15,16 @@ import { User } from './entities/user.entity';
 import { FindUserByEmailDto } from './dtos/findUserByEmail.dto';
 import { FindUserByUsernameDto } from './dtos/FindUserByUsername.dto';
 import { Not } from 'typeorm';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(UserRepository)
     private userRepository: UserRepository,
+
+    @Inject(WINSTON_MODULE_NEST_PROVIDER)
+    private readonly logger: LoggerService,
   ) {}
 
   async create(createDto: CreateUserDto): Promise<User> {
@@ -27,6 +33,10 @@ export class UserService {
     });
 
     if (existingUser) {
+      this.logger.log(
+        `create: User with email ${createDto.email} already exists.`,
+        UserService.name,
+      );
       throw new ConflictException(
         `user with email ${createDto.email} already exists.`,
       );
@@ -45,9 +55,9 @@ export class UserService {
       isActive,
     );
 
-    // if ((result?.totalCount ?? 0) === 0) {
-    //   throw new NotFoundException('No users found.');
-    // }
+    if ((result?.totalCount ?? 0) === 0) {
+      throw new NotFoundException('No users found.');
+    }
 
     return result;
   }
@@ -83,6 +93,10 @@ export class UserService {
     const userToDelete = await this.userRepository.findOne({ email });
 
     if (!userToDelete) {
+      this.logger.log(
+        `delete: User with email ${deleteDto.email} not found.`,
+        UserService.name,
+      );
       throw new NotFoundException(
         `User with email ${deleteDto.email} could not be found`,
       );
@@ -98,8 +112,12 @@ export class UserService {
     });
 
     if (!user) {
+      this.logger.log(
+        `updateRoles: User with email ${updateDto.email} not found.`,
+        UserService.name,
+      );
       throw new NotFoundException(
-        `User with email ${updateDto.email} could not be found`,
+        `User with email ${updateDto.email} could not be found.`,
       );
     }
 
@@ -117,6 +135,10 @@ export class UserService {
     });
 
     if (existingUserWithUsername) {
+      this.logger.log(
+        `updateUsername: User with username ${updateDto.username} already exists.`,
+        UserService.name,
+      );
       throw new ConflictException(
         `user with username ${updateDto.username} already exists.`,
       );
@@ -127,6 +149,10 @@ export class UserService {
     });
 
     if (!userToUpdate) {
+      this.logger.error(
+        `updateUsername: User with email ${currentUser.email} not found.`,
+        UserService.name,
+      );
       throw new NotFoundException(
         `User with email ${currentUser.email} could not be found`,
       );

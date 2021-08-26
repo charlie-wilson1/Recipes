@@ -9,6 +9,12 @@ import { AuthenticationModule } from './authentication/authentication.module';
 import { UserModule } from './user/user.module';
 import { User } from './user/entities/user.entity';
 import { RequestLoggerMiddleware } from './middleware/request-logger.middleware';
+import {
+  utilities as nestWinstonModuleUtilities,
+  WinstonModule,
+} from 'nest-winston';
+import { transports, format } from 'winston';
+import { MongoDB } from 'winston-mongodb';
 
 @Module({
   imports: [
@@ -44,6 +50,36 @@ import { RequestLoggerMiddleware } from './middleware/request-logger.middleware'
         ttl: configService.get('THROTTLE_TTL'),
         limit: configService.get('THROTTLE_LIMIT'),
         storage: new ThrottlerStorageRedisService(configService.get('REDIS')),
+      }),
+    }),
+    WinstonModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        transports: [
+          // new transports.MongoDB({
+          //   level: 'warn',
+          //   db: configService.get('DATABASE_CONNECTION_STRING'),
+          //   options: {
+          //     useUnifiedTopology: true,
+          //     format: format.combine(
+          //       format.timestamp(),
+          //       nestWinstonModuleUtilities.format.nestLike(),
+          //     ),
+          //   },
+          //   collection: 'server_logs',
+          // }),
+          new transports.Console({
+            level: 'warn',
+            format: format.combine(
+              format.timestamp(),
+              nestWinstonModuleUtilities.format.nestLike(),
+            ),
+          }),
+          new transports.File({
+            filename: `${process.cwd()}/${configService.get('LOG_PATH')}`,
+          }),
+        ],
       }),
     }),
     AuthenticationModule,

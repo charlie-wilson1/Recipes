@@ -29,8 +29,8 @@ import { GetUser } from 'src/decorators/get-user.decorator';
 export class UserController {
   constructor(private userService: UserService) {}
 
-  // @UseGuards(RolesGuard)
-  // @Roles(Role.Admin)
+  @UseGuards(RolesGuard)
+  @Roles(Role.Admin)
   @HttpCode(StatusCodes.CREATED)
   @Post()
   async create(@Body() user: CreateUserDto): Promise<User> {

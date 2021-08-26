@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
@@ -29,7 +29,7 @@ import { UserRepository } from 'src/user/user.repository';
     ConfigModule,
     UserModule,
   ],
-  providers: [AuthenticationService, JwtStrategy],
+  providers: [AuthenticationService, JwtStrategy, Logger],
   exports: [JwtStrategy, PassportModule],
 })
 export class AuthenticationModule {}
