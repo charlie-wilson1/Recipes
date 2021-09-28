@@ -30,6 +30,7 @@ export default class Authenticate extends Vue {
 
 		const payload: LoginRequest = {
 			didToken,
+			handleRedirect: true,
 			redirect: this.redirectRoute ?? "/home",
 		};
 
