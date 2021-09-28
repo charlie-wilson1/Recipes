@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <Folder Include="Recipes\Dtos\Responses\" />
+    <Folder Include="ShoppingCarts\Validators\" />
   </ItemGroup>
 
   <ItemGroup>

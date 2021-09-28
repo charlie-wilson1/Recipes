@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Recipes.Core.Application.Common.Models;
 using Recipes.Core.Application.Recipes.Queries;
+using Recipes.Core.Application.ShoppingCarts.Dtos;
+using Recipes.Core.Domain;
 
 namespace Recipes.Core.Application.Common.Mapping
 {
@@ -9,6 +11,8 @@ namespace Recipes.Core.Application.Common.Mapping
         public MappingProfile()
         {
             CreateMap<GetRecipesQuery, PaginatedRequest>();
+            CreateMap<ShoppingCartItemRequest, ShoppingCartItem>();
+            CreateMap<Ingredient, ShoppingCartItem>();
         }
     }
 }

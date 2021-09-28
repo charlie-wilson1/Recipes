@@ -14,7 +14,9 @@ namespace Recipes.Core.Infrastructure.Loaders
         {
             services.AddTransient<IDateTime, DateTimeProvider>();
             services.AddTransient<IRecipeService, RecipeService>();
+            services.AddTransient<IShoppingCartService, ShoppingCartService>();
             services.AddTransient<IRecipeRepository, RecipesRepository>();
+            services.AddTransient<IShoppingCartRepository, ShoppingCartRepository>();
             services.AddSingleton<IFileService, GoogleFileService>();
         }
     }
