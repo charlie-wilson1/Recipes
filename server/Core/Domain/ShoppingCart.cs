@@ -29,12 +29,24 @@ namespace Recipes.Core.Domain
 
         public void AddItem(ShoppingCartItem item)
         {
+            var existingItem = GetItemByName(item.Name);
+
+            if (existingItem?.Unit == item.Unit)
+            {
+                var quantity = existingItem.Quantity + item.Quantity;
+                existingItem.UpdateQuantity(quantity);
+                return;
+            }
+
             Items.Add(item);
         }
 
         public void AddItems(List<ShoppingCartItem> items)
         {
-            Items.AddRange(items);
+            foreach (var item in items)
+            {
+                AddItem(item);
+            }
         }
 
         public void RemoveItem(ShoppingCartItem item)

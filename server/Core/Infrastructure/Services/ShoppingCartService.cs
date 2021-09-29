@@ -30,11 +30,7 @@ namespace Recipes.Core.Infrastructure.Services
             }
 
             shoppingCart.Items = shoppingCart.Items
-                .GroupBy(x => new { x.Name, x.Unit })
-                .Select(x => new ShoppingCartItem(
-                    x.First().Name,
-                    x.Sum(i => i.Quantity),
-                    x.First().Unit))
+                .OrderBy(x => x.Name)
                 .ToList();
 
             return shoppingCart;
