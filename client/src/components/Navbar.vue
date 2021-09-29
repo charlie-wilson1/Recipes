@@ -6,6 +6,7 @@
 			<b-collapse id="nav-collapse" is-nav>
 				<b-navbar-nav v-if="isLoggedIn">
 					<b-nav-item href="/create">Create</b-nav-item>
+					<b-nav-item href="/cart">Cart</b-nav-item>
 				</b-navbar-nav>
 				<b-navbar-nav v-if="isAdmin">
 					<b-nav-item-dropdown text="Admin" right>

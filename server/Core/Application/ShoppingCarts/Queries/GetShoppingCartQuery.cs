@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Recipes.Core.Application.Contracts.Services;
 using Recipes.Core.Domain;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 

@@ -11,7 +11,7 @@ namespace Recipes.Core.Application.ShoppingCarts.Commands
 {
     public class AddItemToShoppingCartCommand : IRequest<ShoppingCart>
     {
-        public ShoppingCartItemRequest Item { get; set; }
+        public AddShoppingCartItemRequest Item { get; set; }
 
         public class Handler : IRequestHandler<AddItemToShoppingCartCommand, ShoppingCart>
         {

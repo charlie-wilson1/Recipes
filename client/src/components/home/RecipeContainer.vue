@@ -85,7 +85,7 @@
 					>
 						Edit
 					</b-button>
-					<b-button variant="info">Buy</b-button>
+					<b-button @click="handleBuy" variant="info">Buy</b-button>
 				</b-col>
 			</b-row>
 		</b-container>
@@ -167,6 +167,17 @@ export default class RecipeContainer extends Vue {
 
 	getRecipeId(recipeId: string): string {
 		return recipeId.substring(recipeId.indexOf("/") + 1);
+	}
+
+	handleBuy(): void {
+		if (!this.selectedRecipe.id) {
+			Vue.$toast.error("Please select a recipe to buy");
+			return;
+		}
+
+		this.$store.dispatch("addRecipeToShoppingCart", {
+			recipeId: this.selectedRecipe.id,
+		});
 	}
 
 	displayBorder(id: string): boolean {

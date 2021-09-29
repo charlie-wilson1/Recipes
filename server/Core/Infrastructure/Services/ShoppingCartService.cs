@@ -3,6 +3,7 @@ using Recipes.Core.Application.Contracts.Repositories;
 using Recipes.Core.Application.Contracts.Services;
 using Recipes.Core.Application.ShoppingCarts.Dtos;
 using Recipes.Core.Domain;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -27,6 +28,14 @@ namespace Recipes.Core.Infrastructure.Services
             {
                 throw new NotFoundException(nameof(ShoppingCart), _currentUserService.Username);
             }
+
+            shoppingCart.Items = shoppingCart.Items
+                .GroupBy(x => new { x.Name, x.Unit })
+                .Select(x => new ShoppingCartItem(
+                    x.First().Name,
+                    x.Sum(i => i.Quantity),
+                    x.First().Unit))
+                .ToList();
 
             return shoppingCart;
         }

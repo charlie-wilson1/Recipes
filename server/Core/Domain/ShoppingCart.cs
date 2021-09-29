@@ -14,6 +14,7 @@ namespace Recipes.Core.Domain
         public ShoppingCart(string owner)
         {
             Owner = owner;
+            Items = new List<ShoppingCartItem>();
         }
 
         public string Id { get; private set; }

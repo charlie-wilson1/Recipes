@@ -8,6 +8,7 @@ import Make from "@/pages/Recipe/Make.vue";
 import Login from "@/pages/Auth/Login.vue";
 import Profile from "@/pages/Auth/Profile.vue";
 import ManageUsers from "@/pages/Admin/ManageUsers.vue";
+import ShoppingCartPage from "@/pages/ShoppingCart.vue";
 import { handleLogin, matchesLoginMeta } from "@/middleware/login";
 import { handleLogout, matchesLogoutMeta } from "@/middleware/logout";
 import {
@@ -40,6 +41,14 @@ const routes: Array<RouteConfig> = [
 		path: "/create",
 		name: "create",
 		component: CreateRecipe,
+		meta: {
+			requiresLogin: true,
+		},
+	},
+	{
+		path: "/cart",
+		name: "cart",
+		component: ShoppingCartPage,
 		meta: {
 			requiresLogin: true,
 		},

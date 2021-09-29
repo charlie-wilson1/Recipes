@@ -3,9 +3,9 @@ import { NavigationGuardNext, Route } from "vue-router";
 
 export const handleLogin = async (next: NavigationGuardNext<Vue>) => {
 	await store.dispatch("setDidToken");
-	console.log("coming from handleLogin");
 	await store.dispatch("getJwtToken", { handleRedirect: false });
 	await store.dispatch("setIsLoggedIn");
+	await store.dispatch("createShoppingCart");
 	next();
 };
 

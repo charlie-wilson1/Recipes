@@ -11,7 +11,7 @@ namespace Recipes.Core.Application.Common.Mapping
         public MappingProfile()
         {
             CreateMap<GetRecipesQuery, PaginatedRequest>();
-            CreateMap<ShoppingCartItemRequest, ShoppingCartItem>();
+            CreateMap<AddShoppingCartItemRequest, ShoppingCartItem>();
             CreateMap<Ingredient, ShoppingCartItem>();
         }
     }
