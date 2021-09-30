@@ -1,0 +1,89 @@
+version: "3.9"  # optional since v1.27.0
+services:
+  web:
+    container_name: recipes-web-app
+    build:
+      context: ./client
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/app/web
+      - /app/web/node_modules
+    links:
+      - redis
+    env_file:
+      - ./client/.env
+    networks:
+      - recipesnet
+    depends_on:
+      - identity
+      - core
+  identity:
+    container_name: recipes-identity
+    build:
+      context: ./server/identity
+    volumes:
+      - .:/app/identity
+      - /app/identity/node_modules
+    ports:
+      - "3000:3000"
+    command: npm run start:dev
+    env_file:
+      - ./server/identity/.env
+    networks:
+      - recipesnet
+    depends_on:
+      - mongo
+      - redis
+  core:
+    container_name: recipes-core
+    build:
+      context: ./server/Core
+    volumes:
+      - .:/app/core/publish
+    ports:
+      - "5000:5000"
+      - "5001:5001"
+    networks:
+      - recipesnet
+    depends_on:
+      - raven
+      - redis
+  redis:
+    container_name: recipes-redis
+    image: redis:5
+    networks:
+      - recipesnet
+  mongo:
+    image: mongo:latest
+    container_name: recipes-mongodb
+    restart: always
+    networks:
+      - recipesnet
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    volumes:
+      - mongodata01:/data/db
+    ports:
+      - 27017:27017
+  raven:
+    container_name: recipes-raven
+    image: ravendb/ravendb
+    restart: always
+    networks:
+      - recipesnet
+    environment:
+      RAVEN_Setup_Mode: None
+      RAVEN_DataDir: RavenData
+      RAVEN_Certificate_Path: /config/raven-server.certificate.pfx
+    volumes:
+      - ravendata02:/opt/RavenDB/Server/RavenData
+    ports:
+      - 8081:8080
+      - 38888:38888
+networks:
+  recipesnet:
+volumes:
+  mongodata01:
+  ravendata02:

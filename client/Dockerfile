@@ -1,8 +1,13 @@
-FROM node:12.18-alpine
-ENV NODE_ENV=production
-WORKDIR /usr/src/app
-COPY ["package.json", "package-lock.json*", "npm-shrinkwrap.json*", "./"]
-RUN npm install --production --silent && mv node_modules ../
+# build
+FROM node:lts-alpine as build
+WORKDIR /app/web
+COPY package*.json ./
+RUN npm install
 COPY . .
-EXPOSE 8080
-CMD ["npm", "start"]
+RUN npm run build
+
+# production
+FROM nginx:stable-alpine as production
+COPY --from=build /app/web/dist /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]

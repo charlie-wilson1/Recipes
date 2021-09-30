@@ -1,5 +1,5 @@
 FROM mcr.microsoft.com/dotnet/aspnet:5.0-focal AS base
-WORKDIR /app
+WORKDIR /app/core
 EXPOSE 5000
 EXPOSE 5001
 
@@ -16,12 +16,12 @@ COPY ["./Infrastructure/Recipes.Core.Infrastructure.csproj", "./Infrastructure/"
 RUN dotnet restore
 COPY . .
 WORKDIR "/src/Api"
-RUN dotnet build -c Release -o /app/build
+RUN dotnet build -c Release -o /app/core/build
 
 FROM build AS publish
-RUN dotnet publish -c Release -o /app/publish
+RUN dotnet publish -c Release -o /app/core/publish
 
 FROM base AS final
-WORKDIR /app
-COPY --from=publish /app/publish .
+WORKDIR /app/core
+COPY --from=publish /app/core/publish .
 ENTRYPOINT ["dotnet", "Recipes.Core.Api.dll"]
