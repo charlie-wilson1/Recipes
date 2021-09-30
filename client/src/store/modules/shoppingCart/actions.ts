@@ -91,7 +91,7 @@ export const actions: ActionTree<ShoppingCartState, RootState> = {
 
 	async clearShoppingCart({ commit }) {
 		await axios
-			.patch(`${cartUrl}/clear`)
+			.patch(`${cartUrl}/clear`, {})
 			.then(response => {
 				const cart: ShoppingCart = response.data;
 				commit("setShoppingCart", cart);

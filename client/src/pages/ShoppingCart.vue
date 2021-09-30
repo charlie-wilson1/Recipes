@@ -16,7 +16,12 @@
 					</b-list-group-item>
 				</b-list-group>
 				<b-row>
-					<b-button variant="danger" class="p-2 ml-auto">Clear Cart</b-button>
+					<b-button
+						variant="danger"
+						class="p-2 ml-auto"
+						@click="handleClearCart"
+						>Clear Cart</b-button
+					>
 				</b-row>
 			</b-container>
 		</section>
@@ -38,14 +43,18 @@ export default class ShoppingCartPage extends Vue {
 		return this.$store.state.ShoppingCartModule.shoppingCart;
 	}
 
+	get isLoading() {
+		return this.$store.state.isLoading;
+	}
+
+	handleClearCart(): void {
+		this.$store.dispatch("clearShoppingCart");
+	}
+
 	async beforeCreate() {
 		await this.$store.dispatch("setIsLoading", true);
 		await this.$store.dispatch("loadShoppingCart");
 		await this.$store.dispatch("setIsLoading", false);
-	}
-
-	get isLoading() {
-		return this.$store.state.isLoading;
 	}
 }
 </script>

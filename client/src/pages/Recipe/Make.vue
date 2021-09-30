@@ -156,6 +156,7 @@ export default class Make extends Vue {
 	.carousel {
 		width: 100%;
 		margin-top: 50px;
+		margin-bottom: 50px;
 
 		.carousel-inner {
 			margin-left: auto;
