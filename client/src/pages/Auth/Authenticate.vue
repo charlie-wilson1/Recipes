@@ -1,7 +1,8 @@
-<template
-	><section class="loader vh-100 text-center d-flex">
-		<b-spinner label="Loading..."></b-spinner></section
-></template>
+<template>
+	<section class="loader vh-100 text-center d-flex">
+		<b-spinner label="Loading..."></b-spinner>
+	</section>
+</template>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";

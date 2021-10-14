@@ -4,7 +4,6 @@ import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as Joi from 'joi';
-import { ThrottlerStorageRedisService } from 'nestjs-throttler-storage-redis';
 import { AuthenticationModule } from './authentication/authentication.module';
 import { UserModule } from './user/user.module';
 import { User } from './user/entities/user.entity';
@@ -14,7 +13,6 @@ import {
   WinstonModule,
 } from 'nest-winston';
 import { transports, format } from 'winston';
-import { MongoDB } from 'winston-mongodb';
 
 @Module({
   imports: [
@@ -27,7 +25,6 @@ import { MongoDB } from 'winston-mongodb';
         DATABASE_CONNECTION_STRING: Joi.string().required(),
         THROTTLE_TTL: Joi.string().default(15),
         THROTTLE_LIMIT: Joi.string().default(4),
-        REDIS: Joi.string().required(),
       }),
     }),
     TypeOrmModule.forRootAsync({
@@ -49,7 +46,6 @@ import { MongoDB } from 'winston-mongodb';
       useFactory: async (configService: ConfigService) => ({
         ttl: configService.get('THROTTLE_TTL'),
         limit: configService.get('THROTTLE_LIMIT'),
-        storage: new ThrottlerStorageRedisService(configService.get('REDIS')),
       }),
     }),
     WinstonModule.forRootAsync({
@@ -57,18 +53,6 @@ import { MongoDB } from 'winston-mongodb';
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
         transports: [
-          // new transports.MongoDB({
-          //   level: 'warn',
-          //   db: configService.get('DATABASE_CONNECTION_STRING'),
-          //   options: {
-          //     useUnifiedTopology: true,
-          //     format: format.combine(
-          //       format.timestamp(),
-          //       nestWinstonModuleUtilities.format.nestLike(),
-          //     ),
-          //   },
-          //   collection: 'server_logs',
-          // }),
           new transports.Console({
             level: 'warn',
             format: format.combine(
