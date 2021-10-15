@@ -1,5 +1,7 @@
 # Recipes
 
+**NOTE** as of 10/14/2021 this project is no longer being maintained.
+
 Recipes app using Dotnet Core (core functionality), NestJS (identity), and Vue with Typescript (client). Authentication will eventually be handled with Magic Link. The full project will be deployed as a *private* service (invitation only). Please contact me if interested in joining. Hosting this app in the cloud isn't free. I will eventually also attempt to host this as a demo project somehow. If you attempt to run this locally, please make sure to handle the dependencies and fill out the `.env` files listed below as well as the `appsettings.json` file in the server/Core/Api project.
 
 Magic link allows this app to be run completely passwordless. In order to run this, sign up for [Magic link](https://dashboard.magic.link/signup) to create an app. Copy the public key to the client `.env` file and the private key to the identity `.env` file.
